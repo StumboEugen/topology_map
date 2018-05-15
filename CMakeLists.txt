@@ -139,7 +139,7 @@ include_directories(
 #add_executable(main src/main.cpp)
 #target_link_libraries(main topo)
 
-set(HEADERS src/main.cpp src/ExitInstance.cpp src/ExitInstance.h src/NodeInstance.cpp src/NodeInstance.h src/MapCandidate.cpp src/MapCandidate.h)
+set(HEADERS src/main.cpp src/ExitInstance.cpp src/ExitInstance.h src/NodeInstance.cpp src/NodeInstance.h src/MapCandidate.cpp src/MapCandidate.h src/MapCollection.cpp src/MapCollection.h)
 add_executable(main src/main.cpp ${HEADERS})
 
 ## Rename C++ executable without prefix

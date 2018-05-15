@@ -7,14 +7,15 @@
 
 #include <vector>
 #include <set>
+#include <map>
 #include <string>
 #include <iostream>
 
-#include "ExitInstance.h"
-
-class MapCandidate;
-
 using namespace std;
+
+class TopoNode;
+class ExitInstance;
+class MapCandidate;
 
 /**
  * 拓扑节点类,仅保存结构,连接情况由地图类MapCandidate完成
@@ -26,30 +27,25 @@ public:
     void changeExtraMsgTo(const string &msg);
     void addExtreaMsg(const string &msg);
     const string& getExtraMsg();
-    unsigned long exitNums();
+
+    const uint8_t getExitNums() const {
+        return exitNums;
+    }
+
     const bool isAddComplete() const {
         return addComplete;
-    }
-
-    const vector<ExitInstance> &getExits() const {
-        return exits;
-    }
-
-    const set<shared_ptr<MapCandidate>> &getMapUsed() const {
-        return mapUsed;
     }
 
     bool operator== (const NodeInstance&) const;
 
 private:
-    /**
-     * exits是否添加完成,exits应当是一次性添加后排序的
-     */
+    /** exits是否添加完成,exits应当是一次性添加后排序的 */
     bool addComplete = false;
     vector<ExitInstance> exits;
+    uint8_t exitNums;
     string extraMsg;
-    double & checkDir(double & d);
-    set<shared_ptr<MapCandidate>> mapUsed;
+    const double & checkDir(double & d);
+    map<MapCandidate*, TopoNode*> nodeUsedBy;
 
     /**
      * @return 出口朝向的误差容忍度

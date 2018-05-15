@@ -12,10 +12,12 @@ using namespace std;
 void NodeInstance::addExit(double posx, double posy, double dir) {
     dir = checkDir(dir);
     exits.emplace_back(posx, posy, dir);
+    exitNums ++;
 }
 
 void NodeInstance::finishAdding() {
     sort(exits.begin(), exits.end());
+    exitNums = static_cast<uint8_t>(exits.size());
     addComplete = true;
 }
 
@@ -31,16 +33,12 @@ inline const string &NodeInstance::getExtraMsg() {
     return extraMsg;
 }
 
-inline unsigned long NodeInstance::exitNums() {
-    return exits.size();
-}
-
 /**
  * check & adjust the dir to 0-360°
  * @param d
  * @return the adjusted direction
  */
-double &NodeInstance::checkDir(double &d) {
+const double & NodeInstance::checkDir(double &d) {
     if (d >= 360.0 || d < 0.0) {
         cout << "[WARNING] you add a direction out of range:" << (int)d << endl;
         d =- 360.0 * (int)(d/360.0);

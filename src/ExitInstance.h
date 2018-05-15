@@ -41,14 +41,6 @@ public:
         return midAng;
     }
 
-//    shared_ptr<ExitInstance> & LeadTo() {
-//        return leadTo;
-//    }
-//
-//    shared_ptr<NodeInstance> & ExitForm() {
-//        return exitFrom;
-//    }
-
     /**
      * 按照atan2的结果进行排序
      */
@@ -61,8 +53,6 @@ private:
     double midPosX;
     double midPosY;
     double midAng;
-//    shared_ptr<ExitInstance> leadTo;
-//    shared_ptr<NodeInstance> exitFrom;
 };
 
 
