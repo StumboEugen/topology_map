@@ -8,17 +8,17 @@
 #include <memory>
 #include <cmath>
 
-class TopoNode;
+class NodeInstance;
 
 using namespace std;
 
 static const double piHalf = 3.1415926 / 2.0;
 
-class NodeExit {
+class ExitInstance {
 public:
-    NodeExit() = delete;
+    ExitInstance() = delete;
 
-    explicit NodeExit(double posx, double posy, double dir)
+    explicit ExitInstance(double posx, double posy, double dir)
             :outDir(dir),
              midPosX(posx),
              midPosY(posy),
@@ -29,30 +29,30 @@ public:
         return outDir;
     }
 
-    const double getPosX() const {
+    const double & getPosX() const {
         return midPosX;
     }
 
-    const double getPosY() const {
+    const double & getPosY() const {
         return midPosY;
     }
 
-    double & MidAng() {
+    const double & MidAng() const {
         return midAng;
     }
 
-    shared_ptr<NodeExit> & LeadTo() {
-        return leadTo;
-    }
-
-    shared_ptr<TopoNode> & ExitForm() {
-        return exitFrom;
-    }
+//    shared_ptr<ExitInstance> & LeadTo() {
+//        return leadTo;
+//    }
+//
+//    shared_ptr<NodeInstance> & ExitForm() {
+//        return exitFrom;
+//    }
 
     /**
      * 按照atan2的结果进行排序
      */
-    bool operator < (const NodeExit & anotherNode) const {
+    bool operator < (const ExitInstance & anotherNode) const {
         return this->midAng < anotherNode.midAng;
     }
 
@@ -61,8 +61,8 @@ private:
     double midPosX;
     double midPosY;
     double midAng;
-    shared_ptr<NodeExit> leadTo;
-    shared_ptr<TopoNode> exitFrom;
+//    shared_ptr<ExitInstance> leadTo;
+//    shared_ptr<NodeInstance> exitFrom;
 };
 
 

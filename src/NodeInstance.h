@@ -10,7 +10,7 @@
 #include <string>
 #include <iostream>
 
-#include "NodeExit.h"
+#include "ExitInstance.h"
 
 class MapCandidate;
 
@@ -19,7 +19,7 @@ using namespace std;
 /**
  * 拓扑节点类,仅保存结构,连接情况由地图类MapCandidate完成
  */
-class TopoNode {
+class NodeInstance {
 public:
     void addExit(double posx, double posy, double dir);
     void finishAdding();
@@ -31,7 +31,7 @@ public:
         return addComplete;
     }
 
-    const vector<NodeExit> &getExits() const {
+    const vector<ExitInstance> &getExits() const {
         return exits;
     }
 
@@ -39,14 +39,14 @@ public:
         return mapUsed;
     }
 
-    bool operator== (const TopoNode&) const;
+    bool operator== (const NodeInstance&) const;
 
 private:
     /**
      * exits是否添加完成,exits应当是一次性添加后排序的
      */
     bool addComplete = false;
-    vector<NodeExit> exits;
+    vector<ExitInstance> exits;
     string extraMsg;
     double & checkDir(double & d);
     set<shared_ptr<MapCandidate>> mapUsed;

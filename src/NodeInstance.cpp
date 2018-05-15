@@ -4,34 +4,34 @@
 #include <iostream>
 #include <algorithm>
 
-#include "TopoNode.h"
-#include "NodeExit.h"
+#include "NodeInstance.h"
+#include "ExitInstance.h"
 
 using namespace std;
 
-void TopoNode::addExit(double posx, double posy, double dir) {
+void NodeInstance::addExit(double posx, double posy, double dir) {
     dir = checkDir(dir);
     exits.emplace_back(posx, posy, dir);
 }
 
-void TopoNode::finishAdding() {
+void NodeInstance::finishAdding() {
     sort(exits.begin(), exits.end());
     addComplete = true;
 }
 
-void TopoNode::changeExtraMsgTo(const string &msg) {
+void NodeInstance::changeExtraMsgTo(const string &msg) {
     extraMsg = msg;
 }
 
-void TopoNode::addExtreaMsg(const string &msg) {
+void NodeInstance::addExtreaMsg(const string &msg) {
     extraMsg += msg;
 }
 
-inline const string &TopoNode::getExtraMsg() {
+inline const string &NodeInstance::getExtraMsg() {
     return extraMsg;
 }
 
-inline unsigned long TopoNode::exitNums() {
+inline unsigned long NodeInstance::exitNums() {
     return exits.size();
 }
 
@@ -40,7 +40,7 @@ inline unsigned long TopoNode::exitNums() {
  * @param d
  * @return the adjusted direction
  */
-double &TopoNode::checkDir(double &d) {
+double &NodeInstance::checkDir(double &d) {
     if (d >= 360.0 || d < 0.0) {
         cout << "[WARNING] you add a direction out of range:" << (int)d << endl;
         d =- 360.0 * (int)(d/360.0);
@@ -52,13 +52,13 @@ double &TopoNode::checkDir(double &d) {
  * @param rnode
  * @return is it alike
  */
-bool TopoNode::operator==(const TopoNode & rnode) const {
-    const TopoNode & lnode = *this;
+bool NodeInstance::operator==(const NodeInstance & rnode) const {
+    const NodeInstance & lnode = *this;
 
     //完成添加后才可以比较
     if (!this->addComplete || !rnode.isAddComplete()) {
         cout << "[WARNING] compare nodes before add Complete!!" << endl;
-        cout << "call finishAdding" << endl;
+        cout << "plz call finishAdding" << endl;
     }
 
     //特殊信息是否相同
