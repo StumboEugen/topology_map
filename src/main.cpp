@@ -4,7 +4,6 @@
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include "NodeInstance.h"
 
 #include <sstream>
 

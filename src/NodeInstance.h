@@ -11,11 +11,13 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
+using std::map;
+using std::vector;
+using std::string;
 
-class TopoNode;
 class ExitInstance;
 class MapCandidate;
+class TopoNode;
 
 /**
  * 拓扑节点类,仅保存结构,连接情况由地图类MapCandidate完成
