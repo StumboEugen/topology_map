@@ -143,7 +143,7 @@ set(HEADERS src/ExitInstance.cpp src/ExitInstance.h
         src/NodeInstance.cpp src/NodeInstance.h
         src/MapCandidate.cpp src/MapCandidate.h
         src/MapCollection.cpp src/MapCollection.h
-        )
+        src/TopoEdge.cpp src/TopoEdge.h src/TopoNode.cpp src/TopoNode.h)
 add_executable(main src/main.cpp ${HEADERS})
 
 ## Rename C++ executable without prefix

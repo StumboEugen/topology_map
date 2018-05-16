@@ -3,9 +3,11 @@
 //
 #include <ostream>
 
-
+#include "TopoNode.h"
 #include "MapCandidate.h"
 #include "NodeInstance.h"
+#include "TopoEdge.h"
+
 
 /**
  * usually called at the very beginning
@@ -131,7 +133,6 @@ void MapCandidate::suicide() {
     for (auto node: nodes) {
         delete node;
     }
-    //TODO 调用析构本Map
 }
 
 inline TopoNode *const MapCandidate::addNewNode(const NodeInstance *const instance) {
@@ -153,26 +154,7 @@ inline TopoEdge *const MapCandidate::addNewEdge(TopoNode *const ea, uint8_t ga, 
     return * edgeResult.first;
 }
 
-/**
- * change one exit to another exit
- * @attention the node related will be modified too
- * @param oldNode
- * @param newNode
- * @param newGate
- */
-void TopoEdge::changeExitTo(TopoNode *const oldNode, TopoNode *const newNode, const uint8_t newGate) {
-    if (oldNode == exitB) {
-        exitB->disconnectEdge(gateB);
-        exitB = newNode;
-        gateB = newGate;
-        exitB->addEdge(gateB, this);
-    } else if (oldNode == exitA) {
-        exitA->disconnectEdge(gateA);
-        exitA = newNode;
-        gateA = newGate;
-        exitA->addEdge(gateA, this);
-    } else {
-        cout << "TopoEdge changeExitTo FAILURE" << endl;
-        throw;
-    }
+void MapCandidate::removeNode(TopoNode *node2remove) {
+    delete node2remove;
+    nodes.erase(node2remove);
 }

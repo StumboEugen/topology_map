@@ -2,8 +2,9 @@
 // Created by stumbo on 18-5-10.
 //
 
-#ifndef TOPOLOGY_MAP_TOPONODE_H
-#define TOPOLOGY_MAP_TOPONODE_H
+
+#ifndef TOPOLOGY_MAP_NODEINSTANCE_H
+#define TOPOLOGY_MAP_NODEINSTANCE_H
 
 #include <vector>
 #include <set>
@@ -65,4 +66,4 @@ private:
 };
 
 
-#endif //TOPOLOGY_MAP_TOPONODE_H
+#endif //TOPOLOGY_MAP_NODEINSTANCE_H
