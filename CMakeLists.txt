@@ -116,7 +116,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -134,17 +134,25 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 
-#set(HEADERS src/main.cpp src/ExitInstance.cpp src/ExitInstance.h src/NodeInstance.cpp src/NodeInstance.h src/MapCandidate.cpp src/MapCandidate.h)
-#add_library(topo ${HEADERS})
-#add_executable(main src/main.cpp)
-#target_link_libraries(main topo)
+set(HEADERS include/ExitInstance.cpp include/ExitInstance.h
+        include/NodeInstance.cpp include/NodeInstance.h
+        include/MapCandidate.cpp include/MapCandidate.h
+        include/MapCollection.cpp include/MapCollection.h
+        include/TopoEdge.cpp include/TopoEdge.h
+        include/TopoNode.cpp include/TopoNode.h
+        include/TopoMap.h)
+add_library(topoLayer ${HEADERS})
+add_executable(main src/main.cpp)
+target_link_libraries(main topoLayer)
 
-set(HEADERS src/ExitInstance.cpp src/ExitInstance.h
-        src/NodeInstance.cpp src/NodeInstance.h
-        src/MapCandidate.cpp src/MapCandidate.h
-        src/MapCollection.cpp src/MapCollection.h
-        src/TopoEdge.cpp src/TopoEdge.h src/TopoNode.cpp src/TopoNode.h)
-add_executable(main src/main.cpp ${HEADERS})
+#set(HEADERS src/ExitInstance.cpp src/ExitInstance.h
+#        src/NodeInstance.cpp src/NodeInstance.h
+#        src/MapCandidate.cpp src/MapCandidate.h
+#        src/MapCollection.cpp src/MapCollection.h
+#        src/TopoEdge.cpp src/TopoEdge.h
+#        src/TopoNode.cpp src/TopoNode.h
+#        src/TopoMap.h)
+#add_executable(main src/main.cpp ${HEADERS})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

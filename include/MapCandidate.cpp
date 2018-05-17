@@ -43,8 +43,9 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
      * secondly copy all the TopoEdge instances
      */
     for (auto oriEdge: copyFrom.edges) {
-        TopoEdge *clonedEdge = new TopoEdge(oriEdge->getExitA()->clonedTo, oriEdge->getGateA(),
-                                            oriEdge->getExitB()->clonedTo, oriEdge->getGateB());
+        auto clonedEdge = new TopoEdge(*oriEdge,
+                                       oriEdge->getExitA()->clonedTo,
+                                       oriEdge->getExitB()->clonedTo);
         this->edges.insert(clonedEdge);
         /**add the relationships in nodes;*/
         clonedEdge->getExitA()->addEdge(clonedEdge->getGateA(), clonedEdge);
@@ -79,9 +80,10 @@ void MapCandidate::arriveNewNode(const NodeInstance *const instance, uint8_t arr
  * @param instance the node instance
  * @param arriveAt the arrive gate
  */
-void MapCandidate::arriveAtNode(const NodeInstance *const instance, uint8_t arriveAt) {
+void MapCandidate::arriveAtNode(const NodeInstance *const instance, uint8_t arriveAt, const double & dis_x, const double & dis_y) {
     if (currentEdge == nullptr) {
         arriveNewNode(instance, arriveAt);
+        currentEdge->addOdomData(dis_x, dis_y, currentEdge->getAnotherNode(currentNode));
         justArriveNew = true;
     } else {
         TopoNode * shouldToNode = currentEdge->getAnotherNode(currentNode);
@@ -89,6 +91,8 @@ void MapCandidate::arriveAtNode(const NodeInstance *const instance, uint8_t arri
          * otherwise it is a confilect, this candidate is wrong*/
         if (*instance == *shouldToNode->getInstance()
             && arriveAt == currentEdge->getAnotherGate(currentNode)) {
+            currentEdge->leaveFromNode(currentNode);
+            currentEdge->addOdomData(dis_x, dis_y, currentNode);
             currentNode = shouldToNode;
             justArriveNew = false;
         } else {
@@ -122,7 +126,7 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, uint8_t
  */
 void MapCandidate::setLeaveFrom(uint8_t exit) {
     leaveFrom = exit;
-    currentEdge = currentNode->getEdge(exit);
+    currentEdge = currentNode->getEdge(exit);   //current Edge might be null
 }
 
 
@@ -155,6 +159,7 @@ inline TopoEdge *const MapCandidate::addNewEdge(TopoNode *const ea, uint8_t ga, 
 }
 
 void MapCandidate::removeNode(TopoNode *node2remove) {
+    fullEdgeNumber -= node2remove->getInstance()->getExitNums();
     delete node2remove;
     nodes.erase(node2remove);
 }

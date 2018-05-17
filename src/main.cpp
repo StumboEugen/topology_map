@@ -7,6 +7,8 @@
 
 #include <sstream>
 
+#include "TopoMap.h"
+
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
  */
