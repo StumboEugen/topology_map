@@ -11,5 +11,6 @@
 #include "ExitInstance.h"
 #include "TopoEdge.h"
 #include "TopoNode.h"
+#include "MapCollection.h"
 
 #endif //TOPOLOGY_MAP_TOPOMAP_H

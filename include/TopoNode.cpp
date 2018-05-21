@@ -7,7 +7,7 @@
 
 TopoNode::TopoNode(const NodeInstance *const nodeInstance):
         corresponding(nodeInstance),
-        edgeConnected(nodeInstance->getExitNums(), nullptr),
+        edgeConnected(nodeInstance->sizeOfExits(), nullptr),
         clonedTo(nullptr)
 {
     if (!nodeInstance->isAddComplete()) {

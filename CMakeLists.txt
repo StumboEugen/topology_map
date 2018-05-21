@@ -140,7 +140,9 @@ set(HEADERS include/ExitInstance.cpp include/ExitInstance.h
         include/MapCollection.cpp include/MapCollection.h
         include/TopoEdge.cpp include/TopoEdge.h
         include/TopoNode.cpp include/TopoNode.h
-        include/TopoMap.h)
+        include/NodeCollection.cpp include/NodeCollection.h
+        include/TopoMap.h
+        include/MapArranger.cpp include/MapArranger.h)
 add_library(topoLayer ${HEADERS})
 add_executable(main src/main.cpp)
 target_link_libraries(main topoLayer)

@@ -31,7 +31,7 @@ public:
     void addExtreaMsg(const string &msg);
     const string& getExtraMsg();
 
-    const uint8_t getExitNums() const {
+    const uint8_t sizeOfExits() const {
         return exitNums;
     }
 

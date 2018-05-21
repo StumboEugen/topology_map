@@ -80,7 +80,8 @@ void MapCandidate::arriveNewNode(const NodeInstance *const instance, uint8_t arr
  * @param instance the node instance
  * @param arriveAt the arrive gate
  */
-void MapCandidate::arriveAtNode(const NodeInstance *const instance, uint8_t arriveAt, const double & dis_x, const double & dis_y) {
+void MapCandidate::arriveAtNode(const NodeInstance *const instance, uint8_t arriveAt,
+                                const double dis_x, const double dis_y) {
     if (currentEdge == nullptr) {
         arriveNewNode(instance, arriveAt);
         currentEdge->addOdomData(dis_x, dis_y, currentEdge->getAnotherNode(currentNode));
@@ -145,7 +146,7 @@ inline TopoNode *const MapCandidate::addNewNode(const NodeInstance *const instan
         cout << "addNewNode FAILURE!!!" << endl;
         throw;
     }
-    fullEdgeNumber += instance->getExitNums();
+    fullEdgeNumber += instance->sizeOfExits();
     return * nodeResult.first;
 }
 
@@ -159,7 +160,7 @@ inline TopoEdge *const MapCandidate::addNewEdge(TopoNode *const ea, uint8_t ga, 
 }
 
 void MapCandidate::removeNode(TopoNode *node2remove) {
-    fullEdgeNumber -= node2remove->getInstance()->getExitNums();
+    fullEdgeNumber -= node2remove->getInstance()->sizeOfExits();
     delete node2remove;
     nodes.erase(node2remove);
 }

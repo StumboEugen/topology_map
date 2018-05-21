@@ -21,7 +21,7 @@ public:
     explicit MapCandidate(const NodeInstance *);
     MapCandidate(const MapCandidate&);
     void setLeaveFrom(uint8_t exit);
-    void arriveAtNode(const NodeInstance * instance, uint8_t arriveAt, const double & dis_x, const double & dis_y);
+    void arriveAtNode(const NodeInstance * instance, uint8_t arriveAt, double dis_x, double dis_y);
     MapCandidate *const arriveAtSimiliar(TopoNode *arriveNode, uint8_t arriveGate);
 
     const unsigned getFullEdigeNumber() const {

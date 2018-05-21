@@ -10,6 +10,9 @@
 using namespace std;
 
 void NodeInstance::addExit(double posx, double posy, double dir) {
+    if (!addComplete) {
+        cout << "[NodeInstance::addExit] you add an exit to a completed node!" << endl;
+    }
     dir = checkDir(dir);
     exits.emplace_back(posx, posy, dir);
     exitNums ++;

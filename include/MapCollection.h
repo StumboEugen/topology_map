@@ -12,8 +12,11 @@
 using namespace std;
 
 class MapCollection {
+public:
+    void arriveNodeInstance(const NodeInstance *, uint8_t arriveAt, double dis_x, double dis_y);
+
 private:
-    set<MapCandidate> maps;
+    set<MapCandidate*> maps;
 };
 
 
