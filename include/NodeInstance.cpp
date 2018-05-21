@@ -92,3 +92,14 @@ bool NodeInstance::operator==(const NodeInstance & rnode) const {
     return true;
 }
 
+inline void NodeInstance::addUseage(MapCandidate *usedMap, TopoNode *usedAt) {
+    nodeUseages.insert({usedMap, usedAt});
+}
+
+inline void NodeInstance::removeUseage(MapCandidate *map2unbind) {
+    nodeUseages.erase(map2unbind);
+    if (nodeUseages.empty()) {
+        //TODO suicide();
+    }
+}
+

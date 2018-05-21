@@ -13,8 +13,8 @@ using namespace std;
 
 class MapCollection {
 public:
-    void arriveNodeInstance(const NodeInstance *, uint8_t arriveAt, double dis_x, double dis_y);
-
+    void arriveNodeInstance(NodeInstance *, uint8_t arriveAt, double dis_x, double dis_y);
+    void addNewMap(MapCandidate *);
 private:
     set<MapCandidate*> maps;
 };

@@ -5,7 +5,7 @@
 #include "TopoNode.h"
 
 
-TopoNode::TopoNode(const NodeInstance *const nodeInstance):
+TopoNode::TopoNode(NodeInstance *const nodeInstance):
         corresponding(nodeInstance),
         edgeConnected(nodeInstance->sizeOfExits(), nullptr),
         clonedTo(nullptr)

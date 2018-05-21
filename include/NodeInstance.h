@@ -29,6 +29,8 @@ public:
     void finishAdding();
     void changeExtraMsgTo(const string &msg);
     void addExtreaMsg(const string &msg);
+    void addUseage(MapCandidate *usedMap, TopoNode *usedAt);
+    void removeUseage(MapCandidate *map2unbind);
     const string& getExtraMsg();
 
     const uint8_t sizeOfExits() const {
@@ -41,6 +43,10 @@ public:
 
     bool operator== (const NodeInstance&) const;
 
+    inline const map<MapCandidate *, TopoNode *> &getNodeUseages() const {
+        return nodeUseages;
+    }
+
 private:
     /** exits是否添加完成,exits应当是一次性添加后排序的 */
     bool addComplete = false;
@@ -48,7 +54,7 @@ private:
     uint8_t exitNums;
     string extraMsg;
     const double & checkDir(double & d);
-    map<MapCandidate*, TopoNode*> nodeUsedBy;
+    map<MapCandidate*, TopoNode*> nodeUseages;
 
     /**
      * @return 出口朝向的误差容忍度

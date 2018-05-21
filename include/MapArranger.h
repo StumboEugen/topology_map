@@ -10,7 +10,7 @@
 
 class MapArranger {
 public:
-    void arriveInstance(const NodeInstance * instance, uint8_t arriveAt,
+    void arriveInstance(NodeInstance * instance, uint8_t arriveAt,
                         double dis_x, double dis_y);
 private:
     NodeCollection nodeCollect;

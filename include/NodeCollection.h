@@ -11,14 +11,16 @@
 using namespace std;
 
 class NodeInstance;
+class MapCandidate;
 
 class NodeCollection {
 public:
-    void addInstanceAndCompare(const NodeInstance * instance, uint8_t arriveAt,
-                               double dis_x, double dis_y);
+    vector<MapCandidate *> addInstanceAndCompare(NodeInstance * instance, uint8_t arriveAt,
+                                                 double dis_x, double dis_y);
 private:
     map<int, set<NodeInstance*>> nodeSets;
 };
+//TODO 更多的分类标准
 
 
 #endif //TOPOLOGY_MAP_NODECOLLECTION_H

@@ -18,10 +18,10 @@ class NodeInstance;
 
 class MapCandidate {
 public:
-    explicit MapCandidate(const NodeInstance *);
+    explicit MapCandidate(NodeInstance *);
     MapCandidate(const MapCandidate&);
     void setLeaveFrom(uint8_t exit);
-    void arriveAtNode(const NodeInstance * instance, uint8_t arriveAt, double dis_x, double dis_y);
+    bool arriveAtNode(NodeInstance * instance, uint8_t arriveAt, double dis_x, double dis_y);
     MapCandidate *const arriveAtSimiliar(TopoNode *arriveNode, uint8_t arriveGate);
 
     const unsigned getFullEdigeNumber() const {
@@ -36,7 +36,7 @@ public:
         return edges.size();
     }
 
-    TopoNode *const addNewNode(const NodeInstance * instance);
+    TopoNode *const addNewNode(NodeInstance * instance);
 
     TopoEdge *const addNewEdge(TopoNode * ea, uint8_t ga, TopoNode * eb, uint8_t gb);
 
@@ -44,15 +44,17 @@ public:
 
     void suicide();
 
+    ~MapCandidate();
+
 private:
-    void arriveNewNode(const NodeInstance *instance, uint8_t arriveAt);
+    void arriveNewNode(NodeInstance *instance, uint8_t arriveAt);
     set<TopoNode *> nodes;
     set<TopoEdge *> edges;
     TopoNode * currentNode;
     /**CAN BE NULL
      * means moving on an edge have never been to*/
     TopoEdge * currentEdge;
-    bool justArriveNew;
+    bool justMovedOnKnownEdge;
     uint8_t leaveFrom;
     unsigned fullEdgeNumber;
 };

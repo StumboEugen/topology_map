@@ -17,7 +17,7 @@ class TopoEdge;
 class TopoNode {
 
 public:
-    explicit TopoNode(const NodeInstance * nodeInstance);
+    explicit TopoNode(NodeInstance * nodeInstance);
 
     bool isExitEmpty(uint8_t number) const {
         return edgeConnected[number] == nullptr;
@@ -31,7 +31,7 @@ public:
         return edgeConnected[number];
     }
 
-    const NodeInstance *const getInstance() const {
+    NodeInstance *const getInstance() const {
         return corresponding;
     }
 
@@ -42,7 +42,7 @@ public:
     TopoNode * clonedTo;
 
 private:
-    const NodeInstance *const corresponding;
+    NodeInstance *const corresponding;
     std::vector<TopoEdge*> edgeConnected;
 };
 
