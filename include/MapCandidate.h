@@ -36,13 +36,15 @@ public:
         return edges.size();
     }
 
+    bool isJustMovedOnKnownEdge() {
+        return justMovedOnKnownEdge;
+    }
+
     TopoNode *const addNewNode(NodeInstance * instance);
 
     TopoEdge *const addNewEdge(TopoNode * ea, uint8_t ga, TopoNode * eb, uint8_t gb);
 
     void removeNode(TopoNode * node2remove);
-
-    void suicide();
 
     ~MapCandidate();
 
@@ -50,10 +52,10 @@ private:
     void arriveNewNode(NodeInstance *instance, uint8_t arriveAt);
     set<TopoNode *> nodes;
     set<TopoEdge *> edges;
-    TopoNode * currentNode;
+    TopoNode * lastNode;
     /**CAN BE NULL
      * means moving on an edge have never been to*/
-    TopoEdge * currentEdge;
+    TopoEdge * lastEdge;
     bool justMovedOnKnownEdge;
     uint8_t leaveFrom;
     unsigned fullEdgeNumber;

@@ -21,17 +21,31 @@ using namespace std;
  */
 vector<MapCandidate*> NodeCollection::addInstanceAndCompare(NodeInstance *instance, uint8_t arriveAt,
                                            double dis_x, double dis_y) {
+    //to kill warnning
+    double a = dis_x;
+    a = dis_y;
+
     vector<MapCandidate*> newMaps;
     auto & nodeSet = nodeSets[instance->sizeOfExits()];
-    for (auto & node : nodeSet) {
-        if (*node == *instance) {
-            for (auto & useage : node->getNodeUseages()) {
-                auto newMap = useage.first->arriveAtSimiliar(useage.second, arriveAt);
-                if (newMap != nullptr) {
-                    newMaps.push_back(newMap);
+    auto iter = nodeSet.begin();
+    while (iter != nodeSet.end()) {
+        if ((*iter)->haveNoUseages()) {
+            iter = nodeSet.erase(iter);
+        } else {
+            auto & nodeInstance = *iter;
+            if (nodeInstance->alike(*instance)) {
+                for (auto & useage : nodeInstance->getNodeUseages()) {
+                    if (!useage.first->isJustMovedOnKnownEdge()) {
+                        auto newMap = useage.first->arriveAtSimiliar(useage.second, arriveAt);
+                        if (newMap != nullptr) {
+                            newMaps.push_back(newMap);
+                        }
+                    }
                 }
             }
+            iter++;
         }
     }
+
     return std::move(newMaps);
 }

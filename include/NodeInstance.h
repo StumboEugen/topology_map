@@ -32,6 +32,7 @@ public:
     void addUseage(MapCandidate *usedMap, TopoNode *usedAt);
     void removeUseage(MapCandidate *map2unbind);
     const string& getExtraMsg();
+    bool alike (const NodeInstance&) const;
 
     const uint8_t sizeOfExits() const {
         return exitNums;
@@ -41,10 +42,12 @@ public:
         return addComplete;
     }
 
-    bool operator== (const NodeInstance&) const;
-
     inline const map<MapCandidate *, TopoNode *> &getNodeUseages() const {
         return nodeUseages;
+    }
+
+    bool haveNoUseages() {
+        return nodeUseages.empty();
     }
 
 private:
@@ -54,7 +57,7 @@ private:
     uint8_t exitNums;
     string extraMsg;
     const double & checkDir(double & d);
-    map<MapCandidate*, TopoNode*> nodeUseages;
+    map<MapCandidate*, TopoNode*> nodeUseages;  //TODO map is not good here
 
     /**
      * @return 出口朝向的误差容忍度

@@ -48,49 +48,6 @@ const double & NodeInstance::checkDir(double &d) {
     }
     return d;
 }
-/**
- * compare two nodes if it IS ALIKE
- * @param rnode
- * @return is it alike
- */
-bool NodeInstance::operator==(const NodeInstance & rnode) const {
-    const NodeInstance & lnode = *this;
-
-    //完成添加后才可以比较
-    if (!this->addComplete || !rnode.isAddComplete()) {
-        cout << "[WARNING] compare nodes before add Complete!!" << endl;
-        cout << "plz call finishAdding" << endl;
-    }
-
-    //特殊信息是否相同
-    if (lnode.extraMsg != rnode.extraMsg) {
-        return false;
-    }
-
-    //出口数量是否相同
-    auto & lv = lnode.exits;
-    auto & rv = rnode.exits;
-    if (lv.size() != rv.size()) {
-        return false;
-    }
-
-    //每个出口逐一对照位置和出口方向
-    auto li = lv.cbegin();
-    auto ri = rv.cbegin();
-    for (int i = 0; i < exits.size(); i++) {
-        double dirDif = abs( ri->Dir() - li->Dir());
-        if (dirDif > dirError()) {
-            return false;
-        }
-
-        //TODO 改成二范数?
-        double posDif = abs(ri->getPosX() - li->getPosX()) + abs(ri->getPosY() - li->getPosY());
-        if (posDif > posError()) {
-            return false;
-        }
-    }
-    return true;
-}
 
 inline void NodeInstance::addUseage(MapCandidate *usedMap, TopoNode *usedAt) {
     nodeUseages.insert({usedMap, usedAt});
@@ -98,8 +55,49 @@ inline void NodeInstance::addUseage(MapCandidate *usedMap, TopoNode *usedAt) {
 
 inline void NodeInstance::removeUseage(MapCandidate *map2unbind) {
     nodeUseages.erase(map2unbind);
-    if (nodeUseages.empty()) {
-        //TODO suicide();
+}
+
+/**
+ * compare two nodes if it IS ALIKE
+ * @param rnode
+ * @return is it alike
+ */
+bool NodeInstance::alike(const NodeInstance & rnode) const {
+    const NodeInstance & lnode = *this;
+
+    /**the instance should be added complete*/
+    if (!this->addComplete || !rnode.isAddComplete()) {
+        cout << "[WARNING] compare nodes before add Complete!!" << endl;
+        cout << "plz call finishAdding" << endl;
     }
+
+    /**check if the special msg is the same*/
+    if (lnode.extraMsg != rnode.extraMsg) {
+        return false;
+    }
+
+    /**check the exit numbers*/
+    auto & lExits = lnode.exits;
+    auto & rExits = rnode.exits;
+    if (lExits.size() != rExits.size()) {
+        return false;
+    }
+
+    /**check the pos and dir of all exits*/
+    auto lExit = lExits.cbegin();
+    auto rExit = rExits.cbegin();
+    for (int i = 0; i < exits.size(); i++) {
+        double dirDif = abs( rExit->Dir() - lExit->Dir());
+        if (dirDif > dirError()) {
+            return false;
+        }
+
+        //TODO 改成二范数?
+        double posDif = abs(rExit->getPosX() - lExit->getPosX()) + abs(rExit->getPosY() - lExit->getPosY());
+        if (posDif > posError()) {
+            return false;
+        }
+    }
+    return true;
 }
 

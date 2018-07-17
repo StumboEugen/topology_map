@@ -18,12 +18,8 @@ class ExitInstance {
 public:
     ExitInstance() = delete;
 
-    explicit ExitInstance(double posx, double posy, double dir)
-            :outDir(dir),
-             midPosX(posx),
-             midPosY(posy),
-             midAng(piHalf - atan2(posx, posy))
-    {}
+    explicit ExitInstance(double posx, double posy, double dir);
+
 
     const double & Dir() const {
         return outDir;
