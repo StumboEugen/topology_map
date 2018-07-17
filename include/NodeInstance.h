@@ -21,7 +21,8 @@ class MapCandidate;
 class TopoNode;
 
 /**
- * 拓扑节点类,仅保存结构,连接情况由地图类MapCandidate完成
+ * represent a real node, stored in the NodeCollection
+ * the connect information is stored in map candidate
  */
 class NodeInstance {
 public:
@@ -57,7 +58,7 @@ private:
     uint8_t exitNums;
     string extraMsg;
     const double & checkDir(double & d);
-    map<MapCandidate*, TopoNode*> nodeUseages;  //TODO map is not good here
+    map<MapCandidate*, TopoNode*> nodeUseages;
 
     /**
      * @return 出口朝向的误差容忍度
@@ -67,7 +68,7 @@ private:
     }
 
     /**
-     * @return 出口判定点位置的误差荣热度
+     * @return 出口判定点位置的误差容忍度
      */
     static double posError() {
         return 0.5;

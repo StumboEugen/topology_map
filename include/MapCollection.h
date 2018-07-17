@@ -11,6 +11,10 @@
 
 using namespace std;
 
+/**
+ * collection of the MapCandidates
+ * a member of the mapArranger
+ */
 class MapCollection {
 public:
     void arriveNodeInstance(NodeInstance *, uint8_t arriveAt, double dis_x, double dis_y);

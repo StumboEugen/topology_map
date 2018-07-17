@@ -14,6 +14,9 @@ using namespace std;
 
 static const double piHalf = 3.1415926 / 2.0;
 
+/**
+ * represent an exit in a node instance
+ */
 class ExitInstance {
 public:
     ExitInstance() = delete;

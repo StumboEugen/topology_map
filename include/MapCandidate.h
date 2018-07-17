@@ -16,6 +16,10 @@ class TopoEdge;
 class TopoNode;
 class NodeInstance;
 
+/**
+ * represent a possibility of the real topo structure map
+ * using TopoEdges and TopoNodes
+ */
 class MapCandidate {
 public:
     explicit MapCandidate(NodeInstance *);

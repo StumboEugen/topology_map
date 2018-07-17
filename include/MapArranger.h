@@ -8,6 +8,9 @@
 #include "MapCollection.h"
 #include "NodeCollection.h"
 
+/**
+ * A boss class of the map part
+ */
 class MapArranger {
 public:
     void arriveInstance(NodeInstance * instance, uint8_t arriveAt,

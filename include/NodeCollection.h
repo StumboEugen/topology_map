@@ -13,6 +13,10 @@ using namespace std;
 class NodeInstance;
 class MapCandidate;
 
+/**
+ * collection of the NodeInstances
+ * a member in MapArranger
+ */
 class NodeCollection {
 public:
     vector<MapCandidate *> addInstanceAndCompare(NodeInstance * instance, uint8_t arriveAt,

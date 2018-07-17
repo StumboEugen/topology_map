@@ -44,7 +44,7 @@ inline const string &NodeInstance::getExtraMsg() {
 const double & NodeInstance::checkDir(double &d) {
     if (d >= 360.0 || d < 0.0) {
         cout << "[WARNING] you add a direction out of range:" << (int)d << endl;
-        d =- 360.0 * (int)(d/360.0);
+        d -= 360.0 * (int)(d/360.0);
     }
     return d;
 }

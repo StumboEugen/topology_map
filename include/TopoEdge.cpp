@@ -82,3 +82,34 @@ uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, TopoNode * leftNode) 
     odomY = y / odomAverage;
     return odomAverage;
 }
+
+/**
+ * copy from another edge, but the nodePtr should be different
+ * @param edge oriEdge to copy from
+ * @param ea new node A
+ * @param eb new node B
+ */
+TopoEdge::TopoEdge(const TopoEdge &edge, TopoNode *const ea, TopoNode *const eb)
+        :exitA(ea),
+         exitB(eb),
+         gateA(edge.gateA),
+         gateB(edge.gateB),
+         b2a(edge.b2a),
+         a2b(edge.a2b),
+         odomX(edge.odomX),
+         odomY(edge.odomY),
+         odomAverage(edge.odomAverage)
+{}
+
+TopoEdge::TopoEdge(TopoNode *const ea, uint8_t ga, TopoNode *const eb, uint8_t gb)
+        :exitA(ea),
+         exitB(eb),
+         gateA(ga),
+         gateB(gb),
+         b2a(false),
+         a2b(true),
+         odomX(0.0),
+         odomY(0.0),
+         odomAverage(0)
+//TODO set moved from a2b b2a
+{}

@@ -21,9 +21,6 @@ using namespace std;
  */
 vector<MapCandidate*> NodeCollection::addInstanceAndCompare(NodeInstance *instance, uint8_t arriveAt,
                                            double dis_x, double dis_y) {
-    //to kill warnning
-    double a = dis_x;
-    a = dis_y;
 
     vector<MapCandidate*> newMaps;
     auto & nodeSet = nodeSets[instance->sizeOfExits()];

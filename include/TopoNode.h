@@ -14,6 +14,9 @@ using std::endl;
 class NodeInstance;
 class TopoEdge;
 
+/**
+ * represent a node in map candidate
+ */
 class TopoNode {
 
 public:
