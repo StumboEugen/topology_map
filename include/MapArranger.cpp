@@ -5,10 +5,10 @@
 
 using namespace std;
 
+#include "TopoMap.h"
 #include "MapArranger.h"
-#include "NodeInstance.h"
 
-void MapArranger::arriveInstance(NodeInstance *instance, uint8_t arriveAt,
+void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
                                  double dis_x, double dis_y) {
     if (!instance->isAddComplete()) {
         cout << "[MapArranger::arriveInstance] You add a uncompleted node to the collection!" << endl;
@@ -16,15 +16,23 @@ void MapArranger::arriveInstance(NodeInstance *instance, uint8_t arriveAt,
     /**
      * firstly apply this move to every map
      */
-    mapCollect.arriveNodeInstance(instance, arriveAt, dis_x, dis_y);
+    mapCollection.arriveNodeInstance(instance, arriveAt, dis_x, dis_y);
     /**
      * secondly find the similiar ones
      */
-    auto newMaps = nodeCollect.addInstanceAndCompare(instance, arriveAt, dis_x, dis_y);
+    auto newMaps = nodeCollection.addInstanceAndCompare(instance, arriveAt, dis_x, dis_y);
     /**
      * add the similiar ones to the map collection
      */
     for (auto & newmap : newMaps) {
-        mapCollect.addNewMap(newmap);
+        mapCollection.addNewMap(newmap);
     }
+}
+
+void MapArranger::moveThroughGate(gateId exit) {
+    mapCollection.everyMapThroughGate(exit);
+}
+
+size_t MapArranger::getMapNumbers() {
+    return mapCollection.mapNumbers();
 }

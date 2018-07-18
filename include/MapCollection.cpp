@@ -2,8 +2,7 @@
 // Created by stumbo on 18-5-15.
 //
 
-#include "MapCollection.h"
-#include "NodeInstance.h"
+#include "TopoMap.h"
 
 /**
  * the first step of arriving a node is check it in every map
@@ -17,10 +16,14 @@ void MapCollection::arriveNodeInstance(NodeInstance * instance, uint8_t arriveAt
     if (maps.empty()) {
         maps.emplace(new MapCandidate(instance));
     } else {
-        for (auto & map: maps) {
+        auto iter = maps.begin();
+        while (iter != maps.end()) {
+            auto & map = *iter;
             if(!map->arriveAtNode(instance, arriveAt, dis_x, dis_y)) {
                 delete map;
-                maps.erase(map);
+                iter = maps.erase(iter);
+            } else {
+                iter ++;
             }
         }
     }
@@ -28,4 +31,10 @@ void MapCollection::arriveNodeInstance(NodeInstance * instance, uint8_t arriveAt
 
 void MapCollection::addNewMap(MapCandidate * newMap) {
     maps.insert(newMap);
+}
+
+void MapCollection::everyMapThroughGate(gateId exit) {
+    for (const auto & map: maps) {
+        map->setLeaveFrom(exit);
+    }
 }

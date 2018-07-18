@@ -19,8 +19,8 @@ using namespace std;
  * @param dis_y
  * @return the new map caused by the connection to similiar node
  */
-vector<MapCandidate*> NodeCollection::addInstanceAndCompare(NodeInstance *instance, uint8_t arriveAt,
-                                           double dis_x, double dis_y) {
+vector<MapCandidate*> NodeCollection::addInstanceAndCompare
+        (NodeInstance *instance, uint8_t arriveAt, double dis_x, double dis_y) {
 
     vector<MapCandidate*> newMaps;
     auto & nodeSet = nodeSets[instance->sizeOfExits()];
@@ -43,6 +43,8 @@ vector<MapCandidate*> NodeCollection::addInstanceAndCompare(NodeInstance *instan
             iter++;
         }
     }
+
+    nodeSet.insert(instance);
 
     return std::move(newMaps);
 }

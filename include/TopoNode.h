@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <vector>
+#include "TopoType.h"
 
 using std::cout;
 using std::endl;
@@ -20,17 +21,18 @@ class TopoEdge;
 class TopoNode {
 
 public:
+
     explicit TopoNode(NodeInstance * nodeInstance);
 
-    bool isExitEmpty(uint8_t number) const {
+    bool isExitEmpty(gateId number) const {
         return edgeConnected[number] == nullptr;
     }
 
-    void addEdge(uint8_t number, TopoEdge* edge) {
+    void addEdge(gateId number, TopoEdge* edge) {
         edgeConnected[number] = edge;
     }
 
-    TopoEdge *const getEdge(uint8_t number) const {
+    TopoEdge *const getEdge(gateId number) const {
         return edgeConnected[number];
     }
 
@@ -38,7 +40,7 @@ public:
         return corresponding;
     }
 
-    void disconnectEdge(uint8_t number) {
+    void disconnectEdge(gateId number) {
         edgeConnected[number] = nullptr;
     }
 

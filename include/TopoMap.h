@@ -2,6 +2,10 @@
 // Created by stumbo on 18-5-17.
 //
 
+/**
+ * COOR: NWU
+ */
+
 #ifndef TOPOLOGY_MAP_TOPOMAP_H
 #define TOPOLOGY_MAP_TOPOMAP_H
 
@@ -12,5 +16,6 @@
 #include "TopoEdge.h"
 #include "TopoNode.h"
 #include "MapCollection.h"
+#include "MapArranger.h"
 
 #endif //TOPOLOGY_MAP_TOPOMAP_H

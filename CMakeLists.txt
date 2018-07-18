@@ -135,14 +135,14 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 
 set(HEADERS include/ExitInstance.cpp include/ExitInstance.h
-        include/NodeInstance.cpp include/NodeInstance.h
+        include/NodeInstance.h include/NodeInstance.cpp
         include/MapCandidate.cpp include/MapCandidate.h
         include/MapCollection.cpp include/MapCollection.h
         include/TopoEdge.cpp include/TopoEdge.h
         include/TopoNode.cpp include/TopoNode.h
         include/NodeCollection.cpp include/NodeCollection.h
         include/TopoMap.h
-        include/MapArranger.cpp include/MapArranger.h)
+        include/MapArranger.cpp include/MapArranger.h include/TopoType.h)
 add_library(topoLayer ${HEADERS})
 add_executable(main src/main.cpp)
 target_link_libraries(main topoLayer)

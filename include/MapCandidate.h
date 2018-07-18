@@ -9,6 +9,7 @@
 #include <vector>
 #include <set>
 #include <ostream>
+#include "TopoType.h"
 
 using namespace std;
 
@@ -24,11 +25,11 @@ class MapCandidate {
 public:
     explicit MapCandidate(NodeInstance *);
     MapCandidate(const MapCandidate&);
-    void setLeaveFrom(uint8_t exit);
-    bool arriveAtNode(NodeInstance * instance, uint8_t arriveAt, double dis_x, double dis_y);
-    MapCandidate *const arriveAtSimiliar(TopoNode *arriveNode, uint8_t arriveGate);
+    void setLeaveFrom(gateId exit);
+    bool arriveAtNode(NodeInstance * instance, gateId arriveAt, double dis_x, double dis_y);
+    MapCandidate *const arriveAtSimiliar(TopoNode *arriveNode, gateId arriveGate);
 
-    const unsigned getFullEdigeNumber() const {
+    size_t getFullEdgeNumber() const {
         return fullEdgeNumber;
     }
 
@@ -46,23 +47,23 @@ public:
 
     TopoNode *const addNewNode(NodeInstance * instance);
 
-    TopoEdge *const addNewEdge(TopoNode * ea, uint8_t ga, TopoNode * eb, uint8_t gb);
+    TopoEdge *const addNewEdge(TopoNode * ea, gateId ga, TopoNode * eb, gateId gb);
 
     void removeNode(TopoNode * node2remove);
 
     ~MapCandidate();
 
 private:
-    void arriveNewNode(NodeInstance *instance, uint8_t arriveAt);
+    void arriveNewNode(NodeInstance *instance, gateId arriveAt);
     set<TopoNode *> nodes;
     set<TopoEdge *> edges;
     TopoNode * lastNode;
     /**CAN BE NULL
-     * means moving on an edge have never been to*/
+     * nullptr means moving on an edge have never been to*/
     TopoEdge * lastEdge;
     bool justMovedOnKnownEdge;
     uint8_t leaveFrom;
-    unsigned fullEdgeNumber;
+    size_t fullEdgeNumber;
 };
 
 

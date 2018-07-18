@@ -7,9 +7,12 @@
 
 #include <set>
 
-#include "MapCandidate.h"
+#include "TopoType.h"
 
 using namespace std;
+
+class NodeInstance;
+class MapCandidate;
 
 /**
  * collection of the MapCandidates
@@ -19,6 +22,11 @@ class MapCollection {
 public:
     void arriveNodeInstance(NodeInstance *, uint8_t arriveAt, double dis_x, double dis_y);
     void addNewMap(MapCandidate *);
+    void everyMapThroughGate(gateId exit);
+
+    size_t mapNumbers() {
+        return maps.size();
+    }
 private:
     set<MapCandidate*> maps;
 };

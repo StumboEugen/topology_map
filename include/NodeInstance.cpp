@@ -9,6 +9,11 @@
 
 using namespace std;
 
+/**NWU
+ * @param posx coor x according to middle
+ * @param posy coor y according to middle
+ * @param dir yaw in degree 0-360
+ */
 void NodeInstance::addExit(double posx, double posy, double dir) {
     if (!addComplete) {
         cout << "[NodeInstance::addExit] you add an exit to a completed node!" << endl;
@@ -18,7 +23,7 @@ void NodeInstance::addExit(double posx, double posy, double dir) {
     exitNums ++;
 }
 
-void NodeInstance::finishAdding() {
+void NodeInstance::completeAdding() {
     sort(exits.begin(), exits.end());
     exitNums = static_cast<uint8_t>(exits.size());
     addComplete = true;
@@ -49,11 +54,11 @@ const double & NodeInstance::checkDir(double &d) {
     return d;
 }
 
-inline void NodeInstance::addUseage(MapCandidate *usedMap, TopoNode *usedAt) {
+void NodeInstance::addUseage(MapCandidate *usedMap, TopoNode *usedAt) {
     nodeUseages.insert({usedMap, usedAt});
 }
 
-inline void NodeInstance::removeUseage(MapCandidate *map2unbind) {
+void NodeInstance::removeUseage(MapCandidate *map2unbind) {
     nodeUseages.erase(map2unbind);
 }
 
@@ -68,7 +73,7 @@ bool NodeInstance::alike(const NodeInstance & rnode) const {
     /**the instance should be added complete*/
     if (!this->addComplete || !rnode.isAddComplete()) {
         cout << "[WARNING] compare nodes before add Complete!!" << endl;
-        cout << "plz call finishAdding" << endl;
+        cout << "plz call completeAdding" << endl;
     }
 
     /**check if the special msg is the same*/
@@ -97,7 +102,13 @@ bool NodeInstance::alike(const NodeInstance & rnode) const {
         if (posDif > posError()) {
             return false;
         }
+        lExit++;
+        rExit++;
     }
     return true;
+}
+
+NodeInstance::NodeInstance(const string &marker) {
+    extraMsg = marker;
 }
 

@@ -26,8 +26,10 @@ class TopoNode;
  */
 class NodeInstance {
 public:
+    NodeInstance() = default;
+    explicit NodeInstance(const string &marker);
     void addExit(double posx, double posy, double dir);
-    void finishAdding();
+    void completeAdding();
     void changeExtraMsgTo(const string &msg);
     void addExtreaMsg(const string &msg);
     void addUseage(MapCandidate *usedMap, TopoNode *usedAt);
@@ -55,7 +57,7 @@ private:
     /** exits是否添加完成,exits应当是一次性添加后排序的 */
     bool addComplete = false;
     vector<ExitInstance> exits;
-    uint8_t exitNums;
+    uint8_t exitNums = 0;
     string extraMsg;
     const double & checkDir(double & d);
     map<MapCandidate*, TopoNode*> nodeUseages;
