@@ -6,6 +6,7 @@
 
 #include "NodeInstance.h"
 #include "ExitInstance.h"
+#include "TopoType.h"
 
 using namespace std;
 
@@ -88,23 +89,51 @@ bool NodeInstance::alike(const NodeInstance & rnode) const {
         return false;
     }
 
-    /**check the pos and dir of all exits*/
-    auto lExit = lExits.cbegin();
-    auto rExit = rExits.cbegin();
+    if (lExits.size() == 1) {
+        return lExits.begin()->alike(*lExits.begin());
+    }
+
+    /**check the pos and dir of all exits
+     * because of the marginal effect, we need to compare the in loop sequence
+     */
+    auto lExit = lExits.begin();
+    auto rExit = rExits.begin();
+    auto lExitBack = lExits.end() - 1;
+    auto rExitBack = lExits.end() - 1;
+
+    double firstEleRadDif = lExit->getMidRad() - rExit->getMidRad();
+
+    if (firstEleRadDif > exitRadTollerance()) {
+        double secondDif = abs(lExitBack->getMidRad() - rExit->getMidRad()) - piTwo;
+        if (secondDif > exitRadTollerance()) {
+            return false;
+        }
+        lExit = lExitBack;
+    }
+    else if (firstEleRadDif < -exitRadTollerance()) {
+        double secondDif = abs(lExitBack->getMidRad() - rExit->getMidRad()) - piTwo;
+        if (secondDif > exitRadTollerance()) {
+            return false;
+        }
+        rExit = rExitBack;
+    }
+
     for (int i = 0; i < exits.size(); i++) {
-        double dirDif = abs( rExit->Dir() - lExit->Dir());
-        if (dirDif > dirError()) {
+        if (!lExit->alike(*rExit)) {
             return false;
         }
 
-        //TODO 改成二范数?
-        double posDif = abs(rExit->getPosX() - lExit->getPosX()) + abs(rExit->getPosY() - lExit->getPosY());
-        if (posDif > posError()) {
-            return false;
-        }
         lExit++;
         rExit++;
+
+        if (lExit == lExits.end()) {
+            lExit = lExits.begin();
+        }
+        if (rExit == rExits.end()) {
+            rExit = rExits.begin();
+        }
     }
+
     return true;
 }
 

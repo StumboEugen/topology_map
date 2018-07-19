@@ -53,6 +53,10 @@ public:
         return nodeUseages.empty();
     }
 
+    static double exitRadTollerance() {
+        return 0.3;
+    }
+
 private:
     /** exits是否添加完成,exits应当是一次性添加后排序的 */
     bool addComplete = false;
@@ -61,20 +65,6 @@ private:
     string extraMsg;
     const double & checkDir(double & d);
     map<MapCandidate*, TopoNode*> nodeUseages;
-
-    /**
-     * @return 出口朝向的误差容忍度
-     */
-    static double dirError() {
-        return 30.0;
-    }
-
-    /**
-     * @return 出口判定点位置的误差容忍度
-     */
-    static double posError() {
-        return 0.5;
-    }
 };
 
 

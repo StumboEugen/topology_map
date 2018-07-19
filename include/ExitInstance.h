@@ -22,7 +22,6 @@ public:
 
     explicit ExitInstance(double posx, double posy, double dir);
 
-
     const double & Dir() const {
         return outDir;
     }
@@ -35,22 +34,32 @@ public:
         return midPosY;
     }
 
-    const double & MidAng() const {
-        return midAng;
+    const double & getMidRad() const {
+        return midRad;
     }
 
     /**
      * 按照atan2的结果进行排序
      */
     bool operator < (const ExitInstance & anotherNode) const {
-        return this->midAng < anotherNode.midAng;
+        return this->midRad < anotherNode.midRad;
+    }
+
+    bool alike(const ExitInstance &) const;
+
+    static double dirTollerance() {
+        return 30.0;
+    }
+
+    static double posTollerance() {
+        return 0.5;
     }
 
 private:
     double outDir;
     double midPosX;
     double midPosY;
-    double midAng;
+    double midRad;
 };
 
 
