@@ -4,6 +4,9 @@
 
 #include <iostream>
 #include <vector>
+#include <list>
+#include <set>
+
 
 #include "NodeCollection.h"
 #include "NodeInstance.h"
@@ -13,16 +16,17 @@ using namespace std;
 
 /**
  * compare the instace with every node and find the similiar ones
+ * the new maps caused by moving to similiar node will be stored in the map fathers
  * @param instance
  * @param arriveAt
  * @param dis_x
  * @param dis_y
- * @return the new map caused by the connection to similiar node
+ * @return
  */
-vector<MapCandidate*> NodeCollection::addInstanceAndCompare
+vector<pair<std::list<MapCandidate *>::iterator, MapCandidate *>>
+NodeCollection::addInstanceAndCompare
         (NodeInstance *instance, uint8_t arriveAt, double dis_x, double dis_y) {
-
-    vector<MapCandidate*> newMaps;
+    vector<pair<std::list<MapCandidate *>::iterator, MapCandidate *>> newMaps;
     auto & nodeSet = nodeSets[instance->sizeOfExits()];
     auto iter = nodeSet.begin();
     while (iter != nodeSet.end()) {
@@ -32,10 +36,11 @@ vector<MapCandidate*> NodeCollection::addInstanceAndCompare
             auto & nodeInstance = *iter;
             if (nodeInstance->alike(*instance)) {
                 for (auto & useage : nodeInstance->getNodeUseages()) {
-                    if (!useage.first->isJustMovedOnKnownEdge()) {
-                        auto newMap = useage.first->arriveAtSimiliar(useage.second, arriveAt);
+                    MapCandidate * relatedMap = useage.first;
+                    if (!relatedMap->isJustMovedOnKnownEdge()) {
+                        auto newMap = relatedMap->arriveAtSimiliar(useage.second, arriveAt);
                         if (newMap != nullptr) {
-                            newMaps.push_back(newMap);
+                            newMaps.emplace_back(relatedMap->getListPosition(), newMap);
                         }
                     }
                 }

@@ -14,12 +14,14 @@
 void MapCollection::arriveNodeInstance(NodeInstance * instance, uint8_t arriveAt,
                                        double dis_x, double dis_y) {
     if (maps.empty()) {
-        maps.emplace(new MapCandidate(instance));
+        auto firstMap = new MapCandidate(instance);
+        maps.emplace_back(firstMap);
+        firstMap->setListPosition(maps.begin());
     } else {
         auto iter = maps.begin();
         while (iter != maps.end()) {
             auto & map = *iter;
-            if(!map->arriveAtNode(instance, arriveAt, dis_x, dis_y)) {
+            if(!map->arriveAtNode(instance, arriveAt, dis_x, dis_y)) {  //TODO sort pos
                 delete map;
                 iter = maps.erase(iter);
             } else {
@@ -29,8 +31,9 @@ void MapCollection::arriveNodeInstance(NodeInstance * instance, uint8_t arriveAt
     }
 }
 
-void MapCollection::addNewMap(MapCandidate * newMap) {
-    maps.insert(newMap);
+list<MapCandidate *>::iterator
+MapCollection::addNewMap(list<MapCandidate *>::iterator pos2Insert, MapCandidate *newMap) {
+    return maps.insert(pos2Insert, newMap);
 }
 
 void MapCollection::everyMapThroughGate(gateId exit) {

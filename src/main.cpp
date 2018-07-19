@@ -7,6 +7,7 @@
 
 #include <sstream>
 #include <MapArranger.h>
+#include <list>
 
 #include "TopoMap.h"
 
@@ -23,7 +24,13 @@ int main(int argc, char **argv)
 
     ros::Rate loop_rate(10);
 
-
+    /**
+     * without these lines, debug will fail
+     */
+    auto xxxxx = new NodeInstance();
+    std::list<MapCandidate*> mm;
+    auto forDebug = new MapCandidate(xxxxx);
+    mm.push_back(forDebug);
 
     MapArranger mapGroup;
     auto instance0 = new NodeInstance();

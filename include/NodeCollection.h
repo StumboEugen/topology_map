@@ -7,6 +7,7 @@
 
 #include <set>
 #include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -19,8 +20,9 @@ class MapCandidate;
  */
 class NodeCollection {
 public:
-    vector<MapCandidate *> addInstanceAndCompare(NodeInstance * instance, uint8_t arriveAt,
-                                                 double dis_x, double dis_y);
+    vector<pair<list<MapCandidate *, std::allocator<MapCandidate *>>::iterator, MapCandidate *>>
+    addInstanceAndCompare(NodeInstance *instance, uint8_t arriveAt,
+                          double dis_x, double dis_y);
 private:
     map<int, set<NodeInstance*>> nodeSets;
 };

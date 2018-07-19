@@ -21,11 +21,10 @@ void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
      * secondly find the similiar ones
      */
     auto newMaps = nodeCollection.addInstanceAndCompare(instance, arriveAt, dis_x, dis_y);
-    /**
-     * add the similiar ones to the map collection
-     */
-    for (auto & newmap : newMaps) {
-        mapCollection.addNewMap(newmap);
+
+    for (const auto & newMap: newMaps) {
+        auto newPos = mapCollection.addNewMap(newMap.first, newMap.second);
+        newMap.second->setListPosition(newPos);
     }
 }
 

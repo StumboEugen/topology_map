@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <list>
 #include <ostream>
 #include "TopoType.h"
 
@@ -41,8 +42,16 @@ public:
         return edges.size();
     }
 
-    bool isJustMovedOnKnownEdge() {
+    bool isJustMovedOnKnownEdge() const {
         return justMovedOnKnownEdge;
+    }
+
+    void setListPosition(std::list<MapCandidate *>::iterator listPos) {
+        listPosition = listPos;
+    }
+
+    std::list<MapCandidate *>::iterator getListPosition() {
+        return listPosition;
     }
 
     TopoNode *const addNewNode(NodeInstance * instance);
@@ -64,6 +73,8 @@ private:
     bool justMovedOnKnownEdge;
     uint8_t leaveFrom;
     size_t fullEdgeNumber;
+
+    std::list<MapCandidate *>::iterator listPosition;
 };
 
 
