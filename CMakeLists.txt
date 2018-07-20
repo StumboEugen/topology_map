@@ -8,9 +8,10 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
+    message_generation
+    roscpp
+    rospy
+    std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -47,6 +48,10 @@ find_package(Boost REQUIRED COMPONENTS system)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
+add_message_files(
+        FILES
+        NewNode.msg
+)
 # add_message_files(
 #   FILES
 #   Message1.msg
@@ -68,10 +73,10 @@ find_package(Boost REQUIRED COMPONENTS system)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+generate_messages(
+        DEPENDENCIES
+        std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -103,9 +108,9 @@ find_package(Boost REQUIRED COMPONENTS system)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  INCLUDE_DIRS include include/${PROJECT_NAME}
+  INCLUDE_DIRS include
 #  LIBRARIES topology_map
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+  CATKIN_DEPENDS roscpp rospy std_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -141,20 +146,17 @@ set(HEADERS include/ExitInstance.cpp include/ExitInstance.h
         include/TopoEdge.cpp include/TopoEdge.h
         include/TopoNode.cpp include/TopoNode.h
         include/NodeCollection.cpp include/NodeCollection.h
+#        include/NodeBuilder.cpp include/NodeBuilder.h
         include/TopoMap.h
         include/MapArranger.cpp include/MapArranger.h include/TopoType.h)
-add_library(topoLayer ${HEADERS})
-add_executable(main src/main.cpp)
-target_link_libraries(main topoLayer)
 
-#set(HEADERS src/ExitInstance.cpp src/ExitInstance.h
-#        src/NodeInstance.cpp src/NodeInstance.h
-#        src/MapCandidate.cpp src/MapCandidate.h
-#        src/MapCollection.cpp src/MapCollection.h
-#        src/TopoEdge.cpp src/TopoEdge.h
-#        src/TopoNode.cpp src/TopoNode.h
-#        src/TopoMap.h)
-#add_executable(main src/main.cpp ${HEADERS})
+add_library(topoLayer ${HEADERS})
+
+add_executable(main src/main.cpp)
+add_executable(FakeOB src/FakeOB.cpp)
+
+target_link_libraries(main topoLayer)
+target_link_libraries(FakeOB topoLayer)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -168,7 +170,10 @@ target_link_libraries(main topoLayer)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(main ${catkin_LIBRARIES})
+target_link_libraries(FakeOB ${catkin_LIBRARIES})
 
+add_dependencies(main ${PROJECT_NAME}_gencpp)
+add_dependencies(FakeOB ${PROJECT_NAME}_gencpp)
 #############
 ## Install ##
 #############
