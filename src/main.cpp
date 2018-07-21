@@ -9,7 +9,7 @@
 #include <MapArranger.h>
 #include <list>
 
-#include <topology_map/NewNode.h>
+#include <topology_map/NewNodeMsg.h>
 
 #include "TopoMap.h"
 

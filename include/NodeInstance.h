@@ -12,6 +12,8 @@
 #include <string>
 #include <iostream>
 
+#include <topology_map/NewNodeMsg.h>
+
 using std::map;
 using std::vector;
 using std::string;
@@ -36,6 +38,10 @@ public:
     void removeUseage(MapCandidate *map2unbind);
     const string& getExtraMsg();
     bool alike (const NodeInstance&) const;
+
+    //TODO slove the problem of switch between gateID and ExitPos
+
+    topology_map::NewNodeMsgPtr encode2ROSmsg(unsigned char arriveAt, float odomX, float odomY);
 
     const uint8_t sizeOfExits() const {
         return exitNums;

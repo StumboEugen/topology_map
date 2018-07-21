@@ -2,82 +2,94 @@
 
 #include "TopoMap.h"
 
-#include <topology_map/NewNode.h>
+#include <topology_map/NewNodeMsg.h>
+#include <std_msgs/UInt8.h>
+#include <std_msgs/String.h>
 
-//TODO finish the first communication via ROS, split this away from TopoMap
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "talker");
 
     ros::NodeHandle n;
 
-    ros::Publisher chatter_pub = n.advertise<topology_map::NewNode>("nodeTraveller", 1);
+    ros::Publisher nodeInfo_pub = n.advertise<topology_map::NewNodeMsg>(TOPO_STD_TOPIC_NAME_NODEINFO, 0);
+    ros::Publisher gateMove_pub = n.advertise<std_msgs::UInt8>(TOPO_STD_TOPIC_NAME_GATEMOVE, 0);
 
-    ros::Rate loop_rate(100);
+    sleep(1);
+
+    ros::Rate loop_rate(10);
 
     MapArranger mapGroup;
 
-    auto instance0 = new NodeInstance();
+    auto instance0 = new NodeInstance();    //TODO use shared_ptr or delete the pointer
     instance0->addExit(1, 0, 0);
     instance0->addExit(0, -1, 90);
     instance0->completeAdding();
-    mapGroup.arriveInstance(instance0, 0, 0, 0);
-    mapGroup.moveThroughGate(0);
+    auto nodeMsg = instance0->encode2ROSmsg(0, 0, 0);
+    std_msgs::UInt8 tempGate;
+    tempGate.data = 0;
+    nodeInfo_pub.publish(nodeMsg);
+    loop_rate.sleep();
+    gateMove_pub.publish(tempGate);
 
     auto instance1 = new NodeInstance();
     instance1->addExit(-1, 0, 0);
     instance1->addExit(0, -1, 90);
     instance1->completeAdding();
-    mapGroup.arriveInstance(instance1, 0, 10, 0);
-    mapGroup.moveThroughGate(1);
+    nodeMsg = instance1->encode2ROSmsg(0, 10, 0);
+    tempGate.data = 1;
+    nodeInfo_pub.publish(nodeMsg);
+    loop_rate.sleep();
+    gateMove_pub.publish(tempGate);
 
     auto instance2 = new NodeInstance();
     instance2->addExit(-1, 0, 0);
     instance2->addExit(0, 1, 180);
     instance2->completeAdding();
-    mapGroup.arriveInstance(instance2, 1, 0, -10);
-    mapGroup.moveThroughGate(0);
+    nodeMsg = instance2->encode2ROSmsg(1, 0, -10);
+    tempGate.data = 0;
+    nodeInfo_pub.publish(nodeMsg);
+    loop_rate.sleep();
+    gateMove_pub.publish(tempGate);
 
     auto instance3 = new NodeInstance();
     instance3->addExit(1, 0, 0);
     instance3->addExit(0, 1, 180);
     instance3->completeAdding();
-    mapGroup.arriveInstance(instance3, 1, -10, 0);
-    mapGroup.moveThroughGate(0);
+    nodeMsg = instance3->encode2ROSmsg(1, -10, 0);
+    tempGate.data = 0;
+    nodeInfo_pub.publish(nodeMsg);
+    loop_rate.sleep();
+    gateMove_pub.publish(tempGate);
 
     auto instance4 = new NodeInstance();
     instance4->addExit(1, 0, 0);
     instance4->addExit(0, -1, 90);
     instance4->completeAdding();
-    mapGroup.arriveInstance(instance4, 1, 0, 10);
-    mapGroup.moveThroughGate(0);
+    nodeMsg = instance4->encode2ROSmsg(1, 0, 10);
+    tempGate.data = 0;
+    nodeInfo_pub.publish(nodeMsg);
+    loop_rate.sleep();
+    gateMove_pub.publish(tempGate);
 
     auto instance5 = new NodeInstance();
     instance5->addExit(-1, 0, 0);
     instance5->addExit(0, -1, 90);
     //instance5->addExit(1, 1, 90);
     instance5->completeAdding();
-    mapGroup.arriveInstance(instance5, 0, 10, 0);
-    mapGroup.moveThroughGate(1);
+    nodeMsg = instance5->encode2ROSmsg(0, 10, 0);
+    tempGate.data = 1;
+    nodeInfo_pub.publish(nodeMsg);
+    loop_rate.sleep();
+    gateMove_pub.publish(tempGate);
 
     int count = 0;
     while (ros::ok())
     {
-        /**
-         * This is a message object. You stuff it with data, and then publish it.
-         */
-        topology_map::NewNode newNode;
-
-
-        /**
-         * The publish() function is how you send messages. The parameter
-         * is the message object. The type of this object must agree with the type
-         * given as a template parameter to the advertise<>() call, as was done
-         * in the constructor above.
-         */
-        chatter_pub.publish(newNode);
-
         ros::spinOnce();
+
+        gateMove_pub.publish(tempGate);
+        nodeInfo_pub.publish(nodeMsg);
 
         loop_rate.sleep();
         ++count;

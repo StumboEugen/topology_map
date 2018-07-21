@@ -22,7 +22,7 @@ public:
 
     explicit ExitInstance(double posx, double posy, double dir);
 
-    const double & Dir() const {
+    const double & getOutDir() const {
         return outDir;
     }
 

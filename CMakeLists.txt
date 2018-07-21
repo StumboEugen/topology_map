@@ -50,7 +50,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 ## Generate messages in the 'msg' folder
 add_message_files(
         FILES
-        NewNode.msg
+        NewNodeMsg.msg
 )
 # add_message_files(
 #   FILES
@@ -146,7 +146,6 @@ set(HEADERS include/ExitInstance.cpp include/ExitInstance.h
         include/TopoEdge.cpp include/TopoEdge.h
         include/TopoNode.cpp include/TopoNode.h
         include/NodeCollection.cpp include/NodeCollection.h
-#        include/NodeBuilder.cpp include/NodeBuilder.h
         include/TopoMap.h
         include/MapArranger.cpp include/MapArranger.h include/TopoType.h)
 
@@ -172,8 +171,10 @@ target_link_libraries(FakeOB topoLayer)
 target_link_libraries(main ${catkin_LIBRARIES})
 target_link_libraries(FakeOB ${catkin_LIBRARIES})
 
+add_dependencies(topoLayer ${PROJECT_NAME}_gencpp)
 add_dependencies(main ${PROJECT_NAME}_gencpp)
 add_dependencies(FakeOB ${PROJECT_NAME}_gencpp)
+
 #############
 ## Install ##
 #############

@@ -16,7 +16,7 @@ using namespace std;
  * @param dir yaw in degree 0-360
  */
 void NodeInstance::addExit(double posx, double posy, double dir) {
-    if (!addComplete) {
+    if (addComplete) {
         cout << "[NodeInstance::addExit] you add an exit to a completed node!" << endl;
     }
     dir = checkDir(dir);
@@ -139,5 +139,30 @@ bool NodeInstance::alike(const NodeInstance & rnode) const {
 
 NodeInstance::NodeInstance(const string &marker) {
     extraMsg = marker;
+}
+
+/**
+ * encode the instance to the rosMsg, which need 3 paras about the movement to the node
+ * @param arriveAt
+ * @param odomX
+ * @param odomY
+ * @return
+ */
+topology_map::NewNodeMsgPtr NodeInstance::encode2ROSmsg(unsigned char arriveAt, float odomX, float odomY) {
+    if (!addComplete) {
+        cout << "[NodeInstance::encode2ROSmsg] w: add is not complete!" << endl;
+    }
+    auto msgPtr = topology_map::NewNodeMsgPtr(new topology_map::NewNodeMsg());
+    msgPtr->exitNum = exitNums;
+    msgPtr->specialMsg = extraMsg;
+    for (const auto & exit: exits) {
+        msgPtr->midPosXs.push_back((float &&) exit.getPosX());
+        msgPtr->midPosYs.push_back((float &&) exit.getPosY());
+        msgPtr->outDirs.push_back((float &&) exit.getOutDir());
+    }
+    msgPtr->odomX = odomX;
+    msgPtr->odomY = odomY;
+    msgPtr->arriveAt = arriveAt;
+    return msgPtr;
 }
 

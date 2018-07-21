@@ -5,4 +5,4 @@ float32 odomX
 float32 odomY
 float32[] midPosXs
 float32[] midPosYs
-float32[] outDir
+float32[] outDirs

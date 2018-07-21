@@ -9,6 +9,7 @@
 #ifndef TOPOLOGY_MAP_TOPOMAP_H
 #define TOPOLOGY_MAP_TOPOMAP_H
 
+#include "TopoType.h"
 #include "MapCandidate.h"
 #include "MapCollection.h"
 #include "NodeInstance.h"
