@@ -17,10 +17,14 @@ class NodeInstance;
 class MapArranger {
 public:
     void arriveInstance(NodeInstance * instance, gateId arriveAt,
-                        double dis_x, double dis_y);
+                        double odomX, double odomY);
     void moveThroughGate(gateId gate);
     size_t getMapNumbers();
+    size_t experienceNum() {
+        return experiences;
+    }
 private:
+    size_t experiences = 0;
     NodeCollection nodeCollection;
     MapCollection mapCollection;
 };

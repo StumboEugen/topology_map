@@ -9,23 +9,24 @@ using namespace std;
 #include "MapArranger.h"
 
 void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
-                                 double dis_x, double dis_y) {
+                                 double odomX, double odomY) {
     if (!instance->isAddComplete()) {
         cout << "[MapArranger::arriveInstance] You add a uncompleted node to the collection!" << endl;
     }
     /**
      * firstly apply this move to every map
      */
-    mapCollection.arriveNodeInstance(instance, arriveAt, dis_x, dis_y);
+    mapCollection.arriveNodeInstance(instance, arriveAt, odomX, odomY);
     /**
      * secondly find the similiar ones
      */
-    auto newMaps = nodeCollection.addInstanceAndCompare(instance, arriveAt, dis_x, dis_y);
+    auto newMaps = nodeCollection.addInstanceAndCompare(instance, arriveAt, odomX, odomY);
 
     for (const auto & newMap: newMaps) {
         auto newPos = mapCollection.addNewMap(newMap.first, newMap.second);
         newMap.second->setListPosition(newPos);
     }
+    experiences ++;
 }
 
 void MapArranger::moveThroughGate(gateId exit) {

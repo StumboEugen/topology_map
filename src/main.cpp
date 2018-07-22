@@ -2,6 +2,8 @@
 // Created by stumbo on 18-5-10.
 //
 
+#include "MapNode.hpp"
+
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 
@@ -21,9 +23,11 @@ void chatterCallback(const std_msgs::String::ConstPtr& msg)
 int main(int argc, char **argv)
 {
 
-    ros::init(argc, argv, "listener");
+    ros::init(argc, argv, "TopoLayer");
 
     ros::NodeHandle n;
+    
+    MapNode mapNode;
 
     ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
 

@@ -6,6 +6,12 @@
 #include <std_msgs/UInt8.h>
 #include <std_msgs/String.h>
 
+void wait4Key(const string &info) {
+    cout << "wait for key:" << info << "..." << endl;
+    int a;
+    cin >> a;
+}
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "talker");
@@ -29,8 +35,10 @@ int main(int argc, char **argv)
     std_msgs::UInt8 tempGate;
     tempGate.data = 0;
     nodeInfo_pub.publish(nodeMsg);
+    wait4Key("1n");
     loop_rate.sleep();
     gateMove_pub.publish(tempGate);
+    wait4Key("1g");
 
     auto instance1 = new NodeInstance();
     instance1->addExit(-1, 0, 0);
@@ -39,8 +47,10 @@ int main(int argc, char **argv)
     nodeMsg = instance1->encode2ROSmsg(0, 10, 0);
     tempGate.data = 1;
     nodeInfo_pub.publish(nodeMsg);
+    wait4Key("2n");
     loop_rate.sleep();
     gateMove_pub.publish(tempGate);
+    wait4Key("2n");
 
     auto instance2 = new NodeInstance();
     instance2->addExit(-1, 0, 0);
@@ -49,8 +59,10 @@ int main(int argc, char **argv)
     nodeMsg = instance2->encode2ROSmsg(1, 0, -10);
     tempGate.data = 0;
     nodeInfo_pub.publish(nodeMsg);
+    wait4Key("3n");
     loop_rate.sleep();
     gateMove_pub.publish(tempGate);
+    wait4Key("3g");
 
     auto instance3 = new NodeInstance();
     instance3->addExit(1, 0, 0);
@@ -59,8 +71,10 @@ int main(int argc, char **argv)
     nodeMsg = instance3->encode2ROSmsg(1, -10, 0);
     tempGate.data = 0;
     nodeInfo_pub.publish(nodeMsg);
+    wait4Key("4n");
     loop_rate.sleep();
     gateMove_pub.publish(tempGate);
+    wait4Key("4g");
 
     auto instance4 = new NodeInstance();
     instance4->addExit(1, 0, 0);
@@ -69,8 +83,10 @@ int main(int argc, char **argv)
     nodeMsg = instance4->encode2ROSmsg(1, 0, 10);
     tempGate.data = 0;
     nodeInfo_pub.publish(nodeMsg);
+    wait4Key("5n");
     loop_rate.sleep();
     gateMove_pub.publish(tempGate);
+    wait4Key("5g");
 
     auto instance5 = new NodeInstance();
     instance5->addExit(-1, 0, 0);
@@ -80,20 +96,22 @@ int main(int argc, char **argv)
     nodeMsg = instance5->encode2ROSmsg(0, 10, 0);
     tempGate.data = 1;
     nodeInfo_pub.publish(nodeMsg);
+    wait4Key("6n");
     loop_rate.sleep();
     gateMove_pub.publish(tempGate);
+    wait4Key("6g");
 
-    int count = 0;
-    while (ros::ok())
-    {
-        ros::spinOnce();
-
-        gateMove_pub.publish(tempGate);
-        nodeInfo_pub.publish(nodeMsg);
-
-        loop_rate.sleep();
-        ++count;
-    }
+//    int count = 0;
+//    while (ros::ok())
+//    {
+//        ros::spinOnce();
+//
+//        gateMove_pub.publish(tempGate);
+//        nodeInfo_pub.publish(nodeMsg);
+//
+//        loop_rate.sleep();
+//        ++count;
+//    }
 
     return 0;
 }
