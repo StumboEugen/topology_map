@@ -37,8 +37,10 @@ private:
 };
 
 MapNode::MapNode() {
-    newNodeInfo_sub = n.subscribe(TOPO_STD_TOPIC_NAME_NODEINFO, 1, &MapNode::callbackNewNode, this);
-    gateMovement_sub = n.subscribe(TOPO_STD_TOPIC_NAME_GATEMOVE, 1, &MapNode::callbackThroughGate, this);
+    newNodeInfo_sub = n.subscribe(TOPO_STD_TOPIC_NAME_NODEINFO, 1,
+            &MapNode::callbackNewNode, this);
+    gateMovement_sub = n.subscribe(TOPO_STD_TOPIC_NAME_GATEMOVE, 1,
+            &MapNode::callbackThroughGate, this);
 }
 
 void MapNode::callbackNewNode(const topology_map::NewNodeMsg &msgP) {
@@ -47,7 +49,8 @@ void MapNode::callbackNewNode(const topology_map::NewNodeMsg &msgP) {
         nodeInstance->addExit(msgP.midPosXs[i], msgP.midPosYs[i], msgP.outDirs[i]);
     }
     nodeInstance->completeAdding();
-    mapGroup.arriveInstance(nodeInstance, static_cast<gateId>(msgP.arriveAt), msgP.odomX, msgP.odomY);
+    mapGroup.arriveInstance(nodeInstance, static_cast<gateId>(msgP.arriveAt),
+                            msgP.odomX, msgP.odomY);
 }
 
 void MapNode::callbackThroughGate(const std_msgs::UInt8 leaveGate) {

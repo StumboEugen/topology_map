@@ -46,12 +46,12 @@ public:
         return justMovedOnKnownEdge;
     }
 
-    void setListPosition(std::list<MapCandidate *>::iterator listPos) {
-        listPosition = listPos;
+    void setPosInList(std::list<MapCandidate *>::iterator listPos) {
+        posInList = listPos;
     }
 
-    std::list<MapCandidate *>::iterator getListPosition() {
-        return listPosition;
+    std::list<MapCandidate *>::iterator getPosInList() {
+        return posInList;
     }
 
     TopoNode *const addNewNode(NodeInstance * instance);
@@ -66,7 +66,7 @@ private:
     void arriveNewNode(NodeInstance *instance, gateId arriveAt);
     set<TopoNode *> nodes;
     set<TopoEdge *> edges;
-    TopoNode * lastNode;
+    TopoNode * lastNode;    //TODO get the detail meaning
     /**CAN BE NULL
      * nullptr means moving on an edge have never been to*/
     TopoEdge * lastEdge;
@@ -74,7 +74,7 @@ private:
     uint8_t leaveFrom;
     size_t fullEdgeNumber;
 
-    std::list<MapCandidate *>::iterator listPosition;
+    mapPosInList posInList;
 };
 
 

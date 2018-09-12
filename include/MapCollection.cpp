@@ -16,7 +16,7 @@ void MapCollection::arriveNodeInstance(NodeInstance * instance, uint8_t arriveAt
     if (maps.empty()) {
         auto firstMap = new MapCandidate(instance);
         maps.emplace_back(firstMap);
-        firstMap->setListPosition(maps.begin());
+        firstMap->setPosInList(maps.begin());
     } else {
         auto iter = maps.begin();
         while (iter != maps.end()) {

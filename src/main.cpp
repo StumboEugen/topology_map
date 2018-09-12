@@ -15,11 +15,6 @@
 
 #include "TopoMap.h"
 
-void chatterCallback(const std_msgs::String::ConstPtr& msg)
-{
-    ROS_INFO("I heard: [%s]", msg->data.c_str());
-}
-
 int main(int argc, char **argv)
 {
 
@@ -27,11 +22,10 @@ int main(int argc, char **argv)
 
     ros::NodeHandle n;
     
-    MapNode mapNode;
-
-    ros::Subscriber sub = n.subscribe("chatter", 1000, chatterCallback);
+    MapNode mapNode;    //the callback is in this class
 
     ros::spin();
+
 
     /**
      * without these lines, debug will fail

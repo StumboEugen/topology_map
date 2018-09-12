@@ -27,7 +27,7 @@ void TopoEdge::changeExitTo(TopoNode *const oldNode, TopoNode *const newNode, co
         gateA = newGate;
         exitA->addEdge(gateA, this);
     } else {
-        cout << "TopoEdge changeExitTo FAILURE" << endl;
+        cout << "[TopoEdge::changeExitTo] FAILURE" << endl;
         throw;
     }
 }

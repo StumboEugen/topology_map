@@ -11,6 +11,6 @@ TopoNode::TopoNode(NodeInstance *const nodeInstance):
         clonedTo(nullptr)
 {
     if (!nodeInstance->isAddComplete()) {
-        cout << "bind TopoNode before add complete!" << endl;
+        cout << "[TopoNode] bind TopoNode before add complete!" << endl;
     }
 }

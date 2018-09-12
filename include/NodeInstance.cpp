@@ -148,7 +148,8 @@ NodeInstance::NodeInstance(const string &marker) {
  * @param odomY
  * @return
  */
-topology_map::NewNodeMsgPtr NodeInstance::encode2ROSmsg(unsigned char arriveAt, float odomX, float odomY) {
+topology_map::NewNodeMsgPtr NodeInstance::encode2ROSmsg(unsigned char arriveAt,
+                                                        float odomX, float odomY) {
     if (!addComplete) {
         cout << "[NodeInstance::encode2ROSmsg] w: add is not complete!" << endl;
     }

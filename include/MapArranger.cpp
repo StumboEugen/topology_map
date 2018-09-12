@@ -24,7 +24,7 @@ void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
 
     for (const auto & newMap: newMaps) {
         auto newPos = mapCollection.addNewMap(newMap.first, newMap.second);
-        newMap.second->setListPosition(newPos);
+        newMap.second->setPosInList(newPos);
     }
     experiences ++;
 }

@@ -18,10 +18,12 @@ int main(int argc, char **argv)
 
     ros::NodeHandle n;
 
-    ros::Publisher nodeInfo_pub = n.advertise<topology_map::NewNodeMsg>(TOPO_STD_TOPIC_NAME_NODEINFO, 0);
-    ros::Publisher gateMove_pub = n.advertise<std_msgs::UInt8>(TOPO_STD_TOPIC_NAME_GATEMOVE, 0);
+    ros::Publisher nodeInfo_pub = n.advertise<topology_map::NewNodeMsg>(
+            TOPO_STD_TOPIC_NAME_NODEINFO, 0);
+    ros::Publisher gateMove_pub = n.advertise<std_msgs::UInt8>(
+            TOPO_STD_TOPIC_NAME_GATEMOVE, 0);
 
-    sleep(1);
+    sleep(1); // this line is necessary, without it, the publish might be lost
 
     ros::Rate loop_rate(10);
 

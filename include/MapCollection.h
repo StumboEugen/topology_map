@@ -27,6 +27,9 @@ public:
         return maps.size();
     }
 private:
+    /**
+     * using list to store the map candidate to sort them quickly
+     */
     std::list<MapCandidate*> maps;
 };
 

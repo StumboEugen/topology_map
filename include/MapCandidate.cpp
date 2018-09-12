@@ -111,7 +111,8 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
 }
 
 /**
- * SPLIT A NEW CANDIDATE FROM A JUST ADDED NEW NODE CANDIDATE
+ * SPLIT A NEW CANDIDATE FROM A JUST ADDED NEW NODE CANDIDATE.
+ * in the new candidate, we should really arrive at the (arriveNode) at gate (arriveGate)
  * @param arriveNode
  * @param arriveGate
  * @return if it is a similar return the new similar ptr, otherwise a nullptr
@@ -151,7 +152,7 @@ void MapCandidate::setLeaveFrom(gateId exit) {
 inline TopoNode *const MapCandidate::addNewNode(NodeInstance *const instance) {
     auto nodeResult = nodes.emplace(new TopoNode(instance));
     if (!nodeResult.second) {
-        cout << "addNewNode FAILURE!!!" << endl;
+        cout << "[MapCandidate::addNewNode] FAILURE!!!" << endl;
         throw;
     }
     auto newNodePtr = *nodeResult.first;
@@ -168,7 +169,7 @@ inline TopoNode *const MapCandidate::addNewNode(NodeInstance *const instance) {
 inline TopoEdge *const MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, TopoNode *const eb, gateId gb) {
     auto edgeResult = edges.emplace(new TopoEdge(ea, ga, eb, gb));
     if (!edgeResult.second) {
-        cout << "addNewEdge FAILURE!!!" << endl;
+        cout << "[MapCandidate::addNewEdge] FAILURE!!!" << endl;
         throw;
     }
     auto newEdge = (* edgeResult.first);
