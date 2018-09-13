@@ -49,8 +49,8 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 ## Generate messages in the 'msg' folder
 add_message_files(
-        FILES
-        NewNodeMsg.msg
+    FILES
+    NewNodeMsg.msg
 )
 # add_message_files(
 #   FILES
@@ -59,11 +59,10 @@ add_message_files(
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+    FILES
+    SaveMap.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -74,8 +73,8 @@ add_message_files(
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
-        DEPENDENCIES
-        std_msgs
+    DEPENDENCIES
+    std_msgs
 )
 
 ################################################
