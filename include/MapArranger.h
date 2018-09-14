@@ -16,6 +16,8 @@ class NodeInstance;
  */
 class MapArranger {
 public:
+    MapArranger();
+
     void arriveInstance(NodeInstance * instance, gateId arriveAt,
                         double odomX, double odomY);
     void moveThroughGate(gateId gate);
@@ -23,10 +25,20 @@ public:
     size_t experienceNum() {
         return experiences;
     }
+
+    const string &getMapName() const {
+        return mapName;
+    }
+
 private:
     size_t experiences = 0;
     NodeCollection nodeCollection;
     MapCollection mapCollection;
+
+    /**
+     * the name of this map group, it should be "const" like
+     */
+    std::string mapName;
 };
 
 

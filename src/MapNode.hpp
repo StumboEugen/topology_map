@@ -11,6 +11,7 @@
 #include "ros/ros.h"
 
 #include <topology_map/NewNodeMsg.h>
+#include <topology_map/SaveMap.h>
 #include <std_msgs/UInt8.h>
 
 using std::cout;
@@ -21,29 +22,32 @@ public:
     MapNode();
 
     ~MapNode() {
-        newNodeInfo_sub.shutdown();
-        gateMovement_sub.shutdown();
+        sub_NewNodeInfo.shutdown();
+        sub_GateMovement.shutdown();
     }
 
 
 private:
     MapArranger mapGroup;
-    ros::Subscriber newNodeInfo_sub;
-    ros::Subscriber gateMovement_sub;
+    ros::Subscriber sub_NewNodeInfo;
+    ros::Subscriber sub_GateMovement;
+    ros::ServiceServer srv_SaveMap;
     ros::NodeHandle n;
 
-    void callbackNewNode(const topology_map::NewNodeMsg &);
-    void callbackThroughGate(std_msgs::UInt8);
+    void cbNewNode(const topology_map::NewNodeMsg &);
+    void cbThroughGate(std_msgs::UInt8);
+    bool srvSaveMap(topology_map::SaveMap::Request &, topology_map::SaveMap::Response &);
 };
 
 MapNode::MapNode() {
-    newNodeInfo_sub = n.subscribe(TOPO_STD_TOPIC_NAME_NODEINFO, 1,
-            &MapNode::callbackNewNode, this);
-    gateMovement_sub = n.subscribe(TOPO_STD_TOPIC_NAME_GATEMOVE, 1,
-            &MapNode::callbackThroughGate, this);
+    sub_NewNodeInfo = n.subscribe(TOPO_STD_TOPIC_NAME_NODEINFO, 1,
+                                  &MapNode::cbNewNode, this);
+    sub_GateMovement = n.subscribe(TOPO_STD_TOPIC_NAME_GATEMOVE, 1,
+                                   &MapNode::cbThroughGate, this);
+    srv_SaveMap = n.advertiseService(TOPO_STD_SERVICE_NAME_SAVEMAP, &MapNode::srvSaveMap, this);
 }
 
-void MapNode::callbackNewNode(const topology_map::NewNodeMsg &msgP) {
+void MapNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
     auto nodeInstance = new NodeInstance();
     for (int i = 0; i < msgP.exitNum; i++) {
         nodeInstance->addExit(msgP.midPosXs[i], msgP.midPosYs[i], msgP.outDirs[i]);
@@ -53,11 +57,17 @@ void MapNode::callbackNewNode(const topology_map::NewNodeMsg &msgP) {
                             msgP.odomX, msgP.odomY);
 }
 
-void MapNode::callbackThroughGate(const std_msgs::UInt8 leaveGate) {
+void MapNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
     mapGroup.moveThroughGate(leaveGate.data);
     if (mapGroup.experienceNum() == 6) {
         cout << mapGroup.getMapNumbers() << endl;
     }
+}
+
+bool MapNode::srvSaveMap(topology_map::SaveMap::Request &req,
+                         topology_map::SaveMap::Response &res) {
+    res.fileName = mapGroup.getMapName();
+    return true;
 }
 
 #endif //TOPOLOGY_MAP_MAPNODE_HPP

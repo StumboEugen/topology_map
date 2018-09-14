@@ -19,5 +19,6 @@ static const double piTwo = 3.1415926 * 2.0;
 
 #define TOPO_STD_TOPIC_NAME_NODEINFO "Topo/NewTravel"
 #define TOPO_STD_TOPIC_NAME_GATEMOVE "Topo/MoveThroughGate"
+#define TOPO_STD_SERVICE_NAME_SAVEMAP "TopoSrv/SaveMap"
 
 #endif //TOPOLOGY_MAP_TOPOTYPE_H
