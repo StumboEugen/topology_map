@@ -2,11 +2,12 @@
 // Created by stumbo on 18-7-18.
 //
 
-#ifndef TOPOLOGY_MAP_TOPOTYPE_H
-#define TOPOLOGY_MAP_TOPOTYPE_H
+#ifndef TOPOLOGY_MAP_TOPOTOOL_H
+#define TOPOLOGY_MAP_TOPOTOOL_H
 
 #include <cstdint>
 #include <list>
+#include <string>
 
 typedef uint8_t	gateId;
 
@@ -23,4 +24,8 @@ static const double piTwo = 3.1415926 * 2.0;
 #define TOPO_STD_TOPIC_NAME_GATEMOVE "Topo/MoveThroughGate"
 #define TOPO_STD_SERVICE_NAME_SAVEMAP "TopoSrv/SaveMap"
 
-#endif //TOPOLOGY_MAP_TOPOTYPE_H
+namespace topo {
+    const std::string getCurrentTimeString();
+}
+
+#endif //TOPOLOGY_MAP_TOPOTOOL_H

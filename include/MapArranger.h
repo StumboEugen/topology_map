@@ -5,7 +5,7 @@
 #ifndef TOPOLOGY_MAP_MAPARRANGER_H
 #define TOPOLOGY_MAP_MAPARRANGER_H
 
-#include "TopoType.h"
+#include "TopoTools.h"
 #include "MapCollection.h"
 #include "NodeCollection.h"
 

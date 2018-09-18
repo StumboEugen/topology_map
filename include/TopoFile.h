@@ -8,13 +8,23 @@
 #include <iostream>
 #include <fstream>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <pwd.h>
+#include <vector>
+#include <string>
 
 class TopoFile {
 public:
-    TopoFile(std::string fileName, bool save = true);
+    explicit TopoFile(const std::string &fileName = "");
+    int setFileName(std::string fileName);
+    int open(std::_Ios_Openmode mode = std::ios::out | std::ios::trunc);
 
 private:
-    std::string path;
+    std::string filePath;
+    std::fstream fs;
+
+    /**move to the user floder*/
+    void chDir2UserPath();
 };
 
 

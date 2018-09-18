@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <vector>
-#include "TopoType.h"
+#include "TopoTools.h"
 
 using std::cout;
 using std::endl;

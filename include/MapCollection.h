@@ -7,7 +7,7 @@
 
 #include <list>
 
-#include "TopoType.h"
+#include "TopoTools.h"
 
 class NodeInstance;
 class MapCandidate;

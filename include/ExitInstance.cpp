@@ -3,7 +3,7 @@
 //
 
 #include "ExitInstance.h"
-#include "TopoType.h"
+#include "TopoTools.h"
 
 
 ExitInstance::ExitInstance(double posx, double posy, double dir)

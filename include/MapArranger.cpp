@@ -2,7 +2,6 @@
 // Created by stumbo on 18-5-21.
 //
 #include <iostream>
-#include <ctime>
 
 using namespace std;
 
@@ -38,12 +37,6 @@ size_t MapArranger::getMapNumbers() {
     return mapCollection.mapNumbers();
 }
 
-MapArranger::MapArranger() {
-    struct tm * timeStructP;
-    time_t timeLong;
-    timeLong = time(nullptr);
-    timeStructP = localtime(&timeLong);
-    char tmp[64];
-    strftime(tmp, sizeof(tmp), "%Y%m%d %H%M", timeStructP);
-    mapName = string(tmp);
-}
+MapArranger::MapArranger()
+        : mapName(topo::getCurrentTimeString())
+{}

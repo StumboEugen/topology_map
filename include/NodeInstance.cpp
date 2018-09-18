@@ -6,7 +6,7 @@
 
 #include "NodeInstance.h"
 #include "ExitInstance.h"
-#include "TopoType.h"
+#include "TopoTools.h"
 
 using namespace std;
 

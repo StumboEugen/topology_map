@@ -10,7 +10,7 @@
 #include <set>
 #include <list>
 #include <ostream>
-#include "TopoType.h"
+#include "TopoTools.h"
 
 using namespace std;
 
