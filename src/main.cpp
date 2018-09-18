@@ -17,6 +17,7 @@
 
 int main(int argc, char **argv)
 {
+    TopoFile("abc/abc/abc");
 
     ros::init(argc, argv, "TopoLayer");
 

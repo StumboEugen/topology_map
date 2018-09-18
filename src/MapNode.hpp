@@ -6,6 +6,7 @@
 #define TOPOLOGY_MAP_MAPNODE_HPP
 
 #include <iostream>
+#include <fstream>
 
 #include "TopoMap.h"
 #include "ros/ros.h"
@@ -24,6 +25,7 @@ public:
     ~MapNode() {
         sub_NewNodeInfo.shutdown();
         sub_GateMovement.shutdown();
+        srv_SaveMap.shutdown();
     }
 
 
@@ -66,6 +68,7 @@ void MapNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
 
 bool MapNode::srvSaveMap(topology_map::SaveMap::Request &req,
                          topology_map::SaveMap::Response &res) {
+    ofstream ostream;
     res.fileName = mapGroup.getMapName();
     return true;
 }

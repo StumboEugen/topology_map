@@ -18,5 +18,6 @@
 #include "TopoNode.h"
 #include "MapCollection.h"
 #include "MapArranger.h"
+#include "TopoFile.h"
 
 #endif //TOPOLOGY_MAP_TOPOMAP_H
