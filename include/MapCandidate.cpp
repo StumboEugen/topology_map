@@ -14,13 +14,13 @@
  * @param firstInstance the first node instance
  */
 MapCandidate::MapCandidate( NodeInstance *const firstInstance):
-        justMovedOnKnownEdge(true),
+        lastEdgeIsOldEdge(true),
         leaveFrom(0),
         fullEdgeNumber(0),
-        lastEdge(nullptr)
+        currentEdge(nullptr)
 {
     auto firstNode = addNewNode(firstInstance);
-    lastNode = firstNode;
+    currentNode = firstNode;
 }
 
 /**
@@ -29,18 +29,18 @@ MapCandidate::MapCandidate( NodeInstance *const firstInstance):
  */
 MapCandidate::MapCandidate(const MapCandidate & copyFrom)
         :leaveFrom(copyFrom.leaveFrom),
-         justMovedOnKnownEdge(copyFrom.justMovedOnKnownEdge),
+         lastEdgeIsOldEdge(copyFrom.lastEdgeIsOldEdge),
          fullEdgeNumber(copyFrom.fullEdgeNumber)
 {
     /**
      * firstly copy all the TopoNode instances
      */
     for (auto oriNode: copyFrom.nodes) {
-        TopoNode *clonedNodePtr = * this->nodes.emplace(new TopoNode(oriNode->getInstance())).first;
+        TopoNode *clonedNodePtr = * this->nodes.emplace(new TopoNode(oriNode->getInstanceCorresponding())).first;
         /**the useage should be added oustide of the constructor
          * because there is no map info in constructor
          */
-        clonedNodePtr->getInstance()->addUseage(this, clonedNodePtr);
+        clonedNodePtr->getInstanceCorresponding()->addUseage(this, clonedNodePtr);
         oriNode->clonedTo = clonedNodePtr;
     }
     /**
@@ -58,13 +58,13 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
     /**
      * other details
      */
-     lastNode = copyFrom.lastNode->clonedTo;
-     if (copyFrom.lastEdge != nullptr) {
+     currentNode = copyFrom.currentNode->clonedTo;
+     if (copyFrom.currentEdge != nullptr) {
          /**find the current edge from the node -> new node -> new edge*/
-         lastEdge = copyFrom.lastEdge->getExitA()->
-                 clonedTo->getEdge(copyFrom.lastEdge->getGateA());
+         currentEdge = copyFrom.currentEdge->getExitA()->
+                 clonedTo->getEdge(copyFrom.currentEdge->getGateA());
      } else {
-         lastEdge = nullptr;
+         currentEdge = nullptr;
      }
 }
 
@@ -75,9 +75,9 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
  */
 inline void MapCandidate::arriveNewNode(NodeInstance *const instance, gateId arriveAt) {
     auto newNodePtr = addNewNode(instance);
-    auto newEdgePtr = addNewEdge(lastNode, leaveFrom, newNodePtr, arriveAt);
-    lastNode = newNodePtr;
-    lastEdge = newEdgePtr;
+    auto newEdgePtr = addNewEdge(currentNode, leaveFrom, newNodePtr, arriveAt);
+    currentNode = newNodePtr;
+    currentEdge = newEdgePtr;
 }
 
 /**
@@ -88,21 +88,21 @@ inline void MapCandidate::arriveNewNode(NodeInstance *const instance, gateId arr
  */
 bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
                                 const double dis_x, const double dis_y) {
-    if (lastEdge == nullptr) {
+    if (currentEdge == nullptr) {
         arriveNewNode(instance, arriveAt);
         // last Edge will not be null after arriveNewNode function
-        lastEdge->addOdomData(dis_x, dis_y, lastEdge->getAnotherNode(lastNode));
-        justMovedOnKnownEdge = false;
+        currentEdge->addOdomData(dis_x, dis_y, currentEdge->getAnotherNode(currentNode));
+        lastEdgeIsOldEdge = false;
     } else {
-        TopoNode * shouldToNode = lastEdge->getAnotherNode(lastNode);
+        TopoNode * shouldToNode = currentEdge->getAnotherNode(currentNode);
         /**if we used to move on this edge, the arrival situation should remain the same
-         * otherwise it is a confilect, this candidate is wrong*/
-        if (instance->alike(*shouldToNode->getInstance())
-            && arriveAt == lastEdge->getAnotherGate(lastNode)) {
-            lastEdge->leaveFromNode(lastNode);
-            lastEdge->addOdomData(dis_x, dis_y, lastNode);
-            lastNode = shouldToNode;
-            justMovedOnKnownEdge = true;
+         * otherwise it is a confilct, this candidate is wrong*/
+        if (instance->alike(*shouldToNode->getInstanceCorresponding())
+            && arriveAt == currentEdge->getAnotherGate(currentNode)) {
+            currentEdge->leaveFromNode(currentNode);
+            currentEdge->addOdomData(dis_x, dis_y, currentNode);
+            currentNode = shouldToNode;
+            lastEdgeIsOldEdge = true;
         } else {
             return false;
         }
@@ -120,17 +120,17 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
 MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId arriveGate) {
     //TODO 其他判定条件
     /**you may match a node on a map, but just moved on a known edge, in this case, return*/
-    if (arriveNode->isExitEmpty(arriveGate)) {
+    if (!arriveNode->isExitEmpty(arriveGate)) {
+        /**because it is called for a new candidate, so we don't let @this suicide()*/
+        return nullptr;
+    } else {
         auto newMap = new MapCandidate(*this);
         /**@attention change is applied on the new map, not "this" */
-        newMap->lastEdge->changeExitTo(newMap->lastNode, arriveNode->clonedTo, arriveGate);
+        newMap->currentEdge->changeExitTo(newMap->currentNode, arriveNode->clonedTo, arriveGate);
         //the old new node is replaced by the similiar node
-        newMap->removeNode(newMap->lastNode);
-        newMap->lastNode = arriveNode->clonedTo;
+        newMap->removeNode(newMap->currentNode);
+        newMap->currentNode = arriveNode->clonedTo;
         return newMap;
-    } else {
-    /**because it is called for a new candidate, so we don't let @this suicide()*/
-        return nullptr;
     }
 }
 
@@ -141,7 +141,7 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId 
  */
 void MapCandidate::setLeaveFrom(gateId exit) {
     leaveFrom = exit;
-    lastEdge = lastNode->getEdge(exit);   //current Edge might be null
+    currentEdge = currentNode->getEdge(exit);   //current Edge might be null
 }
 
 /**
@@ -179,8 +179,8 @@ inline TopoEdge *const MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, T
 }
 
 void MapCandidate::removeNode(TopoNode *node2remove) {
-    fullEdgeNumber -= node2remove->getInstance()->sizeOfExits();
-    node2remove->getInstance()->removeUseage(this);
+    fullEdgeNumber -= node2remove->getInstanceCorresponding()->sizeOfExits();
+    node2remove->getInstanceCorresponding()->removeUseage(this);
     delete node2remove;
     nodes.erase(node2remove);
 }
@@ -190,7 +190,7 @@ MapCandidate::~MapCandidate() {
         delete edge;
     }
     for (auto node: nodes) {
-        node->getInstance()->removeUseage(this);
+        node->getInstanceCorresponding()->removeUseage(this);
         delete node;
     }
 }

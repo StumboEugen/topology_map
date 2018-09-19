@@ -81,8 +81,8 @@ private:
     TopoNode * exitB;
     uint8_t gateA;
     uint8_t gateB;
-    bool a2b;
-    bool b2a;
+    bool a2bMoved;
+    bool b2aMoved;
     double odomX;
     double odomY;
     uint16_t odomAverage;

@@ -24,6 +24,9 @@ public:
 
     explicit TopoNode(NodeInstance * nodeInstance);
 
+    /**
+     * @return if the gateId corresponded edge is empty
+     */
     bool isExitEmpty(gateId number) const {
         return edgeConnected[number] == nullptr;
     }
@@ -36,7 +39,7 @@ public:
         return edgeConnected[number];
     }
 
-    NodeInstance *const getInstance() const {
+    NodeInstance *const getInstanceCorresponding() const {
         return corresponding;
     }
 
@@ -44,10 +47,14 @@ public:
         edgeConnected[number] = nullptr;
     }
 
+    //tool member help cloning maps
     TopoNode * clonedTo;
 
 private:
+    //the corresponded instance
     NodeInstance *const corresponding;
+
+    //edges connected at this TopoNode
     std::vector<TopoEdge*> edgeConnected;
 };
 

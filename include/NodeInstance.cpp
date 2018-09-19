@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 
 #include "NodeInstance.h"
 #include "ExitInstance.h"
@@ -12,11 +13,6 @@ using namespace std;
 
 size_t NodeInstance::serialCount = 0;
 
-/**NWU
- * @param posx coor x according to middle
- * @param posy coor y according to middle
- * @param dir yaw in degree 0-360
- */
 void NodeInstance::addExit(double posx, double posy, double dir) {
     if (addComplete) {
         cout << "[NodeInstance::addExit] you add an exit to a completed node!" << endl;
@@ -32,15 +28,10 @@ void NodeInstance::completeAdding() {
     addComplete = true;
 }
 
-/**
- * check & adjust the dir to 0-360°
- * @param d
- * @return the adjusted direction
- */
 const double & NodeInstance::checkDir(double &d) {
     if (d >= 360.0 || d < 0.0) {
         cout << "[WARNING] you add a direction out of range:" << (int)d << endl;
-        d -= 360.0 * (int)(d/360.0);
+        d -= 360.0 * floor(d/360.0);
     }
     return d;
 }
@@ -51,13 +42,12 @@ void NodeInstance::addUseage(MapCandidate *usedMap, TopoNode *usedAt) {
 
 void NodeInstance::removeUseage(MapCandidate *map2unbind) {
     nodeUseages.erase(map2unbind);
+    if (nodeUseages.empty()) {
+        //TODO need suicide?
+    }
 }
 
-/**
- * compare two nodes if it IS ALIKE
- * @param rnode
- * @return is it alike
- */
+
 bool NodeInstance::alike(const NodeInstance & rnode) const {
     const NodeInstance & lnode = *this;
 
@@ -89,24 +79,43 @@ bool NodeInstance::alike(const NodeInstance & rnode) const {
     auto lExit = lExits.begin();
     auto rExit = rExits.begin();
     auto lExitBack = lExits.end() - 1;
-    auto rExitBack = lExits.end() - 1;
+    auto rExitBack = rExits.end() - 1;
 
-    double firstEleRadDif = lExit->getMidRad() - rExit->getMidRad();
+    double difOri = abs(lExit->getMidRad() - rExit->getMidRad());
+    double difL1RB = abs(lExit->getMidRad() - rExitBack->getMidRad()) - piTwo;
+    double difLBR1 = abs(lExitBack->getMidRad() - rExit->getMidRad()) - piTwo;
 
-    if (firstEleRadDif > exitRadTollerance()) {
-        double secondDif = abs(lExitBack->getMidRad() - rExit->getMidRad()) - piTwo;
-        if (secondDif > exitRadTollerance()) {
-            return false;
+    // we only need to change if difOri is not the smallest
+    if (difOri > difL1RB || difOri > difLBR1) {
+        if (difL1RB < difLBR1) {
+            // in this case, consider lE = 1, rE = 359
+            rExit = rExitBack;
+        } else {
+            // in this case, consider lE = 359, rE = 1
+            lExit = lExitBack;
         }
-        lExit = lExitBack;
     }
-    else if (firstEleRadDif < -exitRadTollerance()) {
-        double secondDif = abs(lExitBack->getMidRad() - rExit->getMidRad()) - piTwo;
-        if (secondDif > exitRadTollerance()) {
-            return false;
-        }
-        rExit = rExitBack;
-    }
+
+    //the old way is not robust:
+
+//    double firstExitRadDif = lExit->getMidRad() - rExit->getMidRad();
+//
+//    // in this case, consider lE = 359, rE = 1
+//    if (firstExitRadDif > exitRadTollerance()) {
+//        double secondDif = abs(lExitBack->getMidRad() - rExit->getMidRad()) - piTwo;
+//        if (secondDif > exitRadTollerance()) {
+//            return false;
+//        }
+//        lExit = lExitBack;
+//    }
+//    // in this case, consider lE = 1, rE = 359
+//    else if (firstExitRadDif < -exitRadTollerance()) {
+//        double secondDif = abs(lExitBack->getMidRad() - rExit->getMidRad()) - piTwo;
+//        if (secondDif > exitRadTollerance()) {
+//            return false;
+//        }
+//        rExit = rExitBack;
+//    }
 
     for (int i = 0; i < exits.size(); i++) {
         if (!lExit->alike(*rExit)) {

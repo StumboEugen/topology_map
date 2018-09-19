@@ -43,14 +43,14 @@ public:
     }
 
     bool isJustMovedOnKnownEdge() const {
-        return justMovedOnKnownEdge;
+        return lastEdgeIsOldEdge;
     }
 
-    void setPosInList(std::list<MapCandidate *>::iterator listPos) {
+    void setPosInList(mapPosInList listPos) {
         posInList = listPos;
     }
 
-    std::list<MapCandidate *>::iterator getPosInList() {
+    mapPosInList getPosInList() {
         return posInList;
     }
 
@@ -66,14 +66,33 @@ private:
     void arriveNewNode(NodeInstance *instance, gateId arriveAt);
     set<TopoNode *> nodes;
     set<TopoEdge *> edges;
-    TopoNode * lastNode;    //TODO get the detail meaning
-    /**CAN BE NULL
-     * nullptr means moving on an edge have never been to*/
-    TopoEdge * lastEdge;
-    bool justMovedOnKnownEdge;
+
+    /**
+     * on edge -> the node just leave
+     *
+     * on node -> current node
+     */
+    TopoNode * currentNode;
+
+    /**CAN BE NULL!
+     *
+     * nullptr means moving on an edge have never been to
+     *
+     * on edge -> current edge
+     *
+     * on node -> last edge*/
+    TopoEdge * currentEdge;
+
+    // last edge might be just made
+    bool lastEdgeIsOldEdge;
+
+    //the gate ID that you leave from the last node
     uint8_t leaveFrom;
+
+    //the sum of all nodes' edges, to determine the close situation
     size_t fullEdgeNumber;
 
+    //to record the place in the mapCollection std::list<>
     mapPosInList posInList;
 };
 

@@ -12,10 +12,6 @@ ExitInstance::ExitInstance(double posx, double posy, double dir)
          midPosY(posy),
          midRad(atan2(posx, posy) - piHalf)
 {
-    // TODO coor problem
-//    if (midRad > pi - 0.2) {
-//        midRad = -pi;
-//    }
 }
 
 bool ExitInstance::alike(const ExitInstance & rExit) const {
@@ -25,6 +21,7 @@ bool ExitInstance::alike(const ExitInstance & rExit) const {
         return false;
     }
 
+    //do not need to consider the midRad, it is just used to sort
     double posDif = abs(rExit.midPosX - lExit.midPosX) + abs(rExit.midPosY - lExit.midPosY);
     return  posDif < posTollerance();   //just to kill warning, may not a good idea
 }

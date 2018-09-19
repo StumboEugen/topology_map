@@ -38,26 +38,33 @@ void TopoEdge::changeExitTo(TopoNode *const oldNode, TopoNode *const newNode, co
  */
 void TopoEdge::leaveFromNode(TopoNode *leftnode) {
     if (leftnode == exitA) {
-        a2b = true;
+        a2bMoved = true;
     } else if (leftnode == exitB) {
-        b2a = true;
+        b2aMoved = true;
     } else {
         cout << "TopoEdge leaveFromNode FAILURE" << endl;
         throw;
     }
 }
 
+/**
+ * @return if moved on this edge leaving from another node in the history
+ */
 bool TopoEdge::haveLeftFromNode(TopoNode *leftnode) {
     if (leftnode == exitA) {
-        return a2b;
+        return a2bMoved;
     } else if (leftnode == exitB) {
-        return b2a;
+        return b2aMoved;
     } else {
         cout << "TopoEdge haveLeftFromNode FAILURE" << endl;
         throw;
     }
 }
 
+/**
+ * add odom data to this edge
+ * @return the experience on this node
+ */
 uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, TopoNode * leftNode) {
     using std::abs;
     if (leftNode == exitB) {
@@ -94,8 +101,8 @@ TopoEdge::TopoEdge(const TopoEdge &edge, TopoNode *const ea, TopoNode *const eb)
          exitB(eb),
          gateA(edge.gateA),
          gateB(edge.gateB),
-         b2a(edge.b2a),
-         a2b(edge.a2b),
+         b2aMoved(edge.b2aMoved),
+         a2bMoved(edge.a2bMoved),
          odomX(edge.odomX),
          odomY(edge.odomY),
          odomAverage(edge.odomAverage)
@@ -106,10 +113,10 @@ TopoEdge::TopoEdge(TopoNode *const ea, uint8_t ga, TopoNode *const eb, uint8_t g
          exitB(eb),
          gateA(ga),
          gateB(gb),
-         b2a(false),
-         a2b(true),
+         b2aMoved(false),
+         a2bMoved(true),
          odomX(0.0),
          odomY(0.0),
          odomAverage(0)
-//TODO set moved from a2b b2a
+//TODO set moved from a2bMoved b2aMoved
 {}

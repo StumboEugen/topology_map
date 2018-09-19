@@ -2,7 +2,7 @@
 // Created by stumbo on 18-5-10.
 //
 
-#include "MapNode.hpp"
+#include "MapROSNode.hpp"
 
 #include "ros/ros.h"
 #include "std_msgs/String.h"
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle n;
     
-    MapNode mapNode;    //the callback is in this class
+    MapROSNode mapNode;    //the callback is in this class
 
     ros::spin();
 

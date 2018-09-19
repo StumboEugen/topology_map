@@ -151,7 +151,7 @@ set(HEADERS include/ExitInstance.cpp include/ExitInstance.h
 
 add_library(topoLayer ${HEADERS})
 
-add_executable(main src/main.cpp src/MapNode.hpp)
+add_executable(main src/main.cpp src/MapROSNode.hpp)
 add_executable(FakeOB src/FakeOB.cpp)
 
 target_link_libraries(main topoLayer)

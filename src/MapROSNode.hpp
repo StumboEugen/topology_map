@@ -18,11 +18,11 @@
 using std::cout;
 using std::endl;
 
-class MapNode {
+class MapROSNode {
 public:
-    MapNode();
+    MapROSNode();
 
-    ~MapNode() {
+    ~MapROSNode() {
         sub_NewNodeInfo.shutdown();
         sub_GateMovement.shutdown();
         srv_SaveMap.shutdown();
@@ -41,16 +41,16 @@ private:
     bool srvSaveMap(topology_map::SaveMap::Request &, topology_map::SaveMap::Response &);
 };
 
-MapNode::MapNode() {
+MapROSNode::MapROSNode() {
     //TODO using client rather than msg?
     sub_NewNodeInfo = n.subscribe(TOPO_STD_TOPIC_NAME_NODEINFO, 1,
-                                  &MapNode::cbNewNode, this);
+                                  &MapROSNode::cbNewNode, this);
     sub_GateMovement = n.subscribe(TOPO_STD_TOPIC_NAME_GATEMOVE, 1,
-                                   &MapNode::cbThroughGate, this);
-    srv_SaveMap = n.advertiseService(TOPO_STD_SERVICE_NAME_SAVEMAP, &MapNode::srvSaveMap, this);
+                                   &MapROSNode::cbThroughGate, this);
+    srv_SaveMap = n.advertiseService(TOPO_STD_SERVICE_NAME_SAVEMAP, &MapROSNode::srvSaveMap, this);
 }
 
-void MapNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
+void MapROSNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
     auto nodeInstance = new NodeInstance();
     for (int i = 0; i < msgP.exitNum; i++) {
         nodeInstance->addExit(msgP.midPosXs[i], msgP.midPosYs[i], msgP.outDirs[i]);
@@ -61,7 +61,7 @@ void MapNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
     cout << "rec new node" << endl;
 }
 
-void MapNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
+void MapROSNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
     mapGroup.moveThroughGate(leaveGate.data);
     if (mapGroup.experienceNum() == 6) {
         cout << mapGroup.getMapNumbers() << endl;
@@ -69,7 +69,7 @@ void MapNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
     cout << "rec new edge" << endl;
 }
 
-bool MapNode::srvSaveMap(topology_map::SaveMap::Request &req,
+bool MapROSNode::srvSaveMap(topology_map::SaveMap::Request &req,
                          topology_map::SaveMap::Response &res) {
     ofstream ostream;
     cout << mapGroup.getMapName();
