@@ -10,6 +10,8 @@
 
 using namespace std;
 
+size_t NodeInstance::serialCount = 0;
+
 /**NWU
  * @param posx coor x according to middle
  * @param posy coor y according to middle
@@ -28,18 +30,6 @@ void NodeInstance::completeAdding() {
     sort(exits.begin(), exits.end());
     exitNums = static_cast<uint8_t>(exits.size());
     addComplete = true;
-}
-
-void NodeInstance::changeExtraMsgTo(const string &msg) {
-    extraMsg = msg;
-}
-
-void NodeInstance::addExtreaMsg(const string &msg) {
-    extraMsg += msg;
-}
-
-inline const string &NodeInstance::getExtraMsg() {
-    return extraMsg;
 }
 
 /**
@@ -137,8 +127,10 @@ bool NodeInstance::alike(const NodeInstance & rnode) const {
     return true;
 }
 
-NodeInstance::NodeInstance(const string &marker) {
-    extraMsg = marker;
+NodeInstance::NodeInstance()
+        : serialNumber(serialCount)
+{
+    serialCount++;
 }
 
 /**

@@ -9,7 +9,8 @@
 void wait4Key(const string &info) {
     cout << "wait for key:" << info << "..." << endl;
     int a;
-    cin >> a;
+//    cin >> a;
+    ros::Duration(0.01).sleep();
 }
 
 int main(int argc, char **argv)

@@ -28,15 +28,11 @@ class TopoNode;
  */
 class NodeInstance {
 public:
-    NodeInstance() = default;
-    explicit NodeInstance(const string &marker);
+    NodeInstance();
     void addExit(double posx, double posy, double dir);
     void completeAdding();
-    void changeExtraMsgTo(const string &msg);
-    void addExtreaMsg(const string &msg);
     void addUseage(MapCandidate *usedMap, TopoNode *usedAt);
     void removeUseage(MapCandidate *map2unbind);
-    const string& getExtraMsg();
     bool alike (const NodeInstance&) const;
 
     //TODO slove the problem of switch between gateID and ExitPos
@@ -63,6 +59,29 @@ public:
         return 0.3;
     }
 
+    void changeExtraMsgTo(const string &msg) {
+        extraMsg = msg;
+    }
+
+    void addExtreaMsg(const string &msg) {
+        extraMsg += msg;
+    }
+
+    inline const string &getExtraMsg() {
+        return extraMsg;
+    }
+
+    size_t getSerialNumber() const {
+        return serialNumber;
+    }
+
+    void setSerialNumber(size_t serialNumber) {
+        NodeInstance::serialNumber = serialNumber;
+    }
+
+
+    static size_t serialCount;
+
 private:
     /** exits是否添加完成,exits应当是一次性添加后排序的 */
     bool addComplete = false;
@@ -71,6 +90,7 @@ private:
     string extraMsg;
     const double & checkDir(double & d);
     map<MapCandidate*, TopoNode*> nodeUseages;
+    size_t serialNumber;
 };
 
 

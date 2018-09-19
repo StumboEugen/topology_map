@@ -97,7 +97,7 @@ int TopoFile::open(std::_Ios_Openmode mode) {
     chDir2UserPath();
     fs.open(filePath, mode);
     if (fs.is_open()) {
-        cout << "open success!" << endl;
+        cout << "open success!\n" << filePath << endl;
     } else {
         cerr << "open FAIL, fall back to default mode" << endl;
         setFileName("");

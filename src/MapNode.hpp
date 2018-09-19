@@ -42,6 +42,7 @@ private:
 };
 
 MapNode::MapNode() {
+    //TODO using client rather than msg?
     sub_NewNodeInfo = n.subscribe(TOPO_STD_TOPIC_NAME_NODEINFO, 1,
                                   &MapNode::cbNewNode, this);
     sub_GateMovement = n.subscribe(TOPO_STD_TOPIC_NAME_GATEMOVE, 1,
@@ -57,6 +58,7 @@ void MapNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
     nodeInstance->completeAdding();
     mapGroup.arriveInstance(nodeInstance, static_cast<gateId>(msgP.arriveAt),
                             msgP.odomX, msgP.odomY);
+    cout << "rec new node" << endl;
 }
 
 void MapNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
@@ -64,12 +66,14 @@ void MapNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
     if (mapGroup.experienceNum() == 6) {
         cout << mapGroup.getMapNumbers() << endl;
     }
+    cout << "rec new edge" << endl;
 }
 
 bool MapNode::srvSaveMap(topology_map::SaveMap::Request &req,
                          topology_map::SaveMap::Response &res) {
     ofstream ostream;
-    res.fileName = mapGroup.getMapName();
+    cout << mapGroup.getMapName();
+    res.fileName = mapGroup.getMapName();   //TODO not working?!
     return true;
 }
 
