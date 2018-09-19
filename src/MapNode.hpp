@@ -73,7 +73,7 @@ bool MapNode::srvSaveMap(topology_map::SaveMap::Request &req,
                          topology_map::SaveMap::Response &res) {
     ofstream ostream;
     cout << mapGroup.getMapName();
-    res.fileName = mapGroup.getMapName();   //TODO not working?!
+    res.fileName = mapGroup.getMapName();
     return true;
 }
 
