@@ -138,7 +138,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 
-set(HEADERS include/ExitInstance.cpp include/ExitInstance.h
+set(TopoHEADERS include/ExitInstance.cpp include/ExitInstance.h
         include/NodeInstance.h include/NodeInstance.cpp
         include/MapCandidate.cpp include/MapCandidate.h
         include/MapCollection.cpp include/MapCollection.h
@@ -149,7 +149,10 @@ set(HEADERS include/ExitInstance.cpp include/ExitInstance.h
         include/MapArranger.cpp include/MapArranger.h
         include/TopoTools.h include/TopoFile.cpp include/TopoFile.h include/TopoTools.cpp)
 
-add_library(topoLayer ${HEADERS})
+add_library(topoLayer ${TopoHEADERS})
+add_library(jsonCpp include/jsoncpp.cpp)
+
+add_dependencies(topoLayer jsonCpp)
 
 add_executable(main src/main.cpp src/MapROSNode.hpp)
 add_executable(FakeOB src/FakeOB.cpp)

@@ -25,3 +25,11 @@ bool ExitInstance::alike(const ExitInstance & rExit) const {
     double posDif = abs(rExit.midPosX - lExit.midPosX) + abs(rExit.midPosY - lExit.midPosY);
     return  posDif < posTollerance();   //just to kill warning, may not a good idea
 }
+
+Json::Value ExitInstance::toJS() {
+    JSobj obj;
+    obj["pos"].append(midPosX);
+    obj["pos"].append(midPosY);
+    obj["dir"] = outDir;
+    return std::move(obj);
+}

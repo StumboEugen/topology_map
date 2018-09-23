@@ -8,8 +8,7 @@
 #include <memory>
 #include <cmath>
 
-
-class NodeInstance;
+#include "TopoTools.h"
 
 using namespace std;
 
@@ -67,6 +66,8 @@ public:
     static double posTollerance() {
         return 0.5;
     }
+
+    Json::Value toJS();
 
 private:
     // the exit outward direction(NOTHING to do with the instance) ENU

@@ -9,8 +9,6 @@
 #include "MapCollection.h"
 #include "NodeCollection.h"
 
-class NodeInstance;
-
 /**
  * A boss class of the map part
  */
@@ -28,6 +26,14 @@ public:
 
     const string &getMapName() const {
         return mapName;
+    }
+
+    const NodeCollection &getNodeCollection() const {
+        return nodeCollection;
+    }
+
+    const MapCollection &getMapCollection() const {
+        return mapCollection;
     }
 
 private:

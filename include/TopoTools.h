@@ -9,9 +9,13 @@
 #include <list>
 #include <string>
 
+#include "json/json.h"
+
 typedef uint8_t	gateId;
 
 class MapCandidate;
+
+typedef Json::Value JSobj;
 typedef std::list<MapCandidate *>::iterator mapPosInList;
 
 static const double piHalf = 3.1415926 / 2.0;

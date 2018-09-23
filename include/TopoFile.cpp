@@ -93,11 +93,11 @@ int TopoFile::setFileName(string fileName) {
 }
 
 int TopoFile::open(std::_Ios_Openmode mode) {
-    //TODO if fail, use default path
     chDir2UserPath();
     fs.open(filePath, mode);
     if (fs.is_open()) {
         cout << "open success!\n" << filePath << endl;
+        return 1;
     } else {
         cerr << "open FAIL, fall back to default mode" << endl;
         setFileName("");
@@ -105,4 +105,23 @@ int TopoFile::open(std::_Ios_Openmode mode) {
     }
 
     return -1;
+}
+
+int TopoFile::outputMap(const MapArranger &mapGroup) {
+    if (!fs.is_open()) {
+        cout << "[TopoFile::outputMap] you didn't open at first! "
+                "Try to open now ..." << endl;
+        open();
+    }
+
+    fs << mapGroup.getMapName() << endl;
+
+    const auto & nodeSets = mapGroup.getNodeCollection().getNodeSets();
+    for (const auto & nodeSet: nodeSets) {
+        for (const auto & nodeIns : nodeSet.second) {
+            fs << nodeIns->getSerialNumber() << spliter;
+//            fs << nodeIns->
+        }
+    }
+    return 0;
 }

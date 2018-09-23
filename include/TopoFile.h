@@ -13,13 +13,27 @@
 #include <vector>
 #include <string>
 
+#include "MapArranger.h"
+#include "MapCollection.h"
+#include "MapCandidate.h"
+#include "TopoEdge.h"
+#include "TopoNode.h"
+#include "NodeCollection.h"
+#include "NodeInstance.h"
+
 class TopoFile {
 public:
     explicit TopoFile(const std::string &fileName = "");
     int setFileName(std::string fileName);
     int open(std::_Ios_Openmode mode = std::ios::out | std::ios::trunc);
+    int outputMap(const MapArranger &mapGroup);
+
+    void setSpliter(const std::string &spliter) {
+        TopoFile::spliter = spliter;
+    }
 
 private:
+    std::string spliter = ",";
     std::string filePath;
     std::fstream fs;
 
