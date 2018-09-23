@@ -50,6 +50,8 @@ public:
     //tool member help cloning maps
     TopoNode * clonedTo;
 
+    JSobj toJS() const;
+
 private:
     //the corresponded instance
     NodeInstance *const corresponding;

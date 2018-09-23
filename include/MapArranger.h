@@ -36,6 +36,8 @@ public:
         return mapCollection;
     }
 
+    JSobj toJS() const;
+
 private:
     size_t experiences = 0;
     NodeCollection nodeCollection;

@@ -40,3 +40,11 @@ size_t MapArranger::getMapNumbers() {
 MapArranger::MapArranger()
         : mapName(topo::getCurrentTimeString())
 {}
+
+JSobj MapArranger::toJS() const {
+    JSobj obj;
+    obj["nodeInstance"] = nodeCollection.toJS();
+    obj["mapInstance"] = mapCollection.toJS();
+    obj["Name"] = mapName;
+    return std::move(obj);
+}

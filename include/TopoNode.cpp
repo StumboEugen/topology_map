@@ -14,3 +14,7 @@ TopoNode::TopoNode(NodeInstance *const nodeInstance):
         cout << "[TopoNode] bind TopoNode before add complete!" << endl;
     }
 }
+
+JSobj TopoNode::toJS() const {
+    return JSobj();
+}

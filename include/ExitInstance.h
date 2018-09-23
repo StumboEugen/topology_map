@@ -67,7 +67,7 @@ public:
         return 0.5;
     }
 
-    Json::Value toJS();
+    JSobj toJS() const;
 
 private:
     // the exit outward direction(NOTHING to do with the instance) ENU

@@ -17,10 +17,6 @@
 
 int main(int argc, char **argv)
 {
-    TopoFile topoFile("map444");
-    topoFile.open();
-
-
     ros::init(argc, argv, "TopoLayer");
 
     ros::NodeHandle n;

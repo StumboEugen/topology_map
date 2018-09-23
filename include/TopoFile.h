@@ -26,14 +26,14 @@ public:
     explicit TopoFile(const std::string &fileName = "");
     int setFileName(std::string fileName);
     int open(std::_Ios_Openmode mode = std::ios::out | std::ios::trunc);
-    int outputMap(const MapArranger &mapGroup);
+    int writeMap(const MapArranger &mapGroup);
 
-    void setSpliter(const std::string &spliter) {
-        TopoFile::spliter = spliter;
-    }
+//    void setSpliter(const std::string &spliter) {
+//        TopoFile::spliter = spliter;
+//    }
 
 private:
-    std::string spliter = ",";
+//    std::string spliter = ",";
     std::string filePath;
     std::fstream fs;
 

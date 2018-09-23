@@ -82,8 +82,8 @@ bool NodeInstance::alike(const NodeInstance & rnode) const {
     auto rExitBack = rExits.end() - 1;
 
     double difOri = abs(lExit->getMidRad() - rExit->getMidRad());
-    double difL1RB = abs(lExit->getMidRad() - rExitBack->getMidRad()) - piTwo;
-    double difLBR1 = abs(lExitBack->getMidRad() - rExit->getMidRad()) - piTwo;
+    double difL1RB = abs(lExit->getMidRad() - rExitBack->getMidRad() - piTwo);
+    double difLBR1 = abs(lExitBack->getMidRad() - rExit->getMidRad() - piTwo);
 
     // we only need to change if difOri is not the smallest
     if (difOri > difL1RB || difOri > difLBR1) {
@@ -166,5 +166,16 @@ topology_map::NewNodeMsgPtr NodeInstance::encode2ROSmsg(unsigned char arriveAt,
     msgPtr->odomY = odomY;
     msgPtr->arriveAt = arriveAt;
     return msgPtr;
+}
+
+JSobj NodeInstance::toJS() const {
+    JSobj obj;
+    obj["No"] = serialNumber;
+    obj["Extra"] = extraMsg;
+    auto & exitJS = obj["Exits"];
+    for (const auto & exit: exits) {
+        exitJS.append(exit.toJS());
+    }
+    return std::move(obj);
 }
 

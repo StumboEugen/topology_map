@@ -152,6 +152,7 @@ set(TopoHEADERS include/ExitInstance.cpp include/ExitInstance.h
 add_library(topoLayer ${TopoHEADERS})
 add_library(jsonCpp include/jsoncpp.cpp)
 
+target_link_libraries(topoLayer jsonCpp)
 add_dependencies(topoLayer jsonCpp)
 
 add_executable(main src/main.cpp src/MapROSNode.hpp)

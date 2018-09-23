@@ -26,6 +26,8 @@ public:
     size_t mapNumbers() {
         return maps.size();
     }
+
+    JSobj toJS() const;
 private:
     /**
      * using list to store the map candidate to sort them quickly

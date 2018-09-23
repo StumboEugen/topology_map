@@ -194,3 +194,18 @@ MapCandidate::~MapCandidate() {
         delete node;
     }
 }
+
+JSobj MapCandidate::toJS() const {
+    JSobj obj;
+    for (const auto & edge: edges) {
+        auto edgeJS = edge->toJS();
+        if (edge == currentEdge) {
+            edgeJS["cur"] = true;
+        }
+        obj["edges"].append(edgeJS);
+    }
+    obj["curNode"] = currentNode->getInstanceCorresponding()->getSerialNumber();
+    obj["lEiOe"] = lastEdgeIsOldEdge; //TODO is this needed?
+    obj["edgeFullNum"] = fullEdgeNumber;
+    return std::move(obj);
+}

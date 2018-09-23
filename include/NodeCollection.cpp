@@ -58,3 +58,13 @@ NodeCollection::addInstanceAndCompare
 
     return std::move(newMaps);
 }
+
+JSobj NodeCollection::toJS() const {
+    JSobj obj;
+    for (const auto & nodeSet: nodeSets) {
+        for (const auto & node: nodeSet.second) {
+            obj.append(node->toJS());
+        }
+    }
+    return std::move(obj);
+}

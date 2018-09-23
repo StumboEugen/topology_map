@@ -9,6 +9,8 @@
 #include <map>
 #include <unordered_map>
 
+#include "TopoTools.h"
+
 using namespace std;
 
 class NodeInstance;
@@ -27,6 +29,8 @@ public:
     const map<int, set<NodeInstance *>> &getNodeSets() const {
         return nodeSets;
     }
+
+    JSobj toJS() const;
 
 private:
     map<int, set<NodeInstance*>> nodeSets;

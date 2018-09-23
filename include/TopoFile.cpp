@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 
+
 using namespace std;
 
 TopoFile::TopoFile(const string &fileName) {
@@ -107,21 +108,14 @@ int TopoFile::open(std::_Ios_Openmode mode) {
     return -1;
 }
 
-int TopoFile::outputMap(const MapArranger &mapGroup) {
+int TopoFile::writeMap(const MapArranger &mapGroup) {
     if (!fs.is_open()) {
-        cout << "[TopoFile::outputMap] you didn't open at first! "
+        cout << "[TopoFile::writeMap] you didn't open at first! "
                 "Try to open now ..." << endl;
         open();
     }
 
-    fs << mapGroup.getMapName() << endl;
+    fs << mapGroup.toJS() << endl;
 
-    const auto & nodeSets = mapGroup.getNodeCollection().getNodeSets();
-    for (const auto & nodeSet: nodeSets) {
-        for (const auto & nodeIns : nodeSet.second) {
-            fs << nodeIns->getSerialNumber() << spliter;
-//            fs << nodeIns->
-        }
-    }
     return 0;
 }

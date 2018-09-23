@@ -41,3 +41,11 @@ void MapCollection::everyMapThroughGate(gateId exit) {
         map->setLeaveFrom(exit);
     }
 }
+
+JSobj MapCollection::toJS() const {
+    JSobj obj;
+    for (const auto & mapIns: maps) {
+        obj.append(mapIns->toJS());
+    }
+    return std::move(obj);
+}

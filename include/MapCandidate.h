@@ -60,6 +60,8 @@ public:
 
     void removeNode(TopoNode * node2remove);
 
+    JSobj toJS() const;
+
     ~MapCandidate();
 
 private:

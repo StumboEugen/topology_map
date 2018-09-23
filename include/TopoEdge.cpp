@@ -5,6 +5,7 @@
 #include "TopoEdge.h"
 #include "MapCandidate.h"
 #include "TopoNode.h"
+#include "NodeInstance.h"
 
 #include <cmath>
 
@@ -120,3 +121,15 @@ TopoEdge::TopoEdge(TopoNode *const ea, uint8_t ga, TopoNode *const eb, uint8_t g
          odomAverage(0)
 //TODO set moved from a2bMoved b2aMoved
 {}
+
+JSobj TopoEdge::toJS() const {
+    JSobj obj;
+    obj["Ea"] = exitA->getInstanceCorresponding()->getSerialNumber();
+    obj["Eb"] = exitB->getInstanceCorresponding()->getSerialNumber();
+    obj["Ga"] = gateA;
+    obj["Gb"] = gateB;
+    obj["Ox"] = odomX;
+    obj["Oy"] = odomY;
+    obj["Oa"] = odomAverage;
+    return std::move(obj);
+}

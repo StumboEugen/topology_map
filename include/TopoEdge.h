@@ -6,9 +6,7 @@
 #define TOPOLOGY_MAP_TOPOEDGE_H
 
 #include <iostream>
-
-using std::cout;
-using std::endl;
+#include "TopoTools.h"
 
 class TopoNode;
 
@@ -29,7 +27,7 @@ public:
         if (node == exitB) {
             return exitA;
         }
-        cout << "TopoEdge another node FAILURE" << endl;
+        std::cout << "TopoEdge another node FAILURE" << std::endl;
         throw;
     }
 
@@ -40,7 +38,7 @@ public:
         if (node == exitB) {
             return gateA;
         }
-        cout << "TopoEdge another gate FAILURE" << endl;
+        std::cout << "TopoEdge another gate FAILURE" << std::endl;
         throw;
     }
 
@@ -75,6 +73,8 @@ public:
     double getOdomY() const {
         return odomY;
     }
+
+    JSobj toJS() const;
 
 private:
     TopoNode * exitA;

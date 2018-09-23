@@ -71,8 +71,9 @@ void MapROSNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
 
 bool MapROSNode::srvSaveMap(topology_map::SaveMap::Request &req,
                          topology_map::SaveMap::Response &res) {
-    ofstream ostream;
-    cout << mapGroup.getMapName();
+    TopoFile topoFile(mapGroup.getMapName());
+    topoFile.open();
+    topoFile.writeMap(mapGroup);
     res.fileName = mapGroup.getMapName();
     return true;
 }

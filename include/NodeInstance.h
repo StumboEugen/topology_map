@@ -14,6 +14,8 @@
 
 #include <topology_map/NewNodeMsg.h>
 
+#include "TopoTools.h"
+
 using std::map;
 using std::vector;
 using std::string;
@@ -112,6 +114,8 @@ public:
 
     // accumulate the serial Number
     static size_t serialCount;
+
+    JSobj toJS() const;
 
 private:
     // determine if the instance is add complete
