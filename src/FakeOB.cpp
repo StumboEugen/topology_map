@@ -31,78 +31,77 @@ int main(int argc, char **argv)
     MapArranger mapGroup;
 
     auto instance0 = new NodeInstance();    //TODO use shared_ptr or delete the pointer
-    instance0->addExit(1, 0, 0);
-    instance0->addExit(0, -1, 90);
+    instance0->addExit(1, 0, 90);
+    instance0->addExit(0, 1, 0);
     instance0->completeAdding();
     auto nodeMsg = instance0->encode2ROSmsg(0, 0, 0);
     std_msgs::UInt8 tempGate;
     tempGate.data = 0;
-    nodeInfo_pub.publish(nodeMsg);
     wait4Key("1n");
+    nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
-    gateMove_pub.publish(tempGate);
     wait4Key("1g");
+    gateMove_pub.publish(tempGate);
 
     auto instance1 = new NodeInstance();
-    instance1->addExit(-1, 0, 0);
-    instance1->addExit(0, -1, 90);
+    instance1->addExit(1, 0, 90);
+    instance1->addExit(0, -1, 180);
     instance1->completeAdding();
     nodeMsg = instance1->encode2ROSmsg(0, 10, 0);
     tempGate.data = 1;
+    wait4Key("2n");
     nodeInfo_pub.publish(nodeMsg);
-    wait4Key("2n");
     loop_rate.sleep();
-    gateMove_pub.publish(tempGate);
     wait4Key("2n");
+    gateMove_pub.publish(tempGate);
 
     auto instance2 = new NodeInstance();
-    instance2->addExit(-1, 0, 0);
-    instance2->addExit(0, 1, 180);
+    instance2->addExit(-1, 0, 270);
+    instance2->addExit(0, -1, 180);
     instance2->completeAdding();
     nodeMsg = instance2->encode2ROSmsg(1, 0, -10);
     tempGate.data = 0;
-    nodeInfo_pub.publish(nodeMsg);
     wait4Key("3n");
+    nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
-    gateMove_pub.publish(tempGate);
     wait4Key("3g");
+    gateMove_pub.publish(tempGate);
 
     auto instance3 = new NodeInstance();
-    instance3->addExit(1, 0, 0);
-    instance3->addExit(0, 1, 180);
+    instance3->addExit(-1, 0, 270);
+    instance3->addExit(0, 1, 0);
     instance3->completeAdding();
     nodeMsg = instance3->encode2ROSmsg(1, -10, 0);
     tempGate.data = 0;
-    nodeInfo_pub.publish(nodeMsg);
     wait4Key("4n");
+    nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
-    gateMove_pub.publish(tempGate);
     wait4Key("4g");
+    gateMove_pub.publish(tempGate);
 
     auto instance4 = new NodeInstance();
-    instance4->addExit(1, 0, 0);
-    instance4->addExit(0, -1, 90);
+    instance4->addExit(1, 0, 90);
+    instance4->addExit(0, 1, 0);
     instance4->completeAdding();
     nodeMsg = instance4->encode2ROSmsg(1, 0, 10);
     tempGate.data = 0;
-    nodeInfo_pub.publish(nodeMsg);
     wait4Key("5n");
+    nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
-    gateMove_pub.publish(tempGate);
     wait4Key("5g");
+    gateMove_pub.publish(tempGate);
 
     auto instance5 = new NodeInstance();
-    instance5->addExit(-1, 0, 0);
-    instance5->addExit(0, -1, 90);
-    //instance5->addExit(1, 1, 90);
+    instance5->addExit(1, 0, 90);
+    instance5->addExit(0, -1, 180);
     instance5->completeAdding();
     nodeMsg = instance5->encode2ROSmsg(0, 10, 0);
     tempGate.data = 1;
-    nodeInfo_pub.publish(nodeMsg);
     wait4Key("6n");
+    nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
-    gateMove_pub.publish(tempGate);
     wait4Key("6g");
+    gateMove_pub.publish(tempGate);
 
 //    int count = 0;
 //    while (ros::ok())
