@@ -15,6 +15,7 @@
 #include <topology_map/NewNodeMsg.h>
 
 #include "TopoTools.h"
+#include "ExitInstance.h"
 
 using std::map;
 using std::vector;

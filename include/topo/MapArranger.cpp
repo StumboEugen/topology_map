@@ -49,8 +49,47 @@ JSobj MapArranger::toJS() const {
     return std::move(obj);
 }
 
-bool MapArranger::readFromJSON(const JSobj &jsobj) {
+using topo::checkJSMember;
+
+bool MapArranger::readFromJSON(const JSobj &obj) {
     mapCollection.clear();
     nodeCollection.clear();
-    return false;
+
+    if (!checkJSMember({"Name", "nodeInstance", "mapInstance"},obj)) {
+        return false;
+    }
+
+    mapName = obj["Name"].asString();
+    auto & JSnodeInses = obj["nodeInstance"];
+
+    if (!checkJSMember({"No", "Exits"}, JSnodeInses[0])) {
+        return false;
+    }
+
+    if (!checkJSMember({"dir", "pos"}, JSnodeInses[0]["Exits"][0])) {
+        return false;
+    }
+
+    std::vector<NodeInstance *> nodeInses(JSnodeInses.size(), nullptr);
+    for (int i = 0; i < JSnodeInses.size(); i++) {
+        auto ins = new NodeInstance();
+        auto & JSIns = JSnodeInses[i];
+        auto & JSexits = JSIns["Exits"];
+        for (int j = 0; j < JSexits.size(); j++) {
+            auto & JSexit = JSexits[i];
+            ins->addExit(JSexit["pos"][0].asDouble(),
+                         JSexit["pos"][1].asDouble(),
+                         JSexit["dir"].asDouble());
+        }
+        ins->completeAdding();
+        int No = JSIns["No"].asInt();
+        while (No > nodeInses.size()) {
+            nodeInses.push_back(nullptr);
+        }
+        nodeInses[No] = ins;
+    }
+
+    //TODO input the maps
+
+    return true;
 }

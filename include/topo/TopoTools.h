@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <list>
 #include <string>
+#include <vector>
 
 #include "json/json.h"
 
@@ -30,6 +31,7 @@ static const double piTwo = 3.1415926 * 2.0;
 
 namespace topo {
     const std::string getCurrentTimeString();
+    bool checkJSMember(const std::vector<std::string> &strs, const JSobj &js);
 }
 
 #endif //TOPOLOGY_MAP_TOPOTOOL_H

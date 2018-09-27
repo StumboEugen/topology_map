@@ -36,7 +36,7 @@ public:
         return mapCollection;
     }
 
-    bool readFromJSON(const JSobj & jsobj);
+    bool readFromJSON(const JSobj & obj);
 
     JSobj toJS() const;
 

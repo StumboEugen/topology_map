@@ -17,3 +17,14 @@ const std::string topo::getCurrentTimeString() {
     strftime(tmp, sizeof(tmp), "%Y%m%d_%H%M", timeStructP);
     return move(string(tmp));
 }
+
+bool topo::checkJSMember(const vector<std::string> &strs, const JSobj &js) {
+    for (const auto & str: strs) {
+        if(js.isMember(str)) {
+            continue;
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
