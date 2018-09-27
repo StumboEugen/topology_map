@@ -102,6 +102,7 @@ int main(int argc, char **argv)
     loop_rate.sleep();
     wait4Key("6g");
     gateMove_pub.publish(tempGate);
+    loop_rate.sleep();
 
 //    int count = 0;
 //    while (ros::ok())

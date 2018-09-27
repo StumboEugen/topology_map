@@ -21,11 +21,37 @@
 #include "NodeCollection.h"
 #include "NodeInstance.h"
 
+/**
+ * a tool class for TopoMap IO
+ */
 class TopoFile {
 public:
+    /**
+     * constructor, the fileName can be assigned
+     * @param fileName the path of the file, default("") is ~/topoMaps/<current Time>.
+     * absolute path is not supported
+     * @example
+     * filename = abc/map will create the map at ~/abc/map
+     */
     explicit TopoFile(const std::string &fileName = "");
+    /**
+     * @param fileName the path of the file, default("") is ~/topoMaps/<current Time>.
+     * absolute path is not supported
+     * @example
+     * filename = abc/map will create the map at ~/abc/map
+     */
     int setFileName(std::string fileName);
+    /**
+     * open file at first, if fail, will automanticly turn to default path and name
+     * @param mode out, trunc(delete at first), in
+     * @return 0 if successful, -1 if failed(but the default setting will work)
+     */
     int open(std::_Ios_Openmode mode = std::ios::out | std::ios::trunc);
+    /**
+     * write the mapGroup you assign to the file in JSON style
+     * @param mapGroup the maps to record
+     * @return 0 if successful, -1 if failed
+     */
     int writeMap(const MapArranger &mapGroup);
 
 //    void setSpliter(const std::string &spliter) {

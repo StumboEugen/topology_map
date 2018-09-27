@@ -81,7 +81,7 @@ int TopoFile::setFileName(string fileName) {
             mkdir(floder.c_str(), 0b111111111);
         }
         if (chdir(floder.c_str()) == -1 || floder == "/") {
-            std::cout << "\n[ERROR] FAIL TO OPEN FILE: ~/" + filePath
+            std::cout << "\n[ERROR] FAIL TO REACH FLODER: ~/" + filePath
                       << "\n        Stuck at:" << floder
                       << "\n        fall back to the default path"
                       << std::endl;
@@ -98,7 +98,7 @@ int TopoFile::open(std::_Ios_Openmode mode) {
     fs.open(filePath, mode);
     if (fs.is_open()) {
         cout << "open success!\n" << filePath << endl;
-        return 1;
+        return 0;
     } else {
         cerr << "open FAIL, fall back to default mode" << endl;
         setFileName("");
