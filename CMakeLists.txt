@@ -4,10 +4,9 @@ project(topology_map)
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
-#set(CMAKE_AUTOMOC ON)
-#set(CMAKE_AUTOUIC ON)
-#set(CMAKE_INCLUDE_CURRENT_DIR ON)
-#set(CMP0071 NEW)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -131,35 +130,6 @@ catkin_package(
 # included via the dependency call in package.xml
 rosbuild_prepare_qt4 (QtCore QtGui) # Add the appropriate components to the component list here
 
-##############################################################################
-# Sections
-##############################################################################
-
-file(GLOB QT_FORMS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ui/*.ui)
-file(GLOB QT_RESOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} resources/*.qrc)
-file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        FOLLOW_SYMLINKS include/qttest/*.hpp)
-
-QT4_ADD_RESOURCES(QT_RESOURCES_CPP ${QT_RESOURCES})
-QT4_WRAP_UI(QT_FORMS_HPP ${QT_FORMS})
-QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
-
-##############################################################################
-# Sources
-##############################################################################
-
-file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS
-        src/mainq.cpp src/main_window.cpp src/qnode.cpp)
-
-##############################################################################
-# Binaries
-##############################################################################
-
-add_executable(qttest ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(qttest ${QT_LIBRARIES} ${catkin_LIBRARIES})
-#install(TARGETS qttest RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
-
-
 ###########
 ## Build ##
 ###########
@@ -185,22 +155,28 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 
+file(GLOB Topo_UI_FORM RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} include/topo/UI/*.ui)
+file(GLOB Topo_UI_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        include/topo/UI/*.h include/topo/UI/*.cpp)
+
 file(GLOB TopoFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         include/topo/*.cpp include/topo/*.h)
 
 file(GLOB JsonFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         include/json/*.cpp include/json/*.h)
 
+add_library(topoLayer_UI ${Topo_UI_FORM} ${Topo_UI_SOURCES})
 add_library(topoLayer ${TopoFILES})
 add_library(jsonCpp ${JsonFILES})
 
-target_link_libraries(topoLayer jsonCpp)
-add_dependencies(topoLayer jsonCpp)
-
-add_executable(main src/main.cpp src/MapROSNode.hpp ${QT4_WRAP_UI})
+add_executable(main src/main.cpp src/MapROSNode.hpp)
+add_executable(UI_Topo src/UI_main.cpp)
 add_executable(FakeOB src/FakeOB.cpp)
 
+target_link_libraries(topoLayer jsonCpp)
+target_link_libraries(topoLayer_UI topoLayer)
 target_link_libraries(main topoLayer)
+target_link_libraries(UI_Topo topoLayer_UI)
 target_link_libraries(FakeOB topoLayer)
 
 ## Rename C++ executable without prefix
@@ -214,8 +190,12 @@ target_link_libraries(FakeOB topoLayer)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(main ${catkin_LIBRARIES} ${QT_LIBRARIES})
+target_link_libraries(main ${catkin_LIBRARIES})
+target_link_libraries(UI_Topo ${catkin_LIBRARIES} ${QT_LIBRARIES})
 target_link_libraries(FakeOB ${catkin_LIBRARIES})
+
+add_dependencies(topoLayer jsonCpp)
+add_dependencies(topoLayer_UI topoLayer)
 
 add_dependencies(topoLayer ${PROJECT_NAME}_gencpp)
 add_dependencies(main ${PROJECT_NAME}_gencpp)

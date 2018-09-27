@@ -16,6 +16,7 @@
 
 int main(int argc, char **argv)
 {
+
     ros::init(argc, argv, "TopoLayer");
 
     ros::NodeHandle n;
@@ -23,7 +24,6 @@ int main(int argc, char **argv)
     MapROSNode mapNode;    //the callback is in this class
 
     ros::spin();
-
 
     /**
      * without these lines, debug will fail
