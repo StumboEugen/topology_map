@@ -138,19 +138,25 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 
-set(TopoHEADERS include/ExitInstance.cpp include/ExitInstance.h
-        include/NodeInstance.h include/NodeInstance.cpp
-        include/MapCandidate.cpp include/MapCandidate.h
-        include/MapCollection.cpp include/MapCollection.h
-        include/TopoEdge.cpp include/TopoEdge.h
-        include/TopoNode.cpp include/TopoNode.h
-        include/NodeCollection.cpp include/NodeCollection.h
-        include/TopoMap.h
-        include/MapArranger.cpp include/MapArranger.h
-        include/TopoTools.h include/TopoFile.cpp include/TopoFile.h include/TopoTools.cpp)
+#set(TopoHEADERS include/ExitInstance.cpp include/ExitInstance.h
+#        include/NodeInstance.h include/NodeInstance.cpp
+#        include/MapCandidate.cpp include/MapCandidate.h
+#        include/MapCollection.cpp include/MapCollection.h
+#        include/TopoEdge.cpp include/TopoEdge.h
+#        include/TopoNode.cpp include/TopoNode.h
+#        include/NodeCollection.cpp include/NodeCollection.h
+#        include/TopoMap.h
+#        include/MapArranger.cpp include/MapArranger.h
+#        include/TopoTools.h include/TopoFile.cpp include/TopoFile.h include/TopoTools.cpp)
 
-add_library(topoLayer ${TopoHEADERS})
-add_library(jsonCpp include/jsoncpp.cpp)
+file(GLOB TopoFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        include/topo/*.cpp include/topo/*.h)
+
+file(GLOB JsonFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+        include/json/*.cpp include/json/*.h)
+
+add_library(topoLayer ${TopoFILES})
+add_library(jsonCpp ${JsonFILES})
 
 target_link_libraries(topoLayer jsonCpp)
 add_dependencies(topoLayer jsonCpp)

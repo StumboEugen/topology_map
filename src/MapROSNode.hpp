@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "TopoMap.h"
+#include "topo/TopoMap.h"
 #include "ros/ros.h"
 
 #include <topology_map/NewNodeMsg.h>

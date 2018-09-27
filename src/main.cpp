@@ -8,12 +8,11 @@
 #include "std_msgs/String.h"
 
 #include <sstream>
-#include <MapArranger.h>
 #include <list>
 
 #include <topology_map/NewNodeMsg.h>
 
-#include "TopoMap.h"
+#include "topo/TopoMap.h"
 
 int main(int argc, char **argv)
 {
