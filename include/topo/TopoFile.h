@@ -50,13 +50,11 @@ public:
     /**
      * write the mapGroup you assign to the file in JSON style
      * @param mapGroup the maps to record
-     * @return 0 if successful, -1 if failed
+     * @return 0 if success, -1 if fail
      */
-    int writeMap(const MapArranger &mapGroup);
+    int outputMap(const MapArranger &mapGroup);
 
-//    void setSpliter(const std::string &spliter) {
-//        TopoFile::spliter = spliter;
-//    }
+    int inputMap(MapArranger &mapGroup);
 
 private:
 //    std::string spliter = ",";

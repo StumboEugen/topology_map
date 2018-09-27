@@ -22,6 +22,9 @@ class MapROSNode {
 public:
     MapROSNode();
 
+
+    MapROSNode(const std::string &fileName);
+
     ~MapROSNode() {
         sub_NewNodeInfo.shutdown();
         sub_GateMovement.shutdown();
@@ -36,18 +39,28 @@ private:
     ros::ServiceServer srv_SaveMap;
     ros::NodeHandle n;
 
+    void rosNodeInit();
+
     void cbNewNode(const topology_map::NewNodeMsg &);
     void cbThroughGate(std_msgs::UInt8);
     bool srvSaveMap(topology_map::SaveMap::Request &, topology_map::SaveMap::Response &);
 };
 
 MapROSNode::MapROSNode() {
-    //TODO using client rather than msg?
-    sub_NewNodeInfo = n.subscribe(TOPO_STD_TOPIC_NAME_NODEINFO, 1,
-                                  &MapROSNode::cbNewNode, this);
-    sub_GateMovement = n.subscribe(TOPO_STD_TOPIC_NAME_GATEMOVE, 1,
-                                   &MapROSNode::cbThroughGate, this);
-    srv_SaveMap = n.advertiseService(TOPO_STD_SERVICE_NAME_SAVEMAP, &MapROSNode::srvSaveMap, this);
+    rosNodeInit();
+}
+
+/**
+ * start from a exist Map
+ * @param fileName
+ */
+MapROSNode::MapROSNode(const std::string &fileName) {
+    TopoFile existFile(fileName);
+    if (existFile.open(std::ios::in) != 0) {
+        cerr << "[Node constructor] read map fail, fall back to empty map" << endl;
+    }
+    existFile.inputMap(mapGroup);
+    rosNodeInit();
 }
 
 void MapROSNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
@@ -73,9 +86,19 @@ bool MapROSNode::srvSaveMap(topology_map::SaveMap::Request &req,
                          topology_map::SaveMap::Response &res) {
     TopoFile topoFile(mapGroup.getMapName());
     topoFile.open();
-    topoFile.writeMap(mapGroup);
+    topoFile.outputMap(mapGroup);
     res.fileName = mapGroup.getMapName();
     return true;
+}
+
+void MapROSNode::rosNodeInit() {
+    //TODO using client rather than msg?
+    sub_NewNodeInfo = n.subscribe(TOPO_STD_TOPIC_NAME_NODEINFO, 5,
+                                  &MapROSNode::cbNewNode, this);
+    sub_GateMovement = n.subscribe(TOPO_STD_TOPIC_NAME_GATEMOVE, 5,
+                                   &MapROSNode::cbThroughGate, this);
+    srv_SaveMap = n.advertiseService(TOPO_STD_SERVICE_NAME_SAVEMAP, &MapROSNode::srvSaveMap, this);
+
 }
 
 #endif //TOPOLOGY_MAP_MAPNODE_HPP

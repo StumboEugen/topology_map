@@ -100,22 +100,35 @@ int TopoFile::open(std::_Ios_Openmode mode) {
         cout << "open success!\n" << filePath << endl;
         return 0;
     } else {
-        cerr << "open FAIL, fall back to default mode" << endl;
-        setFileName("");
-        open();
+        cerr << "open FAIL" << endl;
+//        setFileName("");
+//        open(mode);
+        return -1;
     }
-
-    return -1;
 }
 
-int TopoFile::writeMap(const MapArranger &mapGroup) {
+int TopoFile::outputMap(const MapArranger &mapGroup) {
     if (!fs.is_open()) {
-        cout << "[TopoFile::writeMap] you didn't open at first! "
+        cout << "[TopoFile::outputMap] you didn't open at first! "
                 "Try to open now ..." << endl;
-        open();
+        if ( open(std::ios::out | std::ios::trunc) != 0) {
+            return -1;
+        }
     }
-
     fs << mapGroup.toJS() << endl;
+    return 0;
+}
 
+int TopoFile::inputMap(MapArranger &mapGroup) {
+    if (!fs.is_open()) {
+        cout << "[TopoFile::inputMap] you didn't open at first! "
+                "Try to open now ..." << endl;
+        if (open(std::ios::in) != 0) {
+            return -1;
+        }
+    }
+    JSobj jSobj;
+    fs >> jSobj;
+    cout << jSobj;
     return 0;
 }

@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 
     ros::NodeHandle n;
     
-    MapROSNode mapNode;    //the callback is in this class
+    MapROSNode mapNode("map");    //callbacks are in this class
 
     ros::spin();
 
