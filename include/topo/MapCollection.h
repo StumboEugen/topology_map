@@ -28,6 +28,8 @@ public:
     }
 
     JSobj toJS() const;
+
+    void clear();
 private:
     /**
      * using list to store the map candidate to sort them quickly

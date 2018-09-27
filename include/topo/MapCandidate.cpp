@@ -190,7 +190,6 @@ MapCandidate::~MapCandidate() {
         delete edge;
     }
     for (auto node: nodes) {
-        node->getInstanceCorresponding()->removeUseage(this);
         delete node;
     }
 }
@@ -208,4 +207,13 @@ JSobj MapCandidate::toJS() const {
     obj["lEiOe"] = lastEdgeIsOldEdge; //TODO is this needed?
     obj["edgeFullNum"] = fullEdgeNumber;
     return std::move(obj);
+}
+
+/**
+ * call this function when this map has conflict, and need to be deleted
+ */
+void MapCandidate::removeUseages() {
+    for (auto node: nodes) {
+        node->getInstanceCorresponding()->removeUseage(this);
+    }
 }

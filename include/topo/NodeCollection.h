@@ -32,6 +32,8 @@ public:
 
     JSobj toJS() const;
 
+    void clear();
+
 private:
     map<int, set<NodeInstance*>> nodeSets;
 };

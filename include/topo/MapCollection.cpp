@@ -22,6 +22,7 @@ void MapCollection::arriveNodeInstance(NodeInstance * instance, uint8_t arriveAt
         while (iter != maps.end()) {
             auto & map = *iter;
             if(!map->arriveAtNode(instance, arriveAt, dis_x, dis_y)) {  //TODO sort pos
+                map->removeUseages();
                 delete map;
                 iter = maps.erase(iter);
             } else {
@@ -48,4 +49,11 @@ JSobj MapCollection::toJS() const {
         obj.append(mapIns->toJS());
     }
     return std::move(obj);
+}
+
+void MapCollection::clear() {
+    for (const auto & map: maps) {
+        delete map;
+    }
+    maps.clear();
 }

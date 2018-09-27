@@ -36,6 +36,8 @@ public:
         return mapCollection;
     }
 
+    bool readFromJSON(const JSobj & jsobj);
+
     JSobj toJS() const;
 
 private:

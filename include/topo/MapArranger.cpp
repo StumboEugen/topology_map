@@ -48,3 +48,9 @@ JSobj MapArranger::toJS() const {
     obj["Name"] = mapName;
     return std::move(obj);
 }
+
+bool MapArranger::readFromJSON(const JSobj &jsobj) {
+    mapCollection.clear();
+    nodeCollection.clear();
+    return false;
+}

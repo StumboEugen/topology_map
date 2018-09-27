@@ -64,6 +64,8 @@ public:
 
     ~MapCandidate();
 
+    void removeUseages();
+
 private:
     void arriveNewNode(NodeInstance *instance, gateId arriveAt);
     set<TopoNode *> nodes;

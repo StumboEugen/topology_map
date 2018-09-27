@@ -127,8 +127,8 @@ int TopoFile::inputMap(MapArranger &mapGroup) {
             return -1;
         }
     }
-    JSobj jSobj;
-    fs >> jSobj;
-    cout << jSobj;
+    JSobj jsobj;
+    fs >> jsobj;
+    mapGroup.readFromJSON(jsobj);
     return 0;
 }

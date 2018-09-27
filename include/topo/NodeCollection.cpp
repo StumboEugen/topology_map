@@ -68,3 +68,12 @@ JSobj NodeCollection::toJS() const {
     }
     return std::move(obj);
 }
+
+void NodeCollection::clear() {
+    for (const auto & nodeSet: nodeSets) {
+        for (const auto & node: nodeSet.second) {
+            delete node;
+        }
+    }
+    nodeSets.clear();
+}
