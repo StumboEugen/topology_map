@@ -54,11 +54,7 @@ MapROSNode::MapROSNode() {
  * @param fileName
  */
 MapROSNode::MapROSNode(const std::string &fileName) {
-    TopoFile existFile(fileName);
-    if (existFile.open(std::ios::in) != 0) {
-        cerr << "[Node constructor] read map fail, fall back to empty map" << endl;
-    }
-    existFile.inputMap(mapGroup);
+    mapGroup.reloadFromFile(fileName);
     rosNodeInit();
 }
 

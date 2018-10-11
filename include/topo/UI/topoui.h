@@ -2,6 +2,8 @@
 #define TOPOUI_H
 
 #include <QMainWindow>
+#include <QEvent>
+#include "topo/Topo.h"
 
 namespace Ui {
 class TopoUI;
@@ -16,8 +18,12 @@ public:
     ~TopoUI() override;
 
 private:
+    MapArranger mapGroup;
     Ui::TopoUI *ui;
     void paintEvent(QPaintEvent * event) override;
+
+private Q_SLOTS:
+    void loadMapFromFile();
 };
 
 #endif // TOPOUI_H

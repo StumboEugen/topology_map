@@ -51,9 +51,13 @@ JSobj MapArranger::toJS() const {
 
 using topo::checkJSMember;
 
+/**
+ * decode from a JSON obj
+ * @param obj the JSON obj
+ * @return true if success, false if unsuccess
+ */
 bool MapArranger::readFromJSON(const JSobj &obj) {
-    mapCollection.clear();
-    nodeCollection.clear();
+    selfClean();
 
     /**
      * verify the JS structor
@@ -89,41 +93,73 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
 
     /**
      * build the serialNumber-Instance pair dict
+     * TODO not robust
      */
-    std::vector<NodeInstance *> nodeInsesDict(JSnodeInses.size(), nullptr);
-    for (int i = 0; i < JSnodeInses.size(); i++) {
-        auto ins = new NodeInstance();
-        auto & JSIns = JSnodeInses[i];
-        auto & JSexits = JSIns["Exits"];
-        for (int j = 0; j < JSexits.size(); j++) {
-            auto & JSexit = JSexits[j];
-            ins->addExit(JSexit["pos"][0].asDouble(),
-                         JSexit["pos"][1].asDouble(),
-                         JSexit["dir"].asDouble());
+    try {
+        std::vector<NodeInstance *> nodeInsesDict(JSnodeInses.size(), nullptr);
+        for (int i = 0; i < JSnodeInses.size(); i++) {
+            auto ins = new NodeInstance();
+            auto & JSIns = JSnodeInses[i];
+            auto & JSexits = JSIns["Exits"];
+            for (int j = 0; j < JSexits.size(); j++) {
+                auto & JSexit = JSexits[j];
+                ins->addExit(JSexit["pos"][0].asDouble(),
+                             JSexit["pos"][1].asDouble(),
+                             JSexit["dir"].asDouble());
+            }
+            ins->completeAdding();
+            int No = JSIns["No"].asInt();
+            while (No + 1 > nodeInsesDict.size()) {
+                nodeInsesDict.push_back(nullptr);
+            }
+            nodeInsesDict[No] = ins;
         }
-        ins->completeAdding();
-        int No = JSIns["No"].asInt();
-        while (No + 1 > nodeInsesDict.size()) {
-            nodeInsesDict.push_back(nullptr);
+
+        /**
+         * construct the map collection using the serialNO-INS dict
+         */
+        for (int i = 0; i < JSmaps.size(); i++) {
+            auto newMap = new MapCandidate(nodeInsesDict, JSmaps[i]);
+            auto pos = mapCollection.addMapAtListBack(newMap);
+            newMap->setPosInList(pos);
         }
-        nodeInsesDict[No] = ins;
-    }
 
-    /**
-     * construct the map collection using the serialNO-INS dict
-     */
-    for (int i = 0; i < JSmaps.size(); i++) {
-        auto newMap = new MapCandidate(nodeInsesDict, JSmaps[i]);
-        auto pos = mapCollection.addMapAtListBack(newMap);
-        newMap->setPosInList(pos);
+        /**
+         * construct the node collection
+         */
+        for (const auto & theIns: nodeInsesDict) {
+            nodeCollection.addInstanceDirectly(theIns);
+        }
+    } catch (exception & e) {
+        cerr << "decode JSON file FAIL!\n" << e.what() << endl;
+        return false;
     }
-
-    /**
-     * construct the node collection
-     */
-    for (const auto & theIns: nodeInsesDict) {
-        nodeCollection.addInstanceDirectly(theIns);
-    }
-
     return true;
+}
+
+/**
+ * load the file according to he file name ~/topoMaps/<fileName>
+ * if fail, the whole group will be cleared
+ * @param fileName
+ * @return if the reload is successful
+ */
+bool MapArranger::reloadFromFile(const std::string & fileName) {
+    TopoFile existFile(fileName);
+    if (existFile.open(std::ios::in) != 0) {
+        cerr << "[MapArranger::reloadFromFile] "
+                "open file failure, fall back to empty map" << endl;
+        selfClean();
+        return false;
+    }
+    if(existFile.inputMap(*this) != 0) {
+        selfClean();
+        return false;
+    } else {
+        return true;
+    }
+}
+
+void MapArranger::selfClean() {
+    mapCollection.clear();
+    nodeCollection.clear();
 }

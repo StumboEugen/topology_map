@@ -40,6 +40,10 @@ public:
 
     JSobj toJS() const;
 
+    bool reloadFromFile(const std::string & fileName);
+
+    void selfClean();
+
 private:
     size_t experiences = 0;
     NodeCollection nodeCollection;
