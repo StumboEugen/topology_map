@@ -57,3 +57,14 @@ void MapCollection::clear() {
     }
     maps.clear();
 }
+
+/**
+ * add the mapCandidate to the list back, which means the maps should be added as a sequence
+ * @param newMap
+ */
+mapPosInList MapCollection::addMapAtListBack(MapCandidate *newMap) {
+    maps.push_back(newMap);
+    auto temp = maps.end();
+    temp--;
+    return temp;
+}

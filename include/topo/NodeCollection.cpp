@@ -77,3 +77,7 @@ void NodeCollection::clear() {
     }
     nodeSets.clear();
 }
+
+void NodeCollection::addInstanceDirectly(NodeInstance *newNode) {
+    nodeSets[newNode->sizeOfExits()].insert(newNode);
+}

@@ -24,6 +24,7 @@ class NodeInstance;
  */
 class MapCandidate {
 public:
+    MapCandidate(const std::vector<NodeInstance*> & nodeInses, const JSobj & JSinfo);
     explicit MapCandidate(NodeInstance *);
     MapCandidate(const MapCandidate&);
     void setLeaveFrom(gateId exit);

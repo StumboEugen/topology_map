@@ -30,6 +30,8 @@ public:
     JSobj toJS() const;
 
     void clear();
+
+    mapPosInList addMapAtListBack(MapCandidate *);
 private:
     /**
      * using list to store the map candidate to sort them quickly

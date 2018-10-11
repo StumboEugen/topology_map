@@ -22,7 +22,7 @@ class MapCandidate;
  */
 class NodeCollection {
 public:
-    vector<pair<list<MapCandidate *, std::allocator<MapCandidate *>>::iterator, MapCandidate *>>
+    vector<pair<mapPosInList, MapCandidate *>>
     addInstanceAndCompare(NodeInstance *instance, uint8_t arriveAt,
                           double dis_x, double dis_y);
 
@@ -33,6 +33,8 @@ public:
     JSobj toJS() const;
 
     void clear();
+
+    void addInstanceDirectly(NodeInstance * newNode);
 
 private:
     map<int, set<NodeInstance*>> nodeSets;

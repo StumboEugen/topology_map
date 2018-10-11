@@ -55,11 +55,13 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
     mapCollection.clear();
     nodeCollection.clear();
 
+    /**
+     * verify the JS structor
+     */
     if (!checkJSMember({"Name", "nodeInstance", "mapInstance"},obj)) {
         return false;
     }
 
-    mapName = obj["Name"].asString();
     auto & JSnodeInses = obj["nodeInstance"];
 
     if (!checkJSMember({"No", "Exits"}, JSnodeInses[0])) {
@@ -70,6 +72,24 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
         return false;
     }
 
+    auto & JSmaps = obj["mapInstance"];
+    if (!checkJSMember({"curNode", "edgeFullNum", "edges", "lEiOe"}, JSmaps[0])) {
+        return false;
+    }
+
+    if (!checkJSMember({"Ea", "Eb", "Ga", "Gb", "Oa", "Ox", "Oy"},
+                       JSmaps[0]["edges"][0])) {
+        return false;
+    }
+
+    /**
+     * input the name
+     */
+    mapName = obj["Name"].asString();
+
+    /**
+     * build the serialNumber-Instance pair dict
+     */
     std::vector<NodeInstance *> nodeInses(JSnodeInses.size(), nullptr);
     for (int i = 0; i < JSnodeInses.size(); i++) {
         auto ins = new NodeInstance();
@@ -83,13 +103,27 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
         }
         ins->completeAdding();
         int No = JSIns["No"].asInt();
-        while (No > nodeInses.size()) {
+        while (No + 1 > nodeInses.size()) {
             nodeInses.push_back(nullptr);
         }
         nodeInses[No] = ins;
     }
 
-    //TODO input the maps
+    /**
+     * construct the map collection using the serialNO-INS dict
+     */
+    for (int i = 0; i < JSmaps.size(); i++) {
+        auto newMap = new MapCandidate(nodeInses, JSmaps[i]);
+        auto pos = mapCollection.addMapAtListBack(newMap);
+        newMap->setPosInList(pos);
+    }
+
+    /**
+     * construct the node collection
+     */
+    for (const auto & theIns: nodeInses) {
+     nodeCollection.addInstanceDirectly(theIns);
+    }
 
     return true;
 }

@@ -217,3 +217,43 @@ void MapCandidate::removeUseages() {
         node->getInstanceCorresponding()->removeUseage(this);
     }
 }
+
+/**
+ * generate a candidate from the JS info
+ * @param nodeInses the serialNum-nodeInstance pair container
+ * @param JSinfo the JSinfo
+ */
+MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
+                           const JSobj & JSinfo) {
+    std::vector<TopoNode*> nodeDict{nodeInses.size(), nullptr};
+    auto & JSedges = JSinfo["edges"];
+    for (int i = 0; i < JSedges.size(); i++) {
+        auto & JSedge = JSedges[i];
+
+        size_t serial_A = JSedge["Ea"].asUInt();
+        if (nodeDict[serial_A] == nullptr) {
+            nodeDict[serial_A] = addNewNode(nodeInses[serial_A]);
+        }
+
+        size_t serial_B = JSedge["Eb"].asUInt();
+        if (nodeDict[serial_B] == nullptr) {
+            nodeDict[serial_B] = addNewNode(nodeInses[serial_B]);
+        }
+
+        auto tempEdgePtr = addNewEdge(
+                nodeDict[serial_A], static_cast<gateId>(JSedge["Ga"].asUInt()),
+                nodeDict[serial_B], static_cast<gateId>(JSedge["Gb"].asUInt()));
+
+        if (JSedge.isMember("cur")) {
+            this->currentEdge = tempEdgePtr;
+        }
+    }
+
+    this->currentNode = nodeDict[JSinfo["curNode"].asUInt() ];
+    this->lastEdgeIsOldEdge = JSinfo["lEiOe"].asBool();
+
+    // using this as a way of checking
+    if (JSinfo["edgeFullNum"].asUInt() != this->fullEdgeNumber) {
+        std::cerr << "[ERROR] JS to Map errpr, full edge number not equal!" << endl;
+    }
+}
