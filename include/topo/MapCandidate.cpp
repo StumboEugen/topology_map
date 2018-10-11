@@ -224,7 +224,8 @@ void MapCandidate::removeUseages() {
  * @param JSinfo the JSinfo
  */
 MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
-                           const JSobj & JSinfo) {
+                           const JSobj & JSinfo) : fullEdgeNumber(0)
+{
     std::vector<TopoNode*> nodeDict{nodeInses.size(), nullptr};
     auto & JSedges = JSinfo["edges"];
     for (int i = 0; i < JSedges.size(); i++) {

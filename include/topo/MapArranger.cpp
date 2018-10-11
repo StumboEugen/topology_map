@@ -90,30 +90,30 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
     /**
      * build the serialNumber-Instance pair dict
      */
-    std::vector<NodeInstance *> nodeInses(JSnodeInses.size(), nullptr);
+    std::vector<NodeInstance *> nodeInsesDict(JSnodeInses.size(), nullptr);
     for (int i = 0; i < JSnodeInses.size(); i++) {
         auto ins = new NodeInstance();
         auto & JSIns = JSnodeInses[i];
         auto & JSexits = JSIns["Exits"];
         for (int j = 0; j < JSexits.size(); j++) {
-            auto & JSexit = JSexits[i];
+            auto & JSexit = JSexits[j];
             ins->addExit(JSexit["pos"][0].asDouble(),
                          JSexit["pos"][1].asDouble(),
                          JSexit["dir"].asDouble());
         }
         ins->completeAdding();
         int No = JSIns["No"].asInt();
-        while (No + 1 > nodeInses.size()) {
-            nodeInses.push_back(nullptr);
+        while (No + 1 > nodeInsesDict.size()) {
+            nodeInsesDict.push_back(nullptr);
         }
-        nodeInses[No] = ins;
+        nodeInsesDict[No] = ins;
     }
 
     /**
      * construct the map collection using the serialNO-INS dict
      */
     for (int i = 0; i < JSmaps.size(); i++) {
-        auto newMap = new MapCandidate(nodeInses, JSmaps[i]);
+        auto newMap = new MapCandidate(nodeInsesDict, JSmaps[i]);
         auto pos = mapCollection.addMapAtListBack(newMap);
         newMap->setPosInList(pos);
     }
@@ -121,8 +121,8 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
     /**
      * construct the node collection
      */
-    for (const auto & theIns: nodeInses) {
-     nodeCollection.addInstanceDirectly(theIns);
+    for (const auto & theIns: nodeInsesDict) {
+        nodeCollection.addInstanceDirectly(theIns);
     }
 
     return true;
