@@ -1,6 +1,6 @@
 #include "ros/ros.h"
 
-#include "topo/TopoMap.h"
+#include "topo/Topo.h"
 
 #include <topology_map/NewNodeMsg.h>
 #include <std_msgs/UInt8.h>

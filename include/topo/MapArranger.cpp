@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#include "TopoMap.h"
+#include "Topo.h"
 #include "MapArranger.h"
 
 void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,

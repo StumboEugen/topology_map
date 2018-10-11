@@ -2,7 +2,7 @@
 // Created by stumbo on 18-5-15.
 //
 
-#include "TopoMap.h"
+#include "Topo.h"
 
 /**
  * the first step of arriving a node is check it in every map

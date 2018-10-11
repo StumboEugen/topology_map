@@ -13,10 +13,11 @@ class TopoUI : public QMainWindow
 
 public:
     explicit TopoUI(QWidget *parent = 0);
-    ~TopoUI();
+    ~TopoUI() override;
 
 private:
     Ui::TopoUI *ui;
+    void paintEvent(QPaintEvent * event) override;
 };
 
 #endif // TOPOUI_H

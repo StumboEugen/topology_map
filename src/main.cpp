@@ -12,7 +12,7 @@
 
 #include <topology_map/NewNodeMsg.h>
 
-#include "topo/TopoMap.h"
+#include "topo/Topo.h"
 
 int main(int argc, char **argv)
 {

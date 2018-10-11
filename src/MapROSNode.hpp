@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "topo/TopoMap.h"
+#include "topo/Topo.h"
 #include "ros/ros.h"
 
 #include <topology_map/NewNodeMsg.h>
@@ -22,8 +22,7 @@ class MapROSNode {
 public:
     MapROSNode();
 
-
-    MapROSNode(const std::string &fileName);
+    explicit MapROSNode(const std::string &fileName);
 
     ~MapROSNode() {
         sub_NewNodeInfo.shutdown();
