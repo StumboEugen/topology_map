@@ -6,28 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>782</width>
     <height>464</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>TopoUI</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="paintArea" native="true">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>411</width>
-      <height>361</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>610</x>
+      <x>620</x>
       <y>10</y>
       <width>151</width>
       <height>91</height>
@@ -69,16 +65,32 @@
      </property>
     </widget>
    </widget>
+   <widget class="QGraphicsView" name="mapGView">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>601</width>
+      <height>401</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>782</width>
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuOri">
+    <property name="title">
+     <string>Ori</string>
+    </property>
+   </widget>
+   <addaction name="menuOri"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">

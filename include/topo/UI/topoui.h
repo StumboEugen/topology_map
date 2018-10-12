@@ -2,7 +2,7 @@
 #define TOPOUI_H
 
 #include <QMainWindow>
-#include <QEvent>
+#include <QGraphicsScene>
 #include "topo/Topo.h"
 
 namespace Ui {
@@ -14,12 +14,13 @@ class TopoUI : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit TopoUI(QWidget *parent = 0);
+    explicit TopoUI(QWidget *parent = nullptr);
     ~TopoUI() override;
 
 private:
     MapArranger mapGroup;
     Ui::TopoUI *ui;
+    QGraphicsScene mapScene;
     void paintEvent(QPaintEvent * event) override;
 
 private Q_SLOTS:
