@@ -36,6 +36,14 @@ void TopoUI::paintEvent(QPaintEvent *event) {
 void TopoUI::loadMapFromFile() {
     if (mapGroup.reloadFromFile(ui->etInputMap->text().toStdString())) {
         cout << "UI load map successful" << endl;
+        for (const auto & mapCand: mapGroup.getMapCollection().getMaps()) {
+            static int i = 0;
+            stringstream ss;
+            ss << "#" << i << "-" << mapCand->getFullEdgeNumber();
+            QString a;
+            ui->cbMapCandidate->addItem(QString::number(i)); //TODO
+            i++;
+        }
     } else {
         cerr << "UI load map FAIL" << endl;
     }

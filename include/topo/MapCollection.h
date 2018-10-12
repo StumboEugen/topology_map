@@ -27,6 +27,10 @@ public:
         return maps.size();
     }
 
+    const std::list<MapCandidate *> & getMaps() const {
+        return maps;
+    }
+
     JSobj toJS() const;
 
     void clear();
