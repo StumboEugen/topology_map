@@ -13,6 +13,8 @@ TopoUI::TopoUI(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->btnInputMap, SIGNAL(clicked()), this, SLOT(loadMapFromFile()));
+    connect(ui->cmboMapCandidate, SIGNAL(activated(int)),
+            this, SLOT(displayTheActivitedMap(int)));
     ui->mapGView->setScene(&this->mapScene);
     mapScene.addItem(new QGraphicsRectItem(0,0,100,100));
     mapScene.addItem(new QGraphicsRectItem(100,100,100,100));
@@ -36,15 +38,21 @@ void TopoUI::paintEvent(QPaintEvent *event) {
 void TopoUI::loadMapFromFile() {
     if (mapGroup.reloadFromFile(ui->etInputMap->text().toStdString())) {
         cout << "UI load map successful" << endl;
+        comboBoxMaps.clear();
+
         for (const auto & mapCand: mapGroup.getMapCollection().getMaps()) {
             static int i = 0;
-            stringstream ss;
-            ss << "#" << i << "-" << mapCand->getFullEdgeNumber();
-            QString a;
-            ui->cbMapCandidate->addItem(QString::number(i)); //TODO
+            QString comboInfo = QString("#%1 fullEdge:%2")
+                    .arg(i).arg(mapCand->getFullEdgeNumber());
+            comboBoxMaps.push_back(mapCand);
+            ui->cmboMapCandidate->addItem(comboInfo);
             i++;
         }
     } else {
         cerr << "UI load map FAIL" << endl;
     }
+}
+
+void TopoUI::displayTheActivitedMap(int index) {
+    cout << comboBoxMaps[index]->getFullEdgeNumber() << endl;
 }

@@ -5,6 +5,9 @@
 #include <QGraphicsScene>
 #include "topo/Topo.h"
 
+#include <vector>
+#include <iostream>
+
 namespace Ui {
 class TopoUI;
 }
@@ -21,10 +24,12 @@ private:
     MapArranger mapGroup;
     Ui::TopoUI *ui;
     QGraphicsScene mapScene;
+    std::vector<MapCandidate*> comboBoxMaps;
     void paintEvent(QPaintEvent * event) override;
 
 private Q_SLOTS:
     void loadMapFromFile();
+    void displayTheActivitedMap(int);
 };
 
 #endif // TOPOUI_H

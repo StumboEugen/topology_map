@@ -87,7 +87,7 @@
     <property name="title">
      <string>Map Candidate</string>
     </property>
-    <widget class="QComboBox" name="cbMapCandidate">
+    <widget class="QComboBox" name="cmboMapCandidate">
      <property name="geometry">
       <rect>
        <x>10</x>
