@@ -85,9 +85,34 @@ public:
         return nodeUseages;
     }
 
+    const vector<ExitInstance> & getExits() const {
+        return exits;
+    }
+
     bool haveNoUseages() {
         return nodeUseages.empty();
     }
+
+    size_t getSerialNumber() const {
+        return serialNumber;
+    }
+
+    void setSerialNumber(size_t serialNumber) {
+        NodeInstance::serialNumber = serialNumber;
+    }
+
+    // accumulate the serial Number
+    static size_t serialCount;
+
+    JSobj toJS() const;
+
+private:
+    /**
+     * check & adjust the dir to 0-360°
+     * @param d
+     * @return the adjusted direction
+     */
+    const double & checkDir(double & d);
 
     static double exitRadTollerance() {
         return 0.3;
@@ -105,20 +130,6 @@ public:
         return extraMsg;
     }
 
-    size_t getSerialNumber() const {
-        return serialNumber;
-    }
-
-    void setSerialNumber(size_t serialNumber) {
-        NodeInstance::serialNumber = serialNumber;
-    }
-
-    // accumulate the serial Number
-    static size_t serialCount;
-
-    JSobj toJS() const;
-
-private:
     // determine if the instance is add complete
     bool addComplete = false;
 
@@ -133,14 +144,9 @@ private:
     map<MapCandidate*, TopoNode*> nodeUseages;
 
     //serial number record the input sequence & pointer like number
-    size_t serialNumber;
+    size_t serialNumber;    //TODO 0 start or 1 start?
 
-    /**
-     * check & adjust the dir to 0-360°
-     * @param d
-     * @return the adjusted direction
-     */
-    const double & checkDir(double & d);
+
 };
 
 

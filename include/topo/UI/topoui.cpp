@@ -68,16 +68,16 @@ void TopoUI::displayTheActivitedMap(int index) {
 
     auto beginNode = map2Draw.getOneTopoNode();
 
-    QHash<TopoNode *, QPointF> serialPointPair;
+    QHash<TopoNode *, QPointF> nodePose;
     queue<TopoNode*> lookupQueue;
 
-    serialPointPair.insert(beginNode, QPointF(0.0, 0.0));
+    nodePose.insert(beginNode, QPointF(0.0, 0.0));
     lookupQueue.push(beginNode);
 
     while(!lookupQueue.empty()) {
         auto & curNode = lookupQueue.front();
         lookupQueue.pop();
-        QPointF curPointF = serialPointPair.value(curNode);
+        QPointF curPointF = nodePose.value(curNode);
         for (gateId edgeNo = 0; edgeNo < curNode->getInsCorrespond()->sizeOfExits(); edgeNo++) {
             auto theEdge = curNode->getEdge(edgeNo);
             if (theEdge == nullptr) {
@@ -85,20 +85,24 @@ void TopoUI::displayTheActivitedMap(int index) {
             }
 
             TopoNode * anotherNode = theEdge->getAnotherNode(curNode);
-            if (serialPointPair.find(anotherNode) != serialPointPair.end()) {
+            if (nodePose.find(anotherNode) != nodePose.end()) {
                 continue;
             }
 
             lookupQueue.push(anotherNode);
             auto odomData = theEdge->getOdomData(curNode);
             QPointF dist{odomData.first, odomData.second};
-            serialPointPair.insert(anotherNode, curPointF + dist);
+            nodePose.insert(anotherNode, curPointF + dist);
         }
     }
-    for (const auto & SPpair: serialPointPair) {
-        QString q;
-
+    for (auto it = nodePose.begin(); it != nodePose.end(); it++) {
+        auto tempIns = it.key()->getInsCorrespond();
+        QString tempStr = "(";
+        for (const auto exit: tempIns->getExits()) {
+            tempStr.append(QString::number(exit.getOutDir()) + ",");
+        }
+        tempStr.append(")");
+        qDebug() << tempStr << ", " << it.value();
     }
-    qDebug() << serialPointPair;
-    cout << "it complete" << endl;
+//    cout << "it complete" << endl;
 }

@@ -247,6 +247,7 @@ MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
 
         tempEdgePtr->addOdomData(
                 JSedge["Ox"].asDouble(), JSedge["Oy"].asDouble(), nodeDict[serial_A]);
+        //TODO add directly
 
         if (JSedge.isMember("cur")) {
             this->currentEdge = tempEdgePtr;

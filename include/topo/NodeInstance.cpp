@@ -144,6 +144,7 @@ NodeInstance::NodeInstance()
 
 /**
  * encode the instance to the rosMsg, which need 3 paras about the movement to the node
+ * ENU
  * @param arriveAt
  * @param odomX
  * @param odomY

@@ -47,6 +47,10 @@ public:
         edgeConnected[number] = nullptr;
     }
 
+    const vector<TopoEdge *> & getEdgeConnected() const {
+        return edgeConnected;
+    }
+
     size_t getInstanceSerialNO();
 
     //tool member help cloning maps

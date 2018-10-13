@@ -47,8 +47,8 @@ int main(int argc, char **argv)
     instance1->addExit(1, 0, 90);
     instance1->addExit(0, -1, 180);
     instance1->completeAdding();
-    nodeMsg = instance1->encode2ROSmsg(0, 10, 0);
-    tempGate.data = 1;
+    nodeMsg = instance1->encode2ROSmsg(1, 0, 10);
+    tempGate.data = 0;
     wait4Key("2n");
     nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
     instance2->addExit(-1, 0, 270);
     instance2->addExit(0, -1, 180);
     instance2->completeAdding();
-    nodeMsg = instance2->encode2ROSmsg(1, 0, -10);
+    nodeMsg = instance2->encode2ROSmsg(1, 10, 0);
     tempGate.data = 0;
     wait4Key("3n");
     nodeInfo_pub.publish(nodeMsg);
@@ -71,8 +71,8 @@ int main(int argc, char **argv)
     instance3->addExit(-1, 0, 270);
     instance3->addExit(0, 1, 0);
     instance3->completeAdding();
-    nodeMsg = instance3->encode2ROSmsg(1, -10, 0);
-    tempGate.data = 0;
+    nodeMsg = instance3->encode2ROSmsg(0, 0, -10);
+    tempGate.data = 1;
     wait4Key("4n");
     nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     instance4->addExit(1, 0, 90);
     instance4->addExit(0, 1, 0);
     instance4->completeAdding();
-    nodeMsg = instance4->encode2ROSmsg(1, 0, 10);
+    nodeMsg = instance4->encode2ROSmsg(1, -10, 0);
     tempGate.data = 0;
     wait4Key("5n");
     nodeInfo_pub.publish(nodeMsg);
@@ -95,8 +95,8 @@ int main(int argc, char **argv)
     instance5->addExit(1, 0, 90);
     instance5->addExit(0, -1, 180);
     instance5->completeAdding();
-    nodeMsg = instance5->encode2ROSmsg(0, 10, 0);
-    tempGate.data = 1;
+    nodeMsg = instance5->encode2ROSmsg(1, 0, 10);
+    tempGate.data = 0;
     wait4Key("6n");
     nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
