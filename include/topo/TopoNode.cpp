@@ -18,3 +18,7 @@ TopoNode::TopoNode(NodeInstance *const nodeInstance):
 JSobj TopoNode::toJS() const {
     return JSobj();
 }
+
+size_t TopoNode::getInstanceSerialNO() {
+    return corresponding->getSerialNumber();
+}

@@ -55,6 +55,10 @@ public:
         return posInList;
     }
 
+    TopoNode *const getOneTopoNode() {
+        return nodes.begin().operator*();
+    }
+
     TopoNode *const addNewNode(NodeInstance * instance);
 
     TopoEdge *const addNewEdge(TopoNode * ea, gateId ga, TopoNode * eb, gateId gb);

@@ -28,7 +28,7 @@ void TopoEdge::changeExitTo(TopoNode *const oldNode, TopoNode *const newNode, co
         gateA = newGate;
         exitA->addEdge(gateA, this);
     } else {
-        cout << "[TopoEdge::changeExitTo] FAILURE" << endl;
+        cerr << "[TopoEdge::changeExitTo] FAILURE" << endl;
         throw;
     }
 }
@@ -43,7 +43,7 @@ void TopoEdge::leaveFromNode(TopoNode *leftnode) {
     } else if (leftnode == exitB) {
         b2aMoved = true;
     } else {
-        cout << "TopoEdge leaveFromNode FAILURE" << endl;
+        cerr << "TopoEdge leaveFromNode FAILURE" << endl;
         throw;
     }
 }
@@ -57,7 +57,7 @@ bool TopoEdge::haveLeftFromNode(TopoNode *leftnode) {
     } else if (leftnode == exitB) {
         return b2aMoved;
     } else {
-        cout << "TopoEdge haveLeftFromNode FAILURE" << endl;
+        cerr << "TopoEdge haveLeftFromNode FAILURE" << endl;
         throw;
     }
 }
@@ -73,7 +73,7 @@ uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, TopoNode * leftNode) 
         dis_y *= -1.0;
     }
     else if (leftNode != exitA) {
-        cout << "addOdomData no matching Exit FAILURE" << endl;
+        cerr << "addOdomData no matching Exit FAILURE" << endl;
         throw;
     }
     if (odomAverage != 0) {
@@ -124,12 +124,28 @@ TopoEdge::TopoEdge(TopoNode *const ea, uint8_t ga, TopoNode *const eb, uint8_t g
 
 JSobj TopoEdge::toJS() const {
     JSobj obj;
-    obj["Ea"] = exitA->getInstanceCorresponding()->getSerialNumber();
-    obj["Eb"] = exitB->getInstanceCorresponding()->getSerialNumber();
+    obj["Ea"] = exitA->getInsCorrespond()->getSerialNumber();
+    obj["Eb"] = exitB->getInsCorrespond()->getSerialNumber();
     obj["Ga"] = gateA;
     obj["Gb"] = gateB;
     obj["Ox"] = odomX;
     obj["Oy"] = odomY;
     obj["Oa"] = odomAverage;
     return std::move(obj);
+}
+
+/**
+ * get the odom data, because A2B and B2A is different
+ * @param oriNode
+ * @return the odominfo in std::pair<double(x), double(y)> ENU
+ */
+std::pair<double, double> TopoEdge::getOdomData(TopoNode *oriNode) {
+    if (oriNode == exitA) {
+        return {odomX, odomY};
+    } else if (oriNode == exitB) {
+        return {odomX, odomY};
+    } else {
+        cerr << "TopoEdge::getOdomData no matching Exit FAILURE" << endl;
+        throw;
+    }
 }

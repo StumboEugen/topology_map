@@ -6,6 +6,14 @@
 #include <QPainter>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
+#include <QPointF>
+#include <QHash>
+#include <QDebug>
+
+#include <map>
+#include <queue>
+
+using namespace std;
 
 TopoUI::TopoUI(QWidget *parent) :
     QMainWindow(parent),
@@ -48,11 +56,49 @@ void TopoUI::loadMapFromFile() {
             ui->cmboMapCandidate->addItem(comboInfo);
             i++;
         }
+
     } else {
         cerr << "UI load map FAIL" << endl;
     }
 }
 
 void TopoUI::displayTheActivitedMap(int index) {
-    cout << comboBoxMaps[index]->getFullEdgeNumber() << endl;
+    MapCandidate & map2Draw = *comboBoxMaps[index];
+    cout << map2Draw.getFullEdgeNumber() << endl; //TODO DEL
+
+    auto beginNode = map2Draw.getOneTopoNode();
+
+    QHash<TopoNode *, QPointF> serialPointPair;
+    queue<TopoNode*> lookupQueue;
+
+    serialPointPair.insert(beginNode, QPointF(0.0, 0.0));
+    lookupQueue.push(beginNode);
+
+    while(!lookupQueue.empty()) {
+        auto & curNode = lookupQueue.front();
+        lookupQueue.pop();
+        QPointF curPointF = serialPointPair.value(curNode);
+        for (gateId edgeNo = 0; edgeNo < curNode->getInsCorrespond()->sizeOfExits(); edgeNo++) {
+            auto theEdge = curNode->getEdge(edgeNo);
+            if (theEdge == nullptr) {
+                continue;
+            }
+
+            TopoNode * anotherNode = theEdge->getAnotherNode(curNode);
+            if (serialPointPair.find(anotherNode) != serialPointPair.end()) {
+                continue;
+            }
+
+            lookupQueue.push(anotherNode);
+            auto odomData = theEdge->getOdomData(curNode);
+            QPointF dist{odomData.first, odomData.second};
+            serialPointPair.insert(anotherNode, curPointF + dist);
+        }
+    }
+    for (const auto & SPpair: serialPointPair) {
+        QString q;
+
+    }
+    qDebug() << serialPointPair;
+    cout << "it complete" << endl;
 }

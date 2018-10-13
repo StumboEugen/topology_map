@@ -66,6 +66,8 @@ public:
 
     uint16_t addOdomData(double dis_x, double dis_y, TopoNode * leftNode);
 
+    std::pair<double, double> getOdomData(TopoNode * oriNode);
+
     double getOdomX() const {
         return odomX;
     }

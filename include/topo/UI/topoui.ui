@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>782</width>
-    <height>464</height>
+    <width>940</width>
+    <height>475</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -98,13 +98,23 @@
      </property>
     </widget>
    </widget>
+   <widget class="QGraphicsView" name="nodeGView">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>191</y>
+      <width>221</width>
+      <height>221</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>782</width>
+     <width>940</width>
      <height>22</height>
     </rect>
    </property>

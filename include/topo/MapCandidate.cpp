@@ -36,11 +36,11 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
      * firstly copy all the TopoNode instances
      */
     for (auto oriNode: copyFrom.nodes) {
-        TopoNode *clonedNodePtr = * this->nodes.emplace(new TopoNode(oriNode->getInstanceCorresponding())).first;
+        TopoNode *clonedNodePtr = * this->nodes.emplace(new TopoNode(oriNode->getInsCorrespond())).first;
         /**the useage should be added oustide of the constructor
          * because there is no map info in constructor
          */
-        clonedNodePtr->getInstanceCorresponding()->addUseage(this, clonedNodePtr);
+        clonedNodePtr->getInsCorrespond()->addUseage(this, clonedNodePtr);
         oriNode->clonedTo = clonedNodePtr;
     }
     /**
@@ -97,7 +97,7 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
         TopoNode * shouldToNode = currentEdge->getAnotherNode(currentNode);
         /**if we used to move on this edge, the arrival situation should remain the same
          * otherwise it is a confilct, this candidate is wrong*/
-        if (instance->alike(*shouldToNode->getInstanceCorresponding())
+        if (instance->alike(*shouldToNode->getInsCorrespond())
             && arriveAt == currentEdge->getAnotherGate(currentNode)) {
             currentEdge->leaveFromNode(currentNode);
             currentEdge->addOdomData(dis_x, dis_y, currentNode);
@@ -179,8 +179,8 @@ inline TopoEdge *const MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, T
 }
 
 void MapCandidate::removeNode(TopoNode *node2remove) {
-    fullEdgeNumber -= node2remove->getInstanceCorresponding()->sizeOfExits();
-    node2remove->getInstanceCorresponding()->removeUseage(this);
+    fullEdgeNumber -= node2remove->getInsCorrespond()->sizeOfExits();
+    node2remove->getInsCorrespond()->removeUseage(this);
     delete node2remove;
     nodes.erase(node2remove);
 }
@@ -203,7 +203,7 @@ JSobj MapCandidate::toJS() const {
         }
         obj["edges"].append(edgeJS);
     }
-    obj["curNode"] = currentNode->getInstanceCorresponding()->getSerialNumber();
+    obj["curNode"] = currentNode->getInsCorrespond()->getSerialNumber();
     obj["lEiOe"] = lastEdgeIsOldEdge; //TODO is this needed?
     obj["edgeFullNum"] = fullEdgeNumber;
     return std::move(obj);
@@ -214,7 +214,7 @@ JSobj MapCandidate::toJS() const {
  */
 void MapCandidate::removeUseages() {
     for (auto node: nodes) {
-        node->getInstanceCorresponding()->removeUseage(this);
+        node->getInsCorrespond()->removeUseage(this);
     }
 }
 
@@ -244,6 +244,9 @@ MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
         auto tempEdgePtr = addNewEdge(
                 nodeDict[serial_A], static_cast<gateId>(JSedge["Ga"].asUInt()),
                 nodeDict[serial_B], static_cast<gateId>(JSedge["Gb"].asUInt()));
+
+        tempEdgePtr->addOdomData(
+                JSedge["Ox"].asDouble(), JSedge["Oy"].asDouble(), nodeDict[serial_A]);
 
         if (JSedge.isMember("cur")) {
             this->currentEdge = tempEdgePtr;

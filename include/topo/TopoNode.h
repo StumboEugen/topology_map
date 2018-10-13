@@ -39,13 +39,15 @@ public:
         return edgeConnected[number];
     }
 
-    NodeInstance *const getInstanceCorresponding() const {
+    NodeInstance *const getInsCorrespond() const {
         return corresponding;
     }
 
     void disconnectEdge(gateId number) {
         edgeConnected[number] = nullptr;
     }
+
+    size_t getInstanceSerialNO();
 
     //tool member help cloning maps
     TopoNode * clonedTo;
