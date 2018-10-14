@@ -143,7 +143,7 @@ std::pair<double, double> TopoEdge::getOdomData(TopoNode *oriNode) {
     if (oriNode == exitA) {
         return {odomX, odomY};
     } else if (oriNode == exitB) {
-        return {odomX, odomY};
+        return {-odomX, -odomY};
     } else {
         cerr << "TopoEdge::getOdomData no matching Exit FAILURE" << endl;
         throw;

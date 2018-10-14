@@ -64,6 +64,31 @@ private:
 
     //edges connected at this TopoNode
     std::vector<TopoEdge*> edgeConnected;
+
+
+public:
+    void cleanFlags() {
+        tempFlags = 0;
+    }
+
+    void setFlag(uint8_t index) {
+        if (index > 32) return;
+        tempFlags |= 1u << index;
+    }
+
+    void unsetFlag(uint8_t index) {
+        if (index > 32) return;
+        tempFlags &= ~(1u << index);
+    }
+
+    bool chkFlag(uint8_t index) {
+        if (index > 32) return false;
+        return (tempFlags & (1u << index)) != 0;
+    }
+
+private:
+    //to help iterate the map
+    uint32_t tempFlags;
 };
 
 #endif //TOPOLOGY_MAP_TOPONODE_H

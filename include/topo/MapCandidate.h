@@ -55,6 +55,8 @@ public:
         return posInList;
     }
 
+    void cleanAllNodeFlags();
+
     TopoNode *const getOneTopoNode() {
         return nodes.begin().operator*();
     }

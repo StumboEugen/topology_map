@@ -64,7 +64,7 @@ void TopoUI::loadMapFromFile() {
 
 void TopoUI::displayTheActivitedMap(int index) {
     MapCandidate & map2Draw = *comboBoxMaps[index];
-    cout << map2Draw.getFullEdgeNumber() << endl; //TODO DEL
+    map2Draw.cleanAllNodeFlags();
 
     auto beginNode = map2Draw.getOneTopoNode();
 
@@ -79,18 +79,28 @@ void TopoUI::displayTheActivitedMap(int index) {
         lookupQueue.pop();
         QPointF curPointF = nodePose.value(curNode);
         for (gateId edgeNo = 0; edgeNo < curNode->getInsCorrespond()->sizeOfExits(); edgeNo++) {
-            auto theEdge = curNode->getEdge(edgeNo);
-            if (theEdge == nullptr) {
+
+            //means this edge have been drawn
+            if (curNode->chkFlag(edgeNo)) {
                 continue;
             }
 
-            TopoNode * anotherNode = theEdge->getAnotherNode(curNode);
+            auto curEdge = curNode->getEdge(edgeNo);
+            if (curEdge == nullptr) {
+                continue;
+            }
+
+            TopoNode * anotherNode = curEdge->getAnotherNode(curNode);
+
+            anotherNode->setFlag(curEdge->getAnotherGate(curNode));
+
             if (nodePose.find(anotherNode) != nodePose.end()) {
+                //TODO draw the edge
                 continue;
             }
 
             lookupQueue.push(anotherNode);
-            auto odomData = theEdge->getOdomData(curNode);
+            auto odomData = curEdge->getOdomData(curNode);
             QPointF dist{odomData.first, odomData.second};
             nodePose.insert(anotherNode, curPointF + dist);
         }

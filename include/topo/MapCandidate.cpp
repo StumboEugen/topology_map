@@ -262,3 +262,9 @@ MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
         std::cerr << "[ERROR] JS to Map errpr, full edge number not equal!" << endl;
     }
 }
+
+void MapCandidate::cleanAllNodeFlags() {
+    for (const auto & node : nodes) {
+        node->cleanFlags();
+    }
+}

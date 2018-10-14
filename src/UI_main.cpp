@@ -6,6 +6,10 @@
 #include <QApplication>
 
 int main(int argc, char **argv) {
+    QApplication app(argc, argv);
+    TopoUI theUi;
+    theUi.show();
+    app.exec();
 
     /**
     * without these lines, debug will fail
@@ -14,9 +18,4 @@ int main(int argc, char **argv) {
     std::list<MapCandidate*> mm;
     auto forDebug = new MapCandidate(xxxxx);
     mm.push_back(forDebug);
-
-    QApplication app(argc, argv);
-    TopoUI theUi;
-    theUi.show();
-    app.exec();
 }
