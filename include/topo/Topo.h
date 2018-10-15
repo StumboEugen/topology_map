@@ -6,8 +6,8 @@
  * COOR: NWU
  */
 
-#ifndef TOPOLOGY_MAP_TOPOMAP_H
-#define TOPOLOGY_MAP_TOPOMAP_H
+#ifndef TOPOLOGY_MAP_TOPO_H
+#define TOPOLOGY_MAP_TOPO_H
 
 #include "TopoTools.h"
 #include "MapCandidate.h"
@@ -20,4 +20,4 @@
 #include "MapArranger.h"
 #include "TopoFile.h"
 
-#endif //TOPOLOGY_MAP_TOPOMAP_H
+#endif //TOPOLOGY_MAP_TOPO_H

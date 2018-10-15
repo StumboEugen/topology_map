@@ -5,6 +5,8 @@
 #include <QGraphicsScene>
 #include "topo/Topo.h"
 
+#include "TopoMapGView.h"
+
 #include <vector>
 #include <iostream>
 
@@ -23,6 +25,7 @@ public:
 private:
     MapArranger mapGroup;
     Ui::TopoUI *ui;
+    TopoMapGView * mapGView;
     QGraphicsScene mapScene;
     std::vector<MapCandidate*> comboBoxMaps;
     void paintEvent(QPaintEvent * event) override;

@@ -20,15 +20,21 @@ TopoUI::TopoUI(QWidget *parent) :
     ui(new Ui::TopoUI)
 {
     ui->setupUi(this);
+
+    mapGView = new TopoMapGView(ui->centralWidget);
+    mapGView->setObjectName(QString::fromUtf8("mapGView"));
+    mapGView->setGeometry(QRect(10, 10, 601, 401));
+
     connect(ui->btnInputMap, SIGNAL(clicked()), this, SLOT(loadMapFromFile()));
     connect(ui->cmboMapCandidate, SIGNAL(activated(int)),
             this, SLOT(displayTheActivitedMap(int)));
-    ui->mapGView->setScene(&this->mapScene);
-    mapScene.addItem(new QGraphicsRectItem(0,0,100,100));
+    mapGView->setScene(&this->mapScene);
+    auto rect1 = new QGraphicsRectItem(0,0,100,100);
+    mapScene.addItem(rect1);
     mapScene.addItem(new QGraphicsRectItem(100,100,100,100));
 //    mapScene.addItem(new QGraphicsRectItem(0,500,100,100));
 //    mapScene.addItem(new QGraphicsRectItem(500,0,100,100));
-    ui->mapGView->setDragMode(QGraphicsView::ScrollHandDrag);
+    mapGView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 TopoUI::~TopoUI()
@@ -44,6 +50,8 @@ void TopoUI::paintEvent(QPaintEvent *event) {
 }
 
 void TopoUI::loadMapFromFile() {
+    mapScene.removeItem(mapScene.itemAt({50, 50}));
+
     if (mapGroup.reloadFromFile(ui->etInputMap->text().toStdString())) {
         cout << "UI load map successful" << endl;
         comboBoxMaps.clear();
