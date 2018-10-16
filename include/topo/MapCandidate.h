@@ -43,6 +43,14 @@ public:
         return edges.size();
     }
 
+    const set<TopoNode *> & getNodes() const {
+        return nodes;
+    }
+
+    const set<TopoEdge *> & getEdges() const {
+        return edges;
+    }
+
     bool isJustMovedOnKnownEdge() const {
         return lastEdgeIsOldEdge;
     }

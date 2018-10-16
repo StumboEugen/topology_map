@@ -30,6 +30,10 @@ public:
         return nodeSets;
     }
 
+    size_t size() const {
+        return nodeSets.size();
+    }
+
     JSobj toJS() const;
 
     void clear();

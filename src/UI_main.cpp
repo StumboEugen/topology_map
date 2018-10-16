@@ -3,6 +3,7 @@
 //
 
 #include "topo/UI/topoui.h"
+#include "topo/Topo.h"
 #include <QApplication>
 
 int main(int argc, char **argv) {

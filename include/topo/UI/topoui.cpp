@@ -3,6 +3,9 @@
 
 #include "topo/Topo.h"
 
+#include "QGI_Node.h"
+#include "QGI_Edge.h"
+
 #include <QPainter>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
@@ -29,9 +32,6 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(ui->cmboMapCandidate, SIGNAL(activated(int)),
             this, SLOT(displayTheActivitedMap(int)));
     mapGView->setScene(&this->mapScene);
-    auto rect1 = new QGraphicsRectItem(0,0,100,100);
-    mapScene.addItem(rect1);
-    mapScene.addItem(new QGraphicsRectItem(100,100,100,100));
 //    mapScene.addItem(new QGraphicsRectItem(0,500,100,100));
 //    mapScene.addItem(new QGraphicsRectItem(500,0,100,100));
     mapGView->setDragMode(QGraphicsView::ScrollHandDrag);
@@ -50,7 +50,9 @@ void TopoUI::paintEvent(QPaintEvent *event) {
 }
 
 void TopoUI::loadMapFromFile() {
-    mapScene.removeItem(mapScene.itemAt({50, 50}));
+    mapScene.clear();
+
+//    mapScene.removeItem(mapScene.itemAt({50, 50}));
 
     if (mapGroup.reloadFromFile(ui->etInputMap->text().toStdString())) {
         cout << "UI load map successful" << endl;
@@ -71,56 +73,72 @@ void TopoUI::loadMapFromFile() {
 }
 
 void TopoUI::displayTheActivitedMap(int index) {
+    mapScene.clear();
+
     MapCandidate & map2Draw = *comboBoxMaps[index];
     map2Draw.cleanAllNodeFlags();
 
     auto beginNode = map2Draw.getOneTopoNode();
 
-    QHash<TopoNode *, QPointF> nodePose;
     queue<TopoNode*> lookupQueue;
 
-    nodePose.insert(beginNode, QPointF(0.0, 0.0));
+    auto nodeQGI = new QGI_Node(beginNode);
+    beginNode->setAssistPtr(nodeQGI);
+    mapScene.addItem(nodeQGI);
     lookupQueue.push(beginNode);
 
     while(!lookupQueue.empty()) {
         auto & curNode = lookupQueue.front();
         lookupQueue.pop();
-        QPointF curPointF = nodePose.value(curNode);
+        QPointF curPos = static_cast<QGI_Node*>(curNode->getAssistPtr())->pos();
+
+        //look into every edge
         for (gateId edgeNo = 0; edgeNo < curNode->getInsCorrespond()->sizeOfExits(); edgeNo++) {
 
-            //means this edge have been drawn
-            if (curNode->chkFlag(edgeNo)) {
-                continue;
-            }
+//            //means this edge have been drawn
+//            if (curNode->chkFlag(edgeNo)) {
+//                continue;
+//            }
 
             auto curEdge = curNode->getEdge(edgeNo);
+            //means this edge has never been moved through
             if (curEdge == nullptr) {
                 continue;
             }
 
             TopoNode * anotherNode = curEdge->getAnotherNode(curNode);
-
             anotherNode->setFlag(curEdge->getAnotherGate(curNode));
 
-            if (nodePose.find(anotherNode) != nodePose.end()) {
-                //TODO draw the edge
+            //means the "anotherNode" has been drawn
+            if (anotherNode->getAssistPtr() != nullptr) {
+                auto edge2Draw = new QGI_Edge(curEdge
+                        , static_cast<QGI_Node *>(curNode->getAssistPtr())
+                        , static_cast<QGI_Node *>(anotherNode->getAssistPtr()));
+                mapScene.addItem(edge2Draw);
                 continue;
             }
 
-            lookupQueue.push(anotherNode);
+            //draw another node
             auto odomData = curEdge->getOdomData(curNode);
             QPointF dist{odomData.first, odomData.second};
-            nodePose.insert(anotherNode, curPointF + dist);
+            nodeQGI = new QGI_Node(anotherNode);
+            anotherNode->setAssistPtr(nodeQGI);
+            nodeQGI->setPos(curPos + dist * METER_TO_PIXLE);
+            mapScene.addItem(nodeQGI);
+
+            lookupQueue.push(anotherNode);
         }
     }
-    for (auto it = nodePose.begin(); it != nodePose.end(); it++) {
-        auto tempIns = it.key()->getInsCorrespond();
+
+    for (const auto & node: map2Draw.getNodes()) {
+        auto tempIns = node->getInsCorrespond();
         QString tempStr = "(";
         for (const auto exit: tempIns->getExits()) {
             tempStr.append(QString::number(exit.getOutDir()) + ",");
         }
         tempStr.append(")");
-        qDebug() << tempStr << ", " << it.value();
+        qDebug() << tempStr << ", " << static_cast<QGI_Node*>(node->getAssistPtr())->pos();
     }
+
 //    cout << "it complete" << endl;
 }

@@ -12,11 +12,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-    message_generation
     roscpp
     rospy
     std_msgs
     qt_build
+    message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -170,13 +170,13 @@ add_library(topoLayer ${TopoFILES})
 add_library(jsonCpp ${JsonFILES})
 
 add_executable(main src/main.cpp src/MapROSNode.hpp)
-add_executable(UI_Topo src/UI_main.cpp)
+add_executable(TopoUI src/UI_main.cpp)
 add_executable(FakeOB src/FakeOB.cpp)
 
 target_link_libraries(topoLayer jsonCpp)
 target_link_libraries(topoLayer_UI topoLayer)
 target_link_libraries(main topoLayer)
-target_link_libraries(UI_Topo topoLayer_UI)
+target_link_libraries(TopoUI topoLayer_UI)
 target_link_libraries(FakeOB topoLayer)
 
 ## Rename C++ executable without prefix
@@ -191,11 +191,12 @@ target_link_libraries(FakeOB topoLayer)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(main ${catkin_LIBRARIES})
-target_link_libraries(UI_Topo ${catkin_LIBRARIES} ${QT_LIBRARIES})
+target_link_libraries(TopoUI ${catkin_LIBRARIES} ${QT_LIBRARIES})
 target_link_libraries(FakeOB ${catkin_LIBRARIES})
 
 add_dependencies(topoLayer jsonCpp)
 add_dependencies(topoLayer_UI topoLayer)
+add_dependencies(TopoUI topoLayer_UI)
 
 add_dependencies(topoLayer ${PROJECT_NAME}_gencpp)
 add_dependencies(main ${PROJECT_NAME}_gencpp)

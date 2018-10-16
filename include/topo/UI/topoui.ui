@@ -65,16 +65,6 @@
      </property>
     </widget>
    </widget>
-   <widget class="QGraphicsView" name="mapGView">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>601</width>
-      <height>401</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>

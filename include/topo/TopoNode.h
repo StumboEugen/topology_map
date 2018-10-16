@@ -69,16 +69,17 @@ private:
 public:
     void cleanFlags() {
         tempFlags = 0;
+        assistPtr = nullptr;
     }
 
-    void setFlag(uint8_t index) {
+    void setFlag(uint8_t index, bool set = true) {
         if (index > 32) return;
-        tempFlags |= 1u << index;
-    }
+        if (set) {
+            tempFlags |= 1u << index;
+        } else {
+            tempFlags &= ~(1u << index);
+        }
 
-    void unsetFlag(uint8_t index) {
-        if (index > 32) return;
-        tempFlags &= ~(1u << index);
     }
 
     bool chkFlag(uint8_t index) {
@@ -86,9 +87,19 @@ public:
         return (tempFlags & (1u << index)) != 0;
     }
 
+    void *getAssistPtr() const {
+        return assistPtr;
+    }
+
+    void setAssistPtr(void *helperPtr) {
+        TopoNode::assistPtr = helperPtr;
+    }
+
 private:
     //to help iterate the map
-    uint32_t tempFlags;
+    uint32_t tempFlags = 0;
+
+    void * assistPtr = nullptr;
 };
 
 #endif //TOPOLOGY_MAP_TOPONODE_H
