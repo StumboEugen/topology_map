@@ -6,6 +6,7 @@
 #define TOPOLOGY_MAP_QGI_NODE_H
 
 #define RECT_SIZE_HALF 30
+#define QGI_NODE_TYPE 2000
 
 #include <QGraphicsItem>
 #include "topo/Topo.h"
@@ -25,6 +26,8 @@ public:
     TopoNode *getRelatedNodeTOPO() const {
         return relatedNodeTOPO;
     }
+
+    int type() const override;
 
 private:
     TopoNode * relatedNodeTOPO;

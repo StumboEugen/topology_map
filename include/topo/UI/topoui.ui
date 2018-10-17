@@ -88,16 +88,6 @@
      </property>
     </widget>
    </widget>
-   <widget class="QGraphicsView" name="nodeGView">
-    <property name="geometry">
-     <rect>
-      <x>620</x>
-      <y>191</y>
-      <width>221</width>
-      <height>221</height>
-     </rect>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

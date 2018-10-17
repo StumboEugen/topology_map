@@ -27,11 +27,22 @@ TopoUI::TopoUI(QWidget *parent) :
     mapGView = new TopoMapGView(ui->centralWidget);
     mapGView->setObjectName(QString::fromUtf8("mapGView"));
     mapGView->setGeometry(QRect(10, 10, 601, 401));
-
-    connect(ui->btnInputMap, SIGNAL(clicked()), this, SLOT(loadMapFromFile()));
-    connect(ui->cmboMapCandidate, SIGNAL(activated(int)),
-            this, SLOT(displayTheActivitedMap(int)));
     mapGView->setScene(&this->mapScene);
+
+    nodeGView = new TopoNodeGView(ui->centralWidget);
+    nodeGView->setObjectName(QString::fromUtf8("nodeGView"));
+    nodeGView->setGeometry(QRect(620, 191, 221, 221));
+    nodeGView->setScene(&this->nodeScene);
+
+    connect(ui->btnInputMap, SIGNAL(clicked())
+            , this, SLOT(loadMapFromFile()));
+
+    connect(ui->cmboMapCandidate, SIGNAL(activated(int))
+            , this, SLOT(displayTheActivitedMap(int)));
+
+    connect(mapGView, SIGNAL(QGI_Node_clicked(TopoNode*))
+            , this, SLOT(drawTopoNode(TopoNode*)));
+
 //    mapScene.addItem(new QGraphicsRectItem(0,500,100,100));
 //    mapScene.addItem(new QGraphicsRectItem(500,0,100,100));
 
@@ -142,4 +153,8 @@ void TopoUI::displayTheActivitedMap(int index) {
     }
 
 //    cout << "it complete" << endl;
+}
+
+void TopoUI::drawTopoNode(TopoNode * topoNode) {
+    auto QNode = new QGI_Node(topoNode);
 }

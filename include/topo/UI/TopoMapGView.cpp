@@ -2,11 +2,13 @@
 // Created by stumbo on 18-10-15.
 //
 
-#include "TopoMapGView.h"
 #include <QWheelEvent>
 #include <QMouseEvent>
 #include <QGraphicsItem>
 #include <QDebug>
+
+#include "TopoMapGView.h"
+#include "QGI_Node.h"
 
 #define SCALE_TIME 1.2
 #define SCALE_MAX 4.0
@@ -30,12 +32,15 @@ void TopoMapGView::wheelEvent(QWheelEvent *event) {
 void TopoMapGView::mousePressEvent(QMouseEvent *event) {
     QGraphicsView::mousePressEvent(event);
     auto viewPos = event->pos();
-    qDebug() << "viewPos" << viewPos;
+//    qDebug() << "viewPos" << viewPos;
     auto scenePos = mapToScene(viewPos);
-    qDebug() << "scenePos" << scenePos;
+//    qDebug() << "scenePos" << scenePos;
     auto item = scene()->itemAt(scenePos);
     if (item != nullptr) {
         auto itemPos = item->mapFromScene(scenePos);
-        qDebug() << "itemPos" << itemPos << "\n";
+//        qDebug() << "itemPos" << itemPos << "\n";
+        if (auto nodeItem = dynamic_cast<QGI_Node*>(item)) {
+            Q_EMIT QGI_Node_clicked(nodeItem->getRelatedNodeTOPO());
+        }
     }
 }

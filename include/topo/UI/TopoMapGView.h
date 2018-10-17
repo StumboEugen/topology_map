@@ -8,6 +8,9 @@
 #include <QGraphicsView>
 #include <QWidget>
 
+#include "include/topo/Topo.h"
+#include "QGI_Node.h"
+
 class TopoMapGView : public QGraphicsView{
     Q_OBJECT
 
@@ -18,6 +21,9 @@ public:
 protected:
     void wheelEvent(QWheelEvent * event) override ;
     void mousePressEvent(QMouseEvent * event) override ;
+
+Q_SIGNALS:
+    void QGI_Node_clicked(TopoNode *);
 };
 
 

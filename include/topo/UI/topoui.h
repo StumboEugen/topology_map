@@ -8,6 +8,7 @@
 #include "topo/Topo.h"
 
 #include "TopoMapGView.h"
+#include "TopoNodeGView.h"
 
 #include <vector>
 #include <iostream>
@@ -27,14 +28,20 @@ public:
 private:
     MapArranger mapGroup;
     Ui::TopoUI *ui;
+
     TopoMapGView * mapGView;
     QGraphicsScene mapScene;
+
+    TopoNodeGView * nodeGView;
+    QGraphicsScene nodeScene;
+
     std::vector<MapCandidate*> comboBoxMaps;
     void paintEvent(QPaintEvent * event) override;
 
 private Q_SLOTS:
     void loadMapFromFile();
     void displayTheActivitedMap(int);
+    void drawTopoNode(TopoNode *);
 };
 
 #endif // TOPOUI_H

@@ -27,4 +27,9 @@ QGI_Node::QGI_Node(TopoNode * node)
         :relatedNodeTOPO(node)
 {
     this->setZValue(2);
+    setFlag(ItemIsSelectable);
+}
+
+int QGI_Node::type() const {
+    return QGI_NODE_TYPE;
 }
