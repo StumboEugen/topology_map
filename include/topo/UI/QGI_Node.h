@@ -27,10 +27,15 @@ public:
         return relatedNodeTOPO;
     }
 
+    void setDrawDetail(bool drawDetail) {
+        QGI_Node::drawDetail = drawDetail;
+    }
+
     int type() const override;
 
 private:
     TopoNode * relatedNodeTOPO;
+    bool drawDetail = false;
 };
 
 

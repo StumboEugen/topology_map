@@ -132,7 +132,7 @@ void TopoUI::displayTheActivitedMap(int index) {
 
             //draw another node
             auto odomData = curEdge->getOdomData(curNode);
-            QPointF dist{odomData.first, odomData.second};
+            QPointF dist{odomData.first, -odomData.second}; //ENU is different with the UI coor
             nodeQGI = new QGI_Node(anotherNode);
             anotherNode->setAssistPtr(nodeQGI);
             nodeQGI->setPos(curPos + dist * METER_TO_PIXLE);
@@ -156,5 +156,8 @@ void TopoUI::displayTheActivitedMap(int index) {
 }
 
 void TopoUI::drawTopoNode(TopoNode * topoNode) {
+    nodeScene.clear();
     auto QNode = new QGI_Node(topoNode);
+    QNode->setDrawDetail(true);
+    nodeScene.addItem(QNode);
 }

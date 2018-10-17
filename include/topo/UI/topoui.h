@@ -1,14 +1,15 @@
 #ifndef TOPOUI_H
 #define TOPOUI_H
 
-#define METER_TO_PIXLE 30
+
 
 #include <QMainWindow>
 #include <QGraphicsScene>
-#include "topo/Topo.h"
 
+#include "topo/Topo.h"
 #include "TopoMapGView.h"
 #include "TopoNodeGView.h"
+#include "UITOOLS.h"
 
 #include <vector>
 #include <iostream>
