@@ -34,7 +34,8 @@ TopoUI::TopoUI(QWidget *parent) :
     mapGView->setScene(&this->mapScene);
 //    mapScene.addItem(new QGraphicsRectItem(0,500,100,100));
 //    mapScene.addItem(new QGraphicsRectItem(500,0,100,100));
-    mapGView->setDragMode(QGraphicsView::ScrollHandDrag);
+
+//    mapGView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 TopoUI::~TopoUI()

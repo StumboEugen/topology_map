@@ -9,13 +9,14 @@
 
 void
 QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    QRect rect{-RECT_SIZE_HALF, -RECT_SIZE_HALF, RECT_SIZE_HALF, RECT_SIZE_HALF};
+    QRect rect{-RECT_SIZE_HALF, -RECT_SIZE_HALF, RECT_SIZE_HALF * 2, RECT_SIZE_HALF * 2};
 //    painter->drawRect(rect);
     painter->fillRect(rect, QColor(200, 200, 200));
 }
 
 QRectF QGI_Node::boundingRect() const {
-    return {-RECT_SIZE_HALF - 1, -RECT_SIZE_HALF - 1, RECT_SIZE_HALF + 1, RECT_SIZE_HALF + 1};
+    return {-RECT_SIZE_HALF - 1, -RECT_SIZE_HALF - 1,
+            RECT_SIZE_HALF * 2 + 2, RECT_SIZE_HALF * 2 + 2};
 }
 
 void QGI_Node::mousePressEvent(QGraphicsSceneMouseEvent *event) {

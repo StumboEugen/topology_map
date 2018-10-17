@@ -3,6 +3,10 @@
 //
 
 #include "TopoMapGView.h"
+#include <QWheelEvent>
+#include <QMouseEvent>
+#include <QGraphicsItem>
+#include <QDebug>
 
 #define SCALE_TIME 1.2
 #define SCALE_MAX 4.0
@@ -20,5 +24,18 @@ void TopoMapGView::wheelEvent(QWheelEvent *event) {
         setMatrix(curTrans.toAffine());
     } else {
         QGraphicsView::wheelEvent(event);
+    }
+}
+
+void TopoMapGView::mousePressEvent(QMouseEvent *event) {
+    QGraphicsView::mousePressEvent(event);
+    auto viewPos = event->pos();
+    qDebug() << "viewPos" << viewPos;
+    auto scenePos = mapToScene(viewPos);
+    qDebug() << "scenePos" << scenePos;
+    auto item = scene()->itemAt(scenePos);
+    if (item != nullptr) {
+        auto itemPos = item->mapFromScene(scenePos);
+        qDebug() << "itemPos" << itemPos << "\n";
     }
 }

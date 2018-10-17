@@ -39,5 +39,5 @@ QRectF QGI_Edge::boundingRect() const {
     auto left = qMin(posA.x(), posB.x());
     auto down = qMax(posA.y(), posB.y());
     auto up = qMin(posA.y(), posB.y());
-    return QRectF{left, up, (right - left), (up - down)};
+    return QRectF{left - 0.5, up - 0.5, (right - left) + 1, (down - up) + 1};
 }
