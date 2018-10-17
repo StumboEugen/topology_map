@@ -7,6 +7,7 @@
 #include <QPainter>
 #include <QColor>
 #include <QDebug>
+#include <QStyleOptionGraphicsItem>
 
 #include "UITOOLS.h"
 
@@ -14,7 +15,6 @@ void
 QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     static QRect rect{-RECT_SIZE_HALF, -RECT_SIZE_HALF,
                       RECT_SIZE_HALF * 2, RECT_SIZE_HALF * 2};
-
     if (drawDetail) {
 //        painter->drawArc(rect, 0, 16 * 360);
         const auto & ins = relatedNodeTOPO->getInsCorrespond();
@@ -30,6 +30,10 @@ QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
             painter->restore();
         }
     } else {
+        if (option->state & QStyle::State_Selected) {
+            painter->setPen(Qt::red);
+            painter->drawRect(rect.adjusted(-1, -1, 0, 0));
+        }
         painter->fillRect(rect, Qt::gray);
     }
 }
