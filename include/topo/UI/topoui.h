@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QActionGroup>
 
 #include "topo/Topo.h"
 #include "TopoMapGView.h"
@@ -27,6 +28,11 @@ public:
     ~TopoUI() override;
 
 private:
+    QActionGroup * workingModeGroup;
+    QAction * mode_READ;
+    QAction * mode_BUILD;
+    QAction * mode_SIMULATION;
+
     MapArranger mapGroup;
     Ui::TopoUI *ui;
 
@@ -41,7 +47,8 @@ private:
     QGraphicsScene nodeScene;
 
     std::vector<MapCandidate*> comboBoxMaps;
-    void paintEvent(QPaintEvent * event) override;
+
+    void cleanEveryThing();
 
 private Q_SLOTS:
     void loadMapFromFile();

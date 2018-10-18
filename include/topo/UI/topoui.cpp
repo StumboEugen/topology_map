@@ -13,6 +13,7 @@
 #include <QHash>
 #include <QDebug>
 #include <QSpacerItem>
+#include <QSizePolicy>
 
 #include <map>
 #include <queue>
@@ -25,6 +26,18 @@ TopoUI::TopoUI(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    workingModeGroup = new QActionGroup(this);
+    mode_READ = workingModeGroup->addAction("read file mode");
+    mode_BUILD = workingModeGroup->addAction("build map mode");
+    mode_SIMULATION = workingModeGroup->addAction("simulation mode");
+    mode_READ->setCheckable(true);
+    mode_BUILD->setCheckable(true);
+    mode_SIMULATION->setCheckable(true);
+    mode_READ->setChecked(true);
+    ui->mainToolBar->addAction(mode_READ);
+    ui->mainToolBar->addAction(mode_BUILD);
+    ui->mainToolBar->addAction(mode_SIMULATION);
+
     centerLayout = new QHBoxLayout(ui->centralWidget);
     centerLayout->setSpacing(6);
     centerLayout->setContentsMargins(11, 11, 11, 11);
@@ -34,29 +47,34 @@ TopoUI::TopoUI(QWidget *parent) :
     mapGView->setObjectName(QString::fromUtf8("mapGView"));
 //    mapGView->setGeometry(QRect(10, 10, 601, 401));
     mapGView->setScene(&this->mapScene);
-    mapGView->setMaximumSize(601, 401);
+//    mapGView->setMaximumSize(601, 401);
+    QSizePolicy p;
+    p.setHorizontalPolicy(QSizePolicy::Expanding);
+    p.setVerticalPolicy(QSizePolicy::Expanding);
+    mapGView->setSizePolicy(p);
     mapGView->setMinimumSize(601, 401);
 
     centerLayout->addWidget(mapGView);
 
     smallWindowLayout = new QVBoxLayout();
     smallWindowLayout->setSpacing(6);
-    smallWindowLayout->setContentsMargins(11, 11, 11, 11);
+    smallWindowLayout->setContentsMargins(11, 11, 11, 0);
     smallWindowLayout->setObjectName(QString::fromUtf8("smallWindowLayout"));
 
     nodeGView = new TopoNodeGView(ui->centralWidget);
     nodeGView->setObjectName(QString::fromUtf8("nodeGView"));
 //    nodeGView->setGeometry(QRect(620, 191, 221, 221));
     nodeGView->setScene(&this->nodeScene);
-    nodeGView->setMaximumSize(221, 221);
-    nodeGView->setMinimumSize(221, 221);
+    nodeGView->setFixedSize(221, 221);
+//    nodeGView->setMaximumSize(221, 221);
+//    nodeGView->setMinimumSize(221, 221);
     nodeGView->setCursor(Qt::CrossCursor);
 
     smallWindowLayout->addWidget(nodeGView, 0, Qt::AlignBottom);
 
     centerLayout->addLayout(smallWindowLayout);
 
-    centerLayout->addItem(new QSpacerItem(40,20));
+//    centerLayout->addItem(new QSpacerItem(40,20));
 
     connect(ui->btnInputMap, SIGNAL(clicked())
             , this, SLOT(loadMapFromFile()));
@@ -78,13 +96,6 @@ TopoUI::~TopoUI()
     delete ui;
 }
 
-void TopoUI::paintEvent(QPaintEvent *event) {
-//    QWidget::paintEvent(event);
-//    QPainter painter(this);
-//    painter.setWindow(QRect(-50, -50, 500, 500));
-//    painter.drawArc(QRectF{10.0, 20.0, 280.0, 260.0}, 30 * 16, 120 * 16);
-}
-
 void TopoUI::loadMapFromFile() {
     mapScene.clear();
 
@@ -92,15 +103,15 @@ void TopoUI::loadMapFromFile() {
 
     if (mapGroup.reloadFromFile(ui->etInputMap->text().toStdString())) {
         cout << "UI load map successful" << endl;
-        comboBoxMaps.clear();
+        cleanEveryThing();
+        int mapCounts = 0;
 
         for (const auto & mapCand: mapGroup.getMapCollection().getMaps()) {
-            static int i = 0;
             QString comboInfo = QString("#%1 fullEdge:%2")
-                    .arg(i).arg(mapCand->getFullEdgeNumber());
+                    .arg(mapCounts).arg(mapCand->getFullEdgeNumber());
             comboBoxMaps.push_back(mapCand);
             ui->cmboMapCandidate->addItem(comboInfo);
-            i++;
+            mapCounts++;
         }
 
     } else {
@@ -184,4 +195,11 @@ void TopoUI::drawTopoNode(TopoNode * topoNode) {
     auto QNode = new QGI_Node(topoNode);
     QNode->setDrawDetail(true);
     nodeScene.addItem(QNode);
+}
+
+void TopoUI::cleanEveryThing() {
+    mapScene.clear();
+    nodeScene.clear();
+    ui->cmboMapCandidate->clear();
+    comboBoxMaps.clear();
 }
