@@ -1,10 +1,10 @@
 #ifndef TOPOUI_H
 #define TOPOUI_H
 
-
-
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 #include "topo/Topo.h"
 #include "TopoMapGView.h"
@@ -30,8 +30,12 @@ private:
     MapArranger mapGroup;
     Ui::TopoUI *ui;
 
+    QHBoxLayout * centerLayout;
+
     TopoMapGView * mapGView;
     QGraphicsScene mapScene;
+
+    QVBoxLayout * smallWindowLayout;
 
     TopoNodeGView * nodeGView;
     QGraphicsScene nodeScene;

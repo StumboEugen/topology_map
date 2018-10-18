@@ -12,6 +12,7 @@
 #include <QPointF>
 #include <QHash>
 #include <QDebug>
+#include <QSpacerItem>
 
 #include <map>
 #include <queue>
@@ -24,15 +25,38 @@ TopoUI::TopoUI(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    centerLayout = new QHBoxLayout(ui->centralWidget);
+    centerLayout->setSpacing(6);
+    centerLayout->setContentsMargins(11, 11, 11, 11);
+    centerLayout->setObjectName(QString::fromUtf8("centerLayout"));
+
     mapGView = new TopoMapGView(ui->centralWidget);
     mapGView->setObjectName(QString::fromUtf8("mapGView"));
-    mapGView->setGeometry(QRect(10, 10, 601, 401));
+//    mapGView->setGeometry(QRect(10, 10, 601, 401));
     mapGView->setScene(&this->mapScene);
+    mapGView->setMaximumSize(601, 401);
+    mapGView->setMinimumSize(601, 401);
+
+    centerLayout->addWidget(mapGView);
+
+    smallWindowLayout = new QVBoxLayout();
+    smallWindowLayout->setSpacing(6);
+    smallWindowLayout->setContentsMargins(11, 11, 11, 11);
+    smallWindowLayout->setObjectName(QString::fromUtf8("smallWindowLayout"));
 
     nodeGView = new TopoNodeGView(ui->centralWidget);
     nodeGView->setObjectName(QString::fromUtf8("nodeGView"));
-    nodeGView->setGeometry(QRect(620, 191, 221, 221));
+//    nodeGView->setGeometry(QRect(620, 191, 221, 221));
     nodeGView->setScene(&this->nodeScene);
+    nodeGView->setMaximumSize(221, 221);
+    nodeGView->setMinimumSize(221, 221);
+    nodeGView->setCursor(Qt::CrossCursor);
+
+    smallWindowLayout->addWidget(nodeGView, 0, Qt::AlignBottom);
+
+    centerLayout->addLayout(smallWindowLayout);
+
+    centerLayout->addItem(new QSpacerItem(40,20));
 
     connect(ui->btnInputMap, SIGNAL(clicked())
             , this, SLOT(loadMapFromFile()));
