@@ -1,3 +1,6 @@
+#include "TopoMapGView.h"
+#include <QGraphicsItem>
+#include <QWheelEvent>
 #include "topoui.h"
 #include "ui_topoui.h"
 #include "ui_dockreadmap.h"
@@ -39,6 +42,13 @@ TopoUI::TopoUI(QWidget *parent) :
     uiMain->mainToolBar->addAction(mode_READ);
     uiMain->mainToolBar->addAction(mode_BUILD);
     uiMain->mainToolBar->addAction(mode_SIMULATION);
+    uiMain->mainToolBar->addSeparator();
+
+    QAction * dragMode = new QAction("Drag Mode", uiMain->mainToolBar);
+    dragMode->setCheckable(true);
+    uiMain->mainToolBar->addAction(dragMode);
+    uiMain->mainToolBar->addSeparator();
+    connect(dragMode, SIGNAL(toggled(bool)), this, SLOT(setMapGViewDragMode(bool)));
 
     centerLayout = new QHBoxLayout(uiMain->centralWidget);
     centerLayout->setSpacing(6);
@@ -104,11 +114,6 @@ TopoUI::TopoUI(QWidget *parent) :
 
     connect(modeGroup, SIGNAL(triggered(QAction*))
             , this, SLOT(changeMode(QAction*)));
-
-//    mapScene.addItem(new QGraphicsRectItem(0,500,100,100));
-//    mapScene.addItem(new QGraphicsRectItem(500,0,100,100));
-
-//    mapGView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 TopoUI::~TopoUI()
@@ -239,5 +244,13 @@ void TopoUI::changeMode(QAction * action) {
 
     if (action == mode_SIMULATION) {
         cout << "switch to simulation mode" << endl;
+    }
+}
+
+void TopoUI::setMapGViewDragMode(bool isDrag) {
+    if (isDrag) {
+        mapGView->setDragMode(QGraphicsView::ScrollHandDrag);
+    } else {
+        mapGView->setDragMode(QGraphicsView::NoDrag);
     }
 }

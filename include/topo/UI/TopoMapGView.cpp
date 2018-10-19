@@ -9,6 +9,7 @@
 
 #include "TopoMapGView.h"
 #include "QGI_Node.h"
+#include "topoui.h"
 
 #define SCALE_TIME 1.2
 #define SCALE_MAX 4.0
@@ -44,3 +45,4 @@ void TopoMapGView::mousePressEvent(QMouseEvent *event) {
         }
     }
 }
+

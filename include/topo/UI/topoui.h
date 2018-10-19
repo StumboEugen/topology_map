@@ -60,6 +60,7 @@ private Q_SLOTS:
     void displayTheActivitedMap(int);
     void drawTopoNode(TopoNode *);
     void changeMode(QAction *);
+    void setMapGViewDragMode(bool);
 };
 
 #endif // TOPOUI_H
