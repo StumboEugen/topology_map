@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QActionGroup>
+#include <QDockWidget>
 
 #include "topo/Topo.h"
 #include "TopoMapGView.h"
@@ -17,6 +18,7 @@
 
 namespace Ui {
 class TopoUI;
+class DockReadMapUI;
 }
 
 class TopoUI : public QMainWindow
@@ -28,13 +30,14 @@ public:
     ~TopoUI() override;
 
 private:
-    QActionGroup * workingModeGroup;
+
+    Ui::TopoUI *uiMain;
+    QActionGroup * modeGroup;
     QAction * mode_READ;
     QAction * mode_BUILD;
     QAction * mode_SIMULATION;
 
     MapArranger mapGroup;
-    Ui::TopoUI *ui;
 
     QHBoxLayout * centerLayout;
 
@@ -46,6 +49,8 @@ private:
     TopoNodeGView * nodeGView;
     QGraphicsScene nodeScene;
 
+    Ui::DockReadMapUI * uiDockReadMap;
+    QDockWidget * dockReadMap;
     std::vector<MapCandidate*> comboBoxMaps;
 
     void cleanEveryThing();
@@ -54,6 +59,7 @@ private Q_SLOTS:
     void loadMapFromFile();
     void displayTheActivitedMap(int);
     void drawTopoNode(TopoNode *);
+    void changeMode(QAction *);
 };
 
 #endif // TOPOUI_H

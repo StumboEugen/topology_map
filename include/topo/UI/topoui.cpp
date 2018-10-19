@@ -1,5 +1,6 @@
 #include "topoui.h"
 #include "ui_topoui.h"
+#include "ui_dockreadmap.h"
 
 #include "topo/Topo.h"
 
@@ -22,28 +23,29 @@ using namespace std;
 
 TopoUI::TopoUI(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::TopoUI)
+    uiMain(new Ui::TopoUI),
+    uiDockReadMap(new Ui::DockReadMapUI)
 {
-    ui->setupUi(this);
+    uiMain->setupUi(this);
 
-    workingModeGroup = new QActionGroup(this);
-    mode_READ = workingModeGroup->addAction("read file mode");
-    mode_BUILD = workingModeGroup->addAction("build map mode");
-    mode_SIMULATION = workingModeGroup->addAction("simulation mode");
+    modeGroup = new QActionGroup(this);
+    mode_READ = modeGroup->addAction("read file mode");
+    mode_BUILD = modeGroup->addAction("build map mode");
+    mode_SIMULATION = modeGroup->addAction("simulation mode");
     mode_READ->setCheckable(true);
     mode_BUILD->setCheckable(true);
     mode_SIMULATION->setCheckable(true);
     mode_READ->setChecked(true);
-    ui->mainToolBar->addAction(mode_READ);
-    ui->mainToolBar->addAction(mode_BUILD);
-    ui->mainToolBar->addAction(mode_SIMULATION);
+    uiMain->mainToolBar->addAction(mode_READ);
+    uiMain->mainToolBar->addAction(mode_BUILD);
+    uiMain->mainToolBar->addAction(mode_SIMULATION);
 
-    centerLayout = new QHBoxLayout(ui->centralWidget);
+    centerLayout = new QHBoxLayout(uiMain->centralWidget);
     centerLayout->setSpacing(6);
     centerLayout->setContentsMargins(11, 11, 11, 11);
     centerLayout->setObjectName(QString::fromUtf8("centerLayout"));
 
-    mapGView = new TopoMapGView(ui->centralWidget);
+    mapGView = new TopoMapGView(uiMain->centralWidget);
     mapGView->setObjectName(QString::fromUtf8("mapGView"));
 //    mapGView->setGeometry(QRect(10, 10, 601, 401));
     mapGView->setScene(&this->mapScene);
@@ -61,7 +63,7 @@ TopoUI::TopoUI(QWidget *parent) :
     smallWindowLayout->setContentsMargins(11, 11, 11, 0);
     smallWindowLayout->setObjectName(QString::fromUtf8("smallWindowLayout"));
 
-    nodeGView = new TopoNodeGView(ui->centralWidget);
+    nodeGView = new TopoNodeGView(uiMain->centralWidget);
     nodeGView->setObjectName(QString::fromUtf8("nodeGView"));
 //    nodeGView->setGeometry(QRect(620, 191, 221, 221));
     nodeGView->setScene(&this->nodeScene);
@@ -74,16 +76,34 @@ TopoUI::TopoUI(QWidget *parent) :
 
     centerLayout->addLayout(smallWindowLayout);
 
-//    centerLayout->addItem(new QSpacerItem(40,20));
+    dockReadMap = new QDockWidget(this);
+    dockReadMap->setObjectName(QString::fromUtf8("dock_readMap"));
+    QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Maximum);
+    sizePolicy1.setHorizontalStretch(0);
+    sizePolicy1.setVerticalStretch(0);
+    sizePolicy1.setHeightForWidth(dockReadMap->sizePolicy().hasHeightForWidth());
+    dockReadMap->setSizePolicy(sizePolicy1);
+    dockReadMap->setFloating(false);
+    dockReadMap->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+    QWidget * dockWidgetReadMapTemp = new QWidget();
+    dockWidgetReadMapTemp->setObjectName(QString::fromUtf8("dockWidgetReadMapTemp"));
+    uiDockReadMap->setupUi(dockWidgetReadMapTemp);
+    dockReadMap->setWidget(dockWidgetReadMapTemp);
+    dockReadMap->setWindowTitle("read map dock");
+    addDockWidget(Qt::RightDockWidgetArea, dockReadMap);
+    setDockNestingEnabled(true);
 
-    connect(ui->btnInputMap, SIGNAL(clicked())
+    connect(uiDockReadMap->btnInputMap, SIGNAL(clicked())
             , this, SLOT(loadMapFromFile()));
 
-    connect(ui->cmboMapCandidate, SIGNAL(activated(int))
+    connect(uiDockReadMap->cmboMapCandidate, SIGNAL(activated(int))
             , this, SLOT(displayTheActivitedMap(int)));
 
     connect(mapGView, SIGNAL(QGI_Node_clicked(TopoNode*))
             , this, SLOT(drawTopoNode(TopoNode*)));
+
+    connect(modeGroup, SIGNAL(triggered(QAction*))
+            , this, SLOT(changeMode(QAction*)));
 
 //    mapScene.addItem(new QGraphicsRectItem(0,500,100,100));
 //    mapScene.addItem(new QGraphicsRectItem(500,0,100,100));
@@ -93,7 +113,7 @@ TopoUI::TopoUI(QWidget *parent) :
 
 TopoUI::~TopoUI()
 {
-    delete ui;
+    delete uiMain;
 }
 
 void TopoUI::loadMapFromFile() {
@@ -101,7 +121,7 @@ void TopoUI::loadMapFromFile() {
 
 //    mapScene.removeItem(mapScene.itemAt({50, 50}));
 
-    if (mapGroup.reloadFromFile(ui->etInputMap->text().toStdString())) {
+    if (mapGroup.reloadFromFile(uiDockReadMap->etInputMap->text().toStdString())) {
         cout << "UI load map successful" << endl;
         cleanEveryThing();
         int mapCounts = 0;
@@ -110,7 +130,7 @@ void TopoUI::loadMapFromFile() {
             QString comboInfo = QString("#%1 fullEdge:%2")
                     .arg(mapCounts).arg(mapCand->getFullEdgeNumber());
             comboBoxMaps.push_back(mapCand);
-            ui->cmboMapCandidate->addItem(comboInfo);
+            uiDockReadMap->cmboMapCandidate->addItem(comboInfo);
             mapCounts++;
         }
 
@@ -200,6 +220,24 @@ void TopoUI::drawTopoNode(TopoNode * topoNode) {
 void TopoUI::cleanEveryThing() {
     mapScene.clear();
     nodeScene.clear();
-    ui->cmboMapCandidate->clear();
+    uiDockReadMap->cmboMapCandidate->clear();
     comboBoxMaps.clear();
+}
+
+void TopoUI::changeMode(QAction * action) {
+    if (action == mode_READ) {
+        cout << "switch to read mode" << endl;
+        dockReadMap->setShown(true);
+    } else {
+        dockReadMap->setShown(false);
+    }
+
+    if (action == mode_BUILD) {
+        cout << "switch to build mode" << endl;
+        cleanEveryThing();
+    }
+
+    if (action == mode_SIMULATION) {
+        cout << "switch to simulation mode" << endl;
+    }
 }
