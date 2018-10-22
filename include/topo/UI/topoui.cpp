@@ -70,9 +70,13 @@ TopoUI::TopoUI(QWidget *parent) :
     centerLayout->addWidget(mapGView);
 
     smallWindowLayout = new QVBoxLayout();
-    smallWindowLayout->setSpacing(6);
-    smallWindowLayout->setContentsMargins(11, 11, 11, 0);
+    smallWindowLayout->setSpacing(11);
+    smallWindowLayout->setContentsMargins(11, 0, 11, 0);
     smallWindowLayout->setObjectName(QString::fromUtf8("smallWindowLayout"));
+
+    infoView = new QTextEdit(uiMain->centralWidget);
+    infoView->setObjectName(QString::fromUtf8("infoView"));
+    smallWindowLayout->addWidget(infoView, 0, Qt::AlignTop);
 
     nodeGView = new TopoNodeGView(uiMain->centralWidget);
     nodeGView->setObjectName(QString::fromUtf8("nodeGView"));
@@ -110,6 +114,9 @@ TopoUI::TopoUI(QWidget *parent) :
 
     connect(modeGroup, SIGNAL(triggered(QAction*))
             , this, SLOT(changeMode(QAction*)));
+
+    connect(uiDockBuildMap->btnMakeNewNode, SIGNAL(clicked())
+            , this, SLOT(buildModeNewNode()));
 }
 
 TopoUI::~TopoUI()
@@ -221,8 +228,9 @@ void TopoUI::drawTopoNode(TopoNode * topoNode) {
 void TopoUI::cleanEveryThing() {
     mapScene.clear();
     nodeScene.clear();
-    uiDockReadMap->cmboMapCandidate->clear();
-    comboBoxMaps.clear();
+    uiDockReadMap->cmboMapCandidate->clear();   //TODO use QVariant
+    comboBoxMaps.clear();   //TODO WARNNING leak
+    buildModeNodes.clear();
 }
 
 void TopoUI::changeMode(QAction * action) {
@@ -266,4 +274,8 @@ QDockWidget *TopoUI::initTheDock(const char *name) {
     theDock->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
     theDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
     return theDock;
+}
+
+void TopoUI::buildModeNewNode() {
+
 }

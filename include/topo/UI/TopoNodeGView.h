@@ -17,6 +17,13 @@ class TopoNodeGView : public QGraphicsView {
 public:
     explicit TopoNodeGView(QWidget *parent = nullptr) : QGraphicsView(parent){}
     ~TopoNodeGView() override = default;
+
+    void setDrawingMode(bool drawingMode) {
+        TopoNodeGView::drawingMode = drawingMode;
+    }
+
+private:
+    bool drawingMode = false;
 };
 
 

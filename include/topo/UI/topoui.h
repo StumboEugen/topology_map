@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QActionGroup>
 #include <QDockWidget>
+#include <QTextEdit>
 
 #include "topo/Topo.h"
 #include "TopoMapGView.h"
@@ -47,6 +48,7 @@ private:
 
     QVBoxLayout * smallWindowLayout;
 
+    QTextEdit * infoView;
     TopoNodeGView * nodeGView;
     QGraphicsScene nodeScene;
 
@@ -56,6 +58,7 @@ private:
 
     Ui::DockBuildMapUI * uiDockBuildMap;
     QDockWidget * dockBuildMap;
+    std::vector<TopoNode *> buildModeNodes;
 
     void cleanEveryThing();
 
@@ -67,6 +70,7 @@ private Q_SLOTS:
     void drawTopoNode(TopoNode *);
     void changeMode(QAction *);
     void setMapGViewDragMode(bool);
+    void buildModeNewNode();
 };
 
 #endif // TOPOUI_H
