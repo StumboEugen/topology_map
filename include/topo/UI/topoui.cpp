@@ -30,7 +30,9 @@ TopoUI::TopoUI(QWidget *parent) :
     uiDockReadMap(new Ui::DockReadMapUI),
     uiDockBuildMap(new Ui::DockBuildMapUI)
 {
+
     uiMain->setupUi(this);
+    setWindowTitle("TOPO Simulator");
 
     modeGroup = new QActionGroup(this);
     mode_READ = modeGroup->addAction("read file mode");
@@ -72,8 +74,11 @@ TopoUI::TopoUI(QWidget *parent) :
     smallWindowLayout->setContentsMargins(11, 0, 11, 0);
     smallWindowLayout->setObjectName(QString::fromUtf8("smallWindowLayout"));
 
-    infoView = new QTextEdit(uiMain->centralWidget);
+    infoView = new QTextBrowser(uiMain->centralWidget);
     infoView->setObjectName(QString::fromUtf8("infoView"));
+    infoView->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+    infoView->setBaseSize(221, 221);
+    infoView->setText("Welcome!");
     smallWindowLayout->addWidget(infoView, 0, Qt::AlignTop);
 
     nodeGView = new TopoNodeGView(uiMain->centralWidget);

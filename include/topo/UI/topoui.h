@@ -8,6 +8,7 @@
 #include <QActionGroup>
 #include <QDockWidget>
 #include <QTextEdit>
+#include <QTextBrowser>
 
 #include "topo/Topo.h"
 #include "TopoMapGView.h"
@@ -48,7 +49,7 @@ private:
 
     QVBoxLayout * smallWindowLayout;
 
-    QTextEdit * infoView;
+    QTextBrowser * infoView;
     TopoNodeGView * nodeGView;
     QGraphicsScene nodeScene;
 
