@@ -111,6 +111,10 @@ TopoUI::TopoUI(QWidget *parent) :
 
     connect(uiDockBuildMap->btnMakeNewNode, SIGNAL(clicked())
             , this, SLOT(buildModeNewNode()));
+
+    connect(uiDockBuildMap->btnAddNodeIntoMap, SIGNAL(clicked())
+            , this, SLOT(buildModeAddNode2MapView()));
+
 }
 
 TopoUI::~TopoUI()
@@ -239,6 +243,7 @@ void TopoUI::changeMode(QAction * action) {
     if (action == mode_BUILD) {
         cout << "switch to build mode" << endl;
         dockBuildMap->setShown(true);
+        uiDockBuildMap->btnMakeNewNode->setText("make a new node");
         cleanEveryThing();
     } else {
         dockBuildMap->setShown(false);
@@ -272,5 +277,36 @@ QDockWidget *TopoUI::initTheDock(const char *name) {
 }
 
 void TopoUI::buildModeNewNode() {
-    nodeGView->startDrawingIns();
+    auto pIns = nodeGView->getTheDrawnInstance();
+    if (pIns == nullptr) {
+        nodeGView->startDrawingIns();
+        uiDockBuildMap->btnMakeNewNode->setText("finish drawing");
+        uiDockBuildMap->cmboMadeNodes->setEnabled(false);
+        uiDockBuildMap->btnAddNodeIntoMap->setEnabled(false);
+    } else {
+        QVariant thePtrVariant = QVariant::fromValue((void*)pIns);
+        auto nameStr = QString("#%1 E%2[")
+                .arg(uiDockBuildMap->cmboMadeNodes->count() + 1)
+                .arg(pIns->sizeOfExits());
+        for (const auto & exit : pIns->getExits()) {
+            nameStr += QString::number(static_cast<int>(exit.getOutDir())) + "|";
+        }
+        nameStr += "]";
+        uiDockBuildMap->cmboMadeNodes->addItem(nameStr, thePtrVariant);
+        uiDockBuildMap->btnMakeNewNode->setText("make a new node");
+        uiDockBuildMap->cmboMadeNodes->setEnabled(true);
+        uiDockBuildMap->btnAddNodeIntoMap->setEnabled(true);
+    }
+
+}
+
+void TopoUI::buildModeAddNode2MapView() {
+    auto pBox = uiDockBuildMap->cmboMadeNodes;
+    NodeInstance * pIns =
+            static_cast<NodeInstance *>(pBox->itemData(pBox->currentIndex()).value<void*>());
+    auto pnode = new TopoNode(pIns);
+    auto QGI_node = new QGI_Node(pnode);
+    QGI_node->setDrawDetail(true);
+    QGI_node->setFlag(QGraphicsItem::ItemIsMovable);
+    mapGView->scene()->addItem(QGI_node);
 }

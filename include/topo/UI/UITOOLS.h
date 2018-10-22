@@ -5,6 +5,8 @@
 #ifndef TOPOLOGY_MAP_UITOOLS_H
 #define TOPOLOGY_MAP_UITOOLS_H
 
+const uint32_t INS_TYPE_SERIAL = 1074;
+
 const int METER_TO_PIXLE = 30;
 
 const double PI = 3.1415926;

@@ -17,9 +17,9 @@ class TopoNodeGView : public QGraphicsView {
 
 public:
     explicit TopoNodeGView(QWidget *parent = nullptr) : QGraphicsView(parent){}
-    ~TopoNodeGView() override = default;
+    ~TopoNodeGView() override;
 
-    NodeInstance *drawingFinish();
+    NodeInstance *getTheDrawnInstance();
 
     void startDrawingIns();
 
@@ -29,10 +29,10 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
-    NodeInstance * drawingIns;
-    QGraphicsLineItem * theDrawingLine;
+    NodeInstance * drawingIns{};
+    QGraphicsLineItem * theDrawingLine{};
     QPointF drawLineStartPos;
-    bool isDrawing = false;
+    bool drawingLine = false;
 };
 
 

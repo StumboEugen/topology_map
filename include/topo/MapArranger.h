@@ -28,7 +28,7 @@ public:
         return mapName;
     }
 
-    const NodeCollection &getNodeCollection() const {
+    NodeCollection &getNodeCollection()  {  //TODO const?
         return nodeCollection;
     }
 

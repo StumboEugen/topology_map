@@ -71,6 +71,7 @@ private Q_SLOTS:
     void changeMode(QAction *);
     void setMapGViewDragMode(bool);
     void buildModeNewNode();
+    void buildModeAddNode2MapView();
 };
 
 #endif // TOPOUI_H

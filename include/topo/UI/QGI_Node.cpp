@@ -17,6 +17,11 @@ QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
                       RECT_SIZE_HALF * 2, RECT_SIZE_HALF * 2};
     if (drawDetail) {
 //        painter->drawArc(rect, 0, 16 * 360);
+        QPainterPath path;
+        path.addEllipse(-20,-20,40,40);
+        path.setFillRule(Qt::WindingFill);
+        painter->setBrush(Qt::yellow);
+        painter->drawPath(path);
         const auto & ins = relatedNodeTOPO->getInsCorrespond();
         for (const auto & exit: ins->getExits()) {
             QPointF exitGatePoint{exit.getPosX() * METER_TO_PIXLE,
