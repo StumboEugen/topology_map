@@ -58,9 +58,7 @@ TopoUI::TopoUI(QWidget *parent) :
 
     mapGView = new TopoMapGView(uiMain->centralWidget);
     mapGView->setObjectName(QString::fromUtf8("mapGView"));
-//    mapGView->setGeometry(QRect(10, 10, 601, 401));
     mapGView->setScene(&this->mapScene);
-//    mapGView->setMaximumSize(601, 401);
     QSizePolicy p;
     p.setHorizontalPolicy(QSizePolicy::Expanding);
     p.setVerticalPolicy(QSizePolicy::Expanding);
@@ -80,12 +78,10 @@ TopoUI::TopoUI(QWidget *parent) :
 
     nodeGView = new TopoNodeGView(uiMain->centralWidget);
     nodeGView->setObjectName(QString::fromUtf8("nodeGView"));
-//    nodeGView->setGeometry(QRect(620, 191, 221, 221));
     nodeGView->setScene(&this->nodeScene);
     nodeGView->setFixedSize(221, 221);
-//    nodeGView->setMaximumSize(221, 221);
-//    nodeGView->setMinimumSize(221, 221);
     nodeGView->setCursor(Qt::CrossCursor);
+    nodeGView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
 
     smallWindowLayout->addWidget(nodeGView, 0, Qt::AlignBottom);
 
@@ -100,8 +96,6 @@ TopoUI::TopoUI(QWidget *parent) :
     uiDockBuildMap->setupUi(dockBuildMap);
     addDockWidget(Qt::RightDockWidgetArea, dockBuildMap);
     dockBuildMap->setShown(false);
-
-//    uiDockBuildMap->setupUi(dockReadMap);//TODO
 
     connect(uiDockReadMap->btnInputMap, SIGNAL(clicked())
             , this, SLOT(loadMapFromFile()));
@@ -237,6 +231,7 @@ void TopoUI::changeMode(QAction * action) {
     if (action == mode_READ) {
         cout << "switch to read mode" << endl;
         dockReadMap->setShown(true);
+        cleanEveryThing();
     } else {
         dockReadMap->setShown(false);
     }
@@ -277,5 +272,5 @@ QDockWidget *TopoUI::initTheDock(const char *name) {
 }
 
 void TopoUI::buildModeNewNode() {
-
+    nodeGView->startDrawingIns();
 }

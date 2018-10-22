@@ -7,6 +7,7 @@
 
 #include <QGraphicsView>
 #include <QWidget>
+#include <QPointF>
 
 #include "include/topo/Topo.h"
 #include "QGI_Node.h"
@@ -18,12 +19,20 @@ public:
     explicit TopoNodeGView(QWidget *parent = nullptr) : QGraphicsView(parent){}
     ~TopoNodeGView() override = default;
 
-    void setDrawingMode(bool drawingMode) {
-        TopoNodeGView::drawingMode = drawingMode;
-    }
+    NodeInstance *drawingFinish();
+
+    void startDrawingIns();
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
-    bool drawingMode = false;
+    NodeInstance * drawingIns;
+    QGraphicsLineItem * theDrawingLine;
+    QPointF drawLineStartPos;
+    bool isDrawing = false;
 };
 
 
