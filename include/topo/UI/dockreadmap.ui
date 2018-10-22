@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>DockReadMapUI</class>
- <widget class="QWidget" name="DockReadMapUI">
+ <widget class="QDockWidget" name="DockReadMapUI">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,103 +11,105 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>read map dock</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="minimumSize">
-      <size>
-       <width>151</width>
-       <height>91</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>151</width>
-       <height>91</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Input map</string>
-     </property>
-     <widget class="QLineEdit" name="etInputMap">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>121</width>
-        <height>25</height>
-       </rect>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="minimumSize">
+       <size>
+        <width>151</width>
+        <height>91</height>
+       </size>
       </property>
-      <property name="whatsThis">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;the map name&lt;/p&gt;&lt;p&gt;default floder: ~/topoMaps/&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <property name="maximumSize">
+       <size>
+        <width>151</width>
+        <height>91</height>
+       </size>
       </property>
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
+      <property name="title">
+       <string>Input map</string>
       </property>
-      <property name="text">
-       <string>map</string>
-      </property>
+      <widget class="QLineEdit" name="etInputMap">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>121</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;the map name&lt;/p&gt;&lt;p&gt;default floder: ~/topoMaps/&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>map</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btnInputMap">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>121</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Input Map</string>
+       </property>
+      </widget>
      </widget>
-     <widget class="QPushButton" name="btnInputMap">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>121</width>
-        <height>25</height>
-       </rect>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="minimumSize">
+       <size>
+        <width>151</width>
+        <height>71</height>
+       </size>
       </property>
-      <property name="text">
-       <string>Input Map</string>
+      <property name="maximumSize">
+       <size>
+        <width>151</width>
+        <height>71</height>
+       </size>
       </property>
+      <property name="title">
+       <string>Map Candidate</string>
+      </property>
+      <widget class="QComboBox" name="cmboMapCandidate">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>131</width>
+         <height>25</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="minimumSize">
-      <size>
-       <width>151</width>
-       <height>71</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>151</width>
-       <height>71</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Map Candidate</string>
-     </property>
-     <widget class="QComboBox" name="cmboMapCandidate">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>131</width>
-        <height>25</height>
-       </rect>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-     </widget>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>105</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-  </layout>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>86</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <resources/>
  <connections/>

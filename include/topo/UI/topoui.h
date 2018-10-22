@@ -17,8 +17,9 @@
 #include <iostream>
 
 namespace Ui {
-class TopoUI;
-class DockReadMapUI;
+    class TopoUI;
+    class DockReadMapUI;
+    class DockBuildMapUI;
 }
 
 class TopoUI : public QMainWindow
@@ -53,7 +54,12 @@ private:
     QDockWidget * dockReadMap;
     std::vector<MapCandidate*> comboBoxMaps;
 
+    Ui::DockBuildMapUI * uiDockBuildMap;
+    QDockWidget * dockBuildMap;
+
     void cleanEveryThing();
+
+    QDockWidget * initTheDock(const char *name);
 
 private Q_SLOTS:
     void loadMapFromFile();

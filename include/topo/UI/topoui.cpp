@@ -1,15 +1,3 @@
-#include "TopoMapGView.h"
-#include <QGraphicsItem>
-#include <QWheelEvent>
-#include "topoui.h"
-#include "ui_topoui.h"
-#include "ui_dockreadmap.h"
-
-#include "topo/Topo.h"
-
-#include "QGI_Node.h"
-#include "QGI_Edge.h"
-
 #include <QPainter>
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
@@ -18,6 +6,18 @@
 #include <QDebug>
 #include <QSpacerItem>
 #include <QSizePolicy>
+#include <QGraphicsItem>
+#include <QWheelEvent>
+
+#include "topoui.h"
+#include "ui_topoui.h"
+#include "ui_dockreadmap.h"
+#include "ui_dockbuildmap.h"
+#include "topo/Topo.h"
+
+#include "TopoMapGView.h"
+#include "QGI_Node.h"
+#include "QGI_Edge.h"
 
 #include <map>
 #include <queue>
@@ -27,7 +27,8 @@ using namespace std;
 TopoUI::TopoUI(QWidget *parent) :
     QMainWindow(parent),
     uiMain(new Ui::TopoUI),
-    uiDockReadMap(new Ui::DockReadMapUI)
+    uiDockReadMap(new Ui::DockReadMapUI),
+    uiDockBuildMap(new Ui::DockBuildMapUI)
 {
     uiMain->setupUi(this);
 
@@ -86,22 +87,17 @@ TopoUI::TopoUI(QWidget *parent) :
 
     centerLayout->addLayout(smallWindowLayout);
 
-    dockReadMap = new QDockWidget(this);
-    dockReadMap->setObjectName(QString::fromUtf8("dock_readMap"));
-    QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Maximum);
-    sizePolicy1.setHorizontalStretch(0);
-    sizePolicy1.setVerticalStretch(0);
-    sizePolicy1.setHeightForWidth(dockReadMap->sizePolicy().hasHeightForWidth());
-    dockReadMap->setSizePolicy(sizePolicy1);
-    dockReadMap->setFloating(false);
-    dockReadMap->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
-    QWidget * dockWidgetReadMapTemp = new QWidget();
-    dockWidgetReadMapTemp->setObjectName(QString::fromUtf8("dockWidgetReadMapTemp"));
-    uiDockReadMap->setupUi(dockWidgetReadMapTemp);
-    dockReadMap->setWidget(dockWidgetReadMapTemp);
-    dockReadMap->setWindowTitle("read map dock");
-    addDockWidget(Qt::RightDockWidgetArea, dockReadMap);
     setDockNestingEnabled(true);
+    dockReadMap = initTheDock("DockReadMap");
+    uiDockReadMap->setupUi(dockReadMap);
+    addDockWidget(Qt::RightDockWidgetArea, dockReadMap);
+
+    dockBuildMap = initTheDock("DockBuildMap");
+    uiDockBuildMap->setupUi(dockBuildMap);
+    addDockWidget(Qt::RightDockWidgetArea, dockBuildMap);
+    dockBuildMap->setShown(false);
+
+//    uiDockBuildMap->setupUi(dockReadMap);//TODO
 
     connect(uiDockReadMap->btnInputMap, SIGNAL(clicked())
             , this, SLOT(loadMapFromFile()));
@@ -239,7 +235,10 @@ void TopoUI::changeMode(QAction * action) {
 
     if (action == mode_BUILD) {
         cout << "switch to build mode" << endl;
+        dockBuildMap->setShown(true);
         cleanEveryThing();
+    } else {
+        dockBuildMap->setShown(false);
     }
 
     if (action == mode_SIMULATION) {
@@ -253,4 +252,18 @@ void TopoUI::setMapGViewDragMode(bool isDrag) {
     } else {
         mapGView->setDragMode(QGraphicsView::NoDrag);
     }
+}
+
+QDockWidget *TopoUI::initTheDock(const char *name) {
+    auto theDock = new QDockWidget(this);
+    theDock->setObjectName(QString::fromUtf8(name));  //TODO
+    QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Maximum);
+    sizePolicy1.setHorizontalStretch(0);
+    sizePolicy1.setVerticalStretch(0);
+    sizePolicy1.setHeightForWidth(theDock->sizePolicy().hasHeightForWidth());
+    theDock->setSizePolicy(sizePolicy1);
+    theDock->setFloating(false);
+    theDock->setFeatures(QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable);
+    theDock->setAllowedAreas(Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
+    return theDock;
 }
