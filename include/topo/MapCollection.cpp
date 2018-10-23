@@ -68,3 +68,31 @@ mapPosInList MapCollection::addMapAtListBack(MapCandidate *newMap) {
     temp--;
     return temp;
 }
+
+void MapCollection::addNodeDirectly(TopoNode * node)  {
+    if (maps.size() > 1) {
+        std::cerr << "[MapCollection::addNodeDirectly]"
+                     "You try to add node directly, but there are more than 1 map candidate"
+                  << endl;
+    }
+
+    if (maps.empty()) {
+        maps.push_back(new MapCandidate(node->getInsCorrespond()));
+    }
+
+    maps.front()->addNodeDirectly(node);
+}
+
+void MapCollection::addEdgeDirectly(TopoEdge * edge) {
+    if (maps.size() > 1) {
+        std::cerr << "[MapCollection::addNodeDirectly]"
+                     "You try to add node directly, but there are more than 1 map candidate"
+                  << endl;
+    }
+
+    if (maps.empty()) {
+        maps.push_back(new MapCandidate(edge->getExitA()->getInsCorrespond()));
+    }
+
+    maps.front()->addEdgeDirectly(edge);
+}

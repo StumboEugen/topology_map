@@ -159,6 +159,9 @@ bool MapArranger::reloadFromFile(const std::string & fileName) {
     }
 }
 
+/**
+ * clean everything, data, ptrs
+ */
 void MapArranger::selfClean() {
     mapCollection.clear();
     nodeCollection.clear();

@@ -13,9 +13,6 @@
 
 using namespace std;
 
-class NodeInstance;
-class MapCandidate;
-
 /**
  * collection of the NodeInstances
  * a member in MapArranger

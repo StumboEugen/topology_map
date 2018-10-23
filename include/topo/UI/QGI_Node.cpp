@@ -16,7 +16,6 @@ QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     static QRect rect{-RECT_SIZE_HALF, -RECT_SIZE_HALF,
                       RECT_SIZE_HALF * 2, RECT_SIZE_HALF * 2};
     if (drawDetail) {
-//        painter->drawArc(rect, 0, 16 * 360);
         QPainterPath path;
         path.addEllipse(-20,-20,40,40);
         path.setFillRule(Qt::WindingFill);
@@ -43,13 +42,14 @@ QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     }
 }
 
+static QRect outline{-RECT_SIZE_HALF - 1, -RECT_SIZE_HALF - 1,
+                     RECT_SIZE_HALF * 2 + 2, RECT_SIZE_HALF * 2 + 2};
+
 QRectF QGI_Node::boundingRect() const {
-    static QRect rect{-RECT_SIZE_HALF - 1, -RECT_SIZE_HALF - 1,
-                      RECT_SIZE_HALF * 2 + 2, RECT_SIZE_HALF * 2 + 2};
     if (drawDetail) {
         return {-100, -100, 200, 200};
     } else {
-        return rect;
+        return outline;
     }
 }
 
@@ -66,4 +66,15 @@ QGI_Node::QGI_Node(TopoNode * node)
 
 int QGI_Node::type() const {
     return QGI_NODE_TYPE;
+}
+
+QPainterPath QGI_Node::shape() const {
+    QPainterPath path;
+    if (drawDetail) {
+        path.addEllipse(-20,-20,40,40);
+        path.setFillRule(Qt::WindingFill);
+    } else {
+        path.addRect(outline);
+    }
+    return path;
 }

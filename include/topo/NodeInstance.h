@@ -21,10 +21,6 @@ using std::map;
 using std::vector;
 using std::string;
 
-class ExitInstance;
-class MapCandidate;
-class TopoNode;
-
 /**
  * represent a real node, stored in the NodeCollection
  * the connect information is stored in map candidate

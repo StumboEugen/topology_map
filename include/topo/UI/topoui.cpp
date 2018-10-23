@@ -231,6 +231,7 @@ void TopoUI::drawTopoNode(TopoNode * topoNode) {
 void TopoUI::cleanEveryThing() {
     mapScene.clear();
     nodeScene.clear();
+    mapGroup.selfClean();
     uiDockReadMap->cmboMapCandidate->clear();   //TODO use QVariant
     comboBoxMaps.clear();   //TODO WARNNING leak
     buildModeNodes.clear();
@@ -267,9 +268,9 @@ void TopoUI::setMapGViewDragMode(bool isDrag) {
     }
 }
 
-QDockWidget *TopoUI::initTheDock(const char *name) {
+QDockWidget *TopoUI::initTheDock(const char *objectName) {
     auto theDock = new QDockWidget(this);
-    theDock->setObjectName(QString::fromUtf8(name));  //TODO
+    theDock->setObjectName(QString::fromUtf8(objectName));
     QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Maximum);
     sizePolicy1.setHorizontalStretch(0);
     sizePolicy1.setVerticalStretch(0);
@@ -283,11 +284,13 @@ QDockWidget *TopoUI::initTheDock(const char *name) {
 
 void TopoUI::buildModeNewNode() {
     auto pIns = nodeGView->getTheDrawnInstance();
+    /**it is not at building ins, start building*/
     if (pIns == nullptr) {
         nodeGView->startDrawingIns();
         uiDockBuildMap->btnMakeNewNode->setText("finish drawing");
         uiDockBuildMap->cmboMadeNodes->setEnabled(false);
         uiDockBuildMap->btnAddNodeIntoMap->setEnabled(false);
+    /**it was at building, stop building, save the node*/
     } else {
         QVariant thePtrVariant = QVariant::fromValue((void*)pIns);
         auto nameStr = QString("#%1 E%2[")
@@ -297,6 +300,7 @@ void TopoUI::buildModeNewNode() {
             nameStr += QString::number(static_cast<int>(exit.getOutDir())) + "|";
         }
         nameStr += "]";
+        mapGroup.addInstanceDirectly(pIns);
         uiDockBuildMap->cmboMadeNodes->addItem(nameStr, thePtrVariant);
         uiDockBuildMap->btnMakeNewNode->setText("make a new node");
         uiDockBuildMap->cmboMadeNodes->setEnabled(true);
@@ -310,6 +314,7 @@ void TopoUI::buildModeAddNode2MapView() {
     NodeInstance * pIns =
             static_cast<NodeInstance *>(pBox->itemData(pBox->currentIndex()).value<void*>());
     auto pnode = new TopoNode(pIns);
+    mapGroup.addTopoNodeDirectly(pnode);
     auto QGI_node = new QGI_Node(pnode);
     QGI_node->setDrawDetail(true);
     QGI_node->setFlag(QGraphicsItem::ItemIsMovable);

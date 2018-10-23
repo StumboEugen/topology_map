@@ -15,6 +15,10 @@
 typedef uint8_t	gateId;
 
 class MapCandidate;
+class NodeInstance;
+class TopoNode;
+class TopoEdge;
+class ExitInstance;
 
 typedef Json::Value JSobj;
 typedef std::list<MapCandidate *>::iterator mapPosInList;

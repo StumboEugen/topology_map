@@ -14,10 +14,6 @@
 
 using namespace std;
 
-class TopoEdge;
-class TopoNode;
-class NodeInstance;
-
 /**
  * represent a possibility of the real topo structure map
  * using TopoEdges and TopoNodes
@@ -67,6 +63,14 @@ public:
 
     TopoNode *const getOneTopoNode() {
         return nodes.begin().operator*();
+    }
+
+    void addNodeDirectly(TopoNode * node) {
+        nodes.insert(node);
+    }
+
+    void addEdgeDirectly(TopoEdge * edge) {
+        edges.insert(edge);
     }
 
     TopoNode *const addNewNode(NodeInstance * instance);

@@ -163,10 +163,18 @@ inline TopoNode *const MapCandidate::addNewNode(NodeInstance *const instance) {
 
 /**
  * add a new edge in the set
- * @param instance
+ * @warning didn't check if the TopoNodes belongs to this Mapcandidate
  * @return the ptr of the edge
  */
-inline TopoEdge *const MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, TopoNode *const eb, gateId gb) {
+inline TopoEdge *const
+MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, TopoNode *const eb, gateId gb) {
+    //TODO cancel this check
+    if (nodes.find(ea) == nodes.end() || nodes.find(eb) == nodes.end()) {
+        cerr << "[MapCandidate::addNewEdge]"
+                "you try to connect two node that didn't belong to this mapcandidate!"
+                << endl;
+    }
+
     auto edgeResult = edges.emplace(new TopoEdge(ea, ga, eb, gb));
     if (!edgeResult.second) {
         cout << "[MapCandidate::addNewEdge] FAILURE!!!" << endl;

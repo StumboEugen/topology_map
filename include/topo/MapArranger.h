@@ -28,12 +28,24 @@ public:
         return mapName;
     }
 
-    NodeCollection &getNodeCollection()  {  //TODO const?
+    const NodeCollection &getNodeCollection() const {
         return nodeCollection;
     }
 
     const MapCollection &getMapCollection() const {
         return mapCollection;
+    }
+
+    void addInstanceDirectly(NodeInstance * ins) {
+        nodeCollection.addInstanceDirectly(ins);
+    }
+
+    void addTopoNodeDirectly(TopoNode * node) {
+        mapCollection.addNodeDirectly(node);
+    }
+
+    void addTopoEdgeDirectly(TopoEdge * edge) {
+        mapCollection.addEdgeDirectly(edge);
     }
 
     bool readFromJSON(const JSobj & obj);

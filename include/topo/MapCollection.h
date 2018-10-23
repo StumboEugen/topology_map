@@ -6,11 +6,9 @@
 #define TOPOLOGY_MAP_MAPCOLLECTION_H
 
 #include <list>
+#include <iostream>
 
 #include "TopoTools.h"
-
-class NodeInstance;
-class MapCandidate;
 
 /**
  * collection of the MapCandidates
@@ -30,6 +28,10 @@ public:
     const std::list<MapCandidate *> & getMaps() const {
         return maps;
     }
+
+    void addNodeDirectly(TopoNode *);
+
+    void addEdgeDirectly(TopoEdge *);
 
     JSobj toJS() const;
 

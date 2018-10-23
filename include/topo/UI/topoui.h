@@ -40,6 +40,9 @@ private:
     QAction * mode_BUILD;
     QAction * mode_SIMULATION;
 
+    /**
+     * in different mode, it has differen't function
+     */
     MapArranger mapGroup;
 
     QHBoxLayout * centerLayout;
@@ -63,7 +66,7 @@ private:
 
     void cleanEveryThing();
 
-    QDockWidget * initTheDock(const char *name);
+    QDockWidget * initTheDock(const char *objectName);
 
 private Q_SLOTS:
     void loadMapFromFile();
