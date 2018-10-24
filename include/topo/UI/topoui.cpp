@@ -128,13 +128,11 @@ TopoUI::~TopoUI()
 }
 
 void TopoUI::loadMapFromFile() {
-    mapScene.clear();
-
-//    mapScene.removeItem(mapScene.itemAt({50, 50}));
+    cleanEveryThing(); //TODO
 
     if (mapGroup.reloadFromFile(uiDockReadMap->etInputMap->text().toStdString())) {
         cout << "UI load map successful" << endl;
-        cleanEveryThing();
+
         int mapCounts = 0;
 
         for (const auto & mapCand: mapGroup.getMapCollection().getMaps()) {
