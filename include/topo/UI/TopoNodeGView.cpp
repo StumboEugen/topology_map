@@ -30,15 +30,9 @@ void TopoNodeGView::startDrawingIns() {
 void TopoNodeGView::mousePressEvent(QMouseEvent *event) {
     QGraphicsView::mousePressEvent(event);
     if (drawingIns != nullptr) {
-        drawLineStartPos = mapToScene(event->pos());
-        qDebug() << "start line" << drawLineStartPos;
-        if (drawLineStartPos.x() > 60 || drawLineStartPos.x() < -60
-            || drawLineStartPos.y() > 60 || drawLineStartPos.y() < -60) {
-            return;
-        }
+        const auto & clickPoint = mapToScene(event->pos());
+        theDrawingLine = new QGraphicsLineItem(getLineDrawingFromOrigin(clickPoint));
         drawingLine = true;
-        theDrawingLine = new QGraphicsLineItem(drawLineStartPos.x(), drawLineStartPos.y()
-                , drawLineStartPos.x(), drawLineStartPos.y() + 1 * METER_TO_PIXLE);
         scene()->addItem(theDrawingLine);
     }
 }
@@ -47,15 +41,14 @@ void TopoNodeGView::mouseMoveEvent(QMouseEvent *event) {
     QGraphicsView::mouseMoveEvent(event);
     if (!drawingLine)
         return;
-    auto pos = mapToScene(event->pos());
-    QLineF dir{drawLineStartPos, pos};
-    auto unitDir = dir.unitVector();
-    unitDir.setLength(1 * METER_TO_PIXLE);
-    theDrawingLine->setLine(unitDir);
+    const auto & clickPoint = mapToScene(event->pos());
+    theDrawingLine->setLine(getLineDrawingFromOrigin(clickPoint));
 }
 
 void TopoNodeGView::mouseReleaseEvent(QMouseEvent *event) {
     QGraphicsView::mouseReleaseEvent(event);
+
+    //TODO
     if (drawingLine) {
         drawingLine = false;
         drawingIns->addExit(drawLineStartPos.x() / METER_TO_PIXLE,
@@ -67,3 +60,23 @@ void TopoNodeGView::mouseReleaseEvent(QMouseEvent *event) {
 TopoNodeGView::~TopoNodeGView() {
     delete drawingIns;
 }
+
+QLineF TopoNodeGView::getLineDrawingFromOrigin(const QPointF point) {
+    if (point.x() == 0 && point.y() == 0) {
+        return {0,0,0,0};
+    }
+    QLineF dir{{0,0}, {1 * METER_TO_PIXLE, 0}};// len is 30 now
+    double angle = atan2(point.y(), point.x());
+    double index = angle / piHalf;
+    if (index > 1.5 || index < -1.5) {
+        dir.setAngle(180);
+    }
+    else if (index > 0.5) {
+        dir.setAngle(-90);
+    }
+    else if (index < -0.5) {
+        dir.setAngle(90);
+    }
+    return dir;
+}
+

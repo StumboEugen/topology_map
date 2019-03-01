@@ -33,6 +33,8 @@ private:
     QGraphicsLineItem * theDrawingLine{};
     QPointF drawLineStartPos;
     bool drawingLine = false;
+
+    QLineF getLineDrawingFromOrigin(const QPointF point);
 };
 
 

@@ -26,12 +26,13 @@ QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
             QPointF exitGatePoint{exit.getPosX() * METER_TO_PIXLE,
                                   -exit.getPosY() * METER_TO_PIXLE};
             painter->drawLine({0,0}, exitGatePoint);
-            QPointF gateDir{sin(exit.getOutDir() * DEG2RAD), -cos(exit.getOutDir() * DEG2RAD)};
-            gateDir *= METER_TO_PIXLE * 0.5;
-            painter->save();
-            painter->setPen(Qt::red);
-            painter->drawLine(exitGatePoint, gateDir + exitGatePoint);
-            painter->restore();
+            // stop drawing dir
+//            QPointF gateDir{sin(exit.getOutDir() * DEG2RAD), -cos(exit.getOutDir() * DEG2RAD)};
+//            gateDir *= METER_TO_PIXLE * 0.5;
+//            painter->save();
+//            painter->setPen(Qt::red);
+//            painter->drawLine(exitGatePoint, gateDir + exitGatePoint);
+//            painter->restore();
         }
     } else {
         if (option->state & QStyle::State_Selected) {
