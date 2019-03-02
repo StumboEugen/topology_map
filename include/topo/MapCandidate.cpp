@@ -149,7 +149,7 @@ void MapCandidate::setLeaveFrom(gateId exit) {
  * @param instance
  * @return the ptr of the node
  */
-inline TopoNode *const MapCandidate::addNewNode(NodeInstance *const instance) {
+TopoNode *const MapCandidate::addNewNode(NodeInstance *const instance) {
     auto nodeResult = nodes.emplace(new TopoNode(instance));
     if (!nodeResult.second) {
         cout << "[MapCandidate::addNewNode] FAILURE!!!" << endl;
@@ -166,7 +166,7 @@ inline TopoNode *const MapCandidate::addNewNode(NodeInstance *const instance) {
  * @warning didn't check if the TopoNodes belongs to this Mapcandidate
  * @return the ptr of the edge
  */
-inline TopoEdge *const
+TopoEdge *const
 MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, TopoNode *const eb, gateId gb) {
     //TODO cancel this check
     if (nodes.find(ea) == nodes.end() || nodes.find(eb) == nodes.end()) {

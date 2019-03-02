@@ -43,7 +43,8 @@ private:
     /**
      * in different mode, it has differen't function
      */
-    MapArranger mapGroup;
+    MapArranger mapFromReading;
+    MapArranger mapFromBuilding;
 
     QHBoxLayout * centerLayout;
 
@@ -76,7 +77,7 @@ private Q_SLOTS:
     void setMapGViewDragMode(bool);
     void buildModeNewNode();
     void buildModeAddNode2MapView();
-    void edgeDrawingBtnPressed();
+    void newEdgeConnected(TopoNode *, uint8_t, TopoNode *, uint8_t);
 };
 
 #endif // TOPOUI_H

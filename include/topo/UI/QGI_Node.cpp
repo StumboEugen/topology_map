@@ -68,11 +68,36 @@ int QGI_Node::type() const {
 
 QPainterPath QGI_Node::shape() const {
     QPainterPath path;
-    if (drawDetail) {
-        path.addEllipse(-20,-20,40,40);
-        path.setFillRule(Qt::WindingFill);
-    } else {
-        path.addRect(outline());
-    }
+//    if (drawDetail) {
+//        path.addEllipse(-20,-20,40,40);
+//        path.setFillRule(Qt::WindingFill);
+//    } else {
+//        path.addRect(outline());
+//    }
+    path.addRect(outline());
     return path;
+}
+
+int QGI_Node::whichExitIsAtPos(const QPointF & pos) {
+    const auto & exits = relatedNodeTOPO->getInsCorrespond()->getExits();
+    for (int i = 0; i < exits.size(); i++) {
+        if (QLineF(posOfExitInItem(i), pos).length() < 10) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+QPointF QGI_Node::posOfExitInItem(int i) {
+    if (i < 0 || i >= relatedNodeTOPO->getEdgeConnected().size()) {
+        throw;
+    }
+    const auto & exits = relatedNodeTOPO->getInsCorrespond()->getExits();
+    QPointF exitPos{exits[i].getPosX(), -exits[i].getPosY()};
+    exitPos *= METER_TO_PIXLE;
+    return exitPos;
+}
+
+QPointF QGI_Node::posOfExitInScene(int index) {
+    return mapToScene(posOfExitInItem(index));
 }

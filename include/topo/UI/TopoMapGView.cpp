@@ -14,6 +14,8 @@
 #define SCALE_TIME 1.2
 #define SCALE_MAX 4.0
 
+extern UIMode CURRENT_MODE;
+
 void TopoMapGView::wheelEvent(QWheelEvent *event) {
     if (event->modifiers() & Qt::ControlModifier) {
         auto curTrans = transform();
@@ -32,24 +34,75 @@ void TopoMapGView::wheelEvent(QWheelEvent *event) {
 
 void TopoMapGView::mousePressEvent(QMouseEvent *event) {
     QGraphicsView::mousePressEvent(event);
-    auto viewPos = event->pos();
-//    qDebug() << "viewPos" << viewPos;
-    auto scenePos = mapToScene(viewPos);
-//    qDebug() << "scenePos" << scenePos;
-    auto item = scene()->itemAt(scenePos);
+    const auto & clickPosInView = event->pos();
+    const auto & clickPosInScene = mapToScene(clickPosInView);
+    auto item = scene()->itemAt(clickPosInScene);
+
     if (item != nullptr) {
-        auto itemPos = item->mapFromScene(scenePos);
-//        qDebug() << "itemPos" << itemPos << "\n";
+
         if (auto nodeItem = dynamic_cast<QGI_Node*>(item)) {
             Q_EMIT QGI_Node_clicked(nodeItem->getRelatedNodeTOPO());
+
+            if (CURRENT_MODE == BUILD_MODE && drawingEdgeMode) {
+                const auto & clickPosInItem = item->mapFromScene(clickPosInScene);
+                int exitNumber = nodeItem->whichExitIsAtPos(clickPosInItem);
+                if (exitNumber != -1) {
+                    theDrawingEdge = new QGraphicsLineItem({nodeItem->posOfExitInScene
+                                                            (exitNumber), clickPosInScene});
+                    isDrawingEdge = true;
+                    scene()->addItem(theDrawingEdge);
+                    nodeAofDrawingEdge = nodeItem->getRelatedNodeTOPO();
+                    exitAofDrawingEdge = static_cast<uint8_t>(exitNumber);
+                }
+            }
         }
     }
 }
 
+void TopoMapGView::mouseMoveEvent(QMouseEvent *event) {
+    QGraphicsView::mouseMoveEvent(event);
+    if (isDrawingEdge && drawingEdgeMode) {
+        const auto & clickPos = mapToScene(event->pos());
+        const auto & firstPos = theDrawingEdge->line().p1();
+        theDrawingEdge->setLine({firstPos, clickPos});
+    }
+}
+
+void TopoMapGView::mouseReleaseEvent(QMouseEvent *event) {
+    QGraphicsView::mouseReleaseEvent(event);
+    if (isDrawingEdge && drawingEdgeMode) {
+        isDrawingEdge = false;
+        const auto & clickPosInScene = mapToScene(event->pos());
+        auto clickedItem = scene()->itemAt(clickPosInScene);
+        if (clickedItem != nullptr) {
+            if (const auto & nodeItem = dynamic_cast<QGI_Node*>(clickedItem)) {
+                const auto & clickPosInItem = nodeItem->mapFromScene(clickPosInScene);
+                int exitNumber = nodeItem->whichExitIsAtPos(clickPosInItem);
+                if (exitNumber > -1) {
+                    if (nodeItem->getRelatedNodeTOPO()->
+                            getEdgeConnected()[exitNumber] == nullptr) {
+                        Q_EMIT newEdgeConnected(nodeAofDrawingEdge,
+                                                exitAofDrawingEdge,
+                                                nodeItem->getRelatedNodeTOPO(),
+                                                static_cast<uint8_t>(exitNumber));
+                        const auto & firstPos = theDrawingEdge->line().p1();
+                        theDrawingEdge->setLine(
+                                {firstPos, nodeItem->posOfExitInScene(exitNumber)});
+                        return;
+                    }
+                }
+            }
+        }
+        scene()->removeItem(theDrawingEdge);
+        delete theDrawingEdge;
+    }
+}
+
+
 void TopoMapGView::drawingEdge(bool start) {
 
     setNodesMoveable(!start);
-    edgeDrawingMode = start;
+    drawingEdgeMode = start;
 
     if (start) {
         setCursor(Qt::CrossCursor);

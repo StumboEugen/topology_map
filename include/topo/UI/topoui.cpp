@@ -24,13 +24,14 @@
 
 using namespace std;
 
+UIMode CURRENT_MODE = READ_MODE;
+
 TopoUI::TopoUI(QWidget *parent) :
     QMainWindow(parent),
     uiMain(new Ui::TopoUI),
     uiDockReadMap(new Ui::DockReadMapUI),
     uiDockBuildMap(new Ui::DockBuildMapUI)
 {
-
     uiMain->setupUi(this);
     setWindowTitle("TOPO Simulator");
 
@@ -123,6 +124,9 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockBuildMap->btnDrawEdge, SIGNAL(clicked(bool))
             , mapGView, SLOT(drawingEdge(bool)));
 
+    connect(mapGView, SIGNAL(newEdgeConnected(TopoNode *, uint8_t, TopoNode *, uint8_t))
+            , this, SLOT(newEdgeConnected(TopoNode *, uint8_t, TopoNode *, uint8_t)));
+
 }
 
 TopoUI::~TopoUI()
@@ -133,12 +137,12 @@ TopoUI::~TopoUI()
 void TopoUI::loadMapFromFile() {
     cleanEveryThing(); //TODO
 
-    if (mapGroup.reloadFromFile(uiDockReadMap->etInputMap->text().toStdString())) {
+    if (mapFromReading.reloadFromFile(uiDockReadMap->etInputMap->text().toStdString())) {
         cout << "UI load map successful" << endl;
 
         int mapCounts = 0;
 
-        for (const auto & mapCand: mapGroup.getMapCollection().getMaps()) {
+        for (const auto & mapCand: mapFromReading.getMapCollection().getMaps()) {
             QString comboInfo = QString("#%1 fullEdge:%2")
                     .arg(mapCounts).arg(mapCand->getFullEdgeNumber());
             comboBoxMaps.push_back(mapCand);
@@ -223,16 +227,18 @@ void TopoUI::displayTheActivitedMap(int index) {
 }
 
 void TopoUI::drawTopoNode(TopoNode * topoNode) {
-    nodeScene.clear();
-    auto QNode = new QGI_Node(topoNode);
-    QNode->setDrawDetail(true);
-    nodeScene.addItem(QNode);
+    if (CURRENT_MODE == READ_MODE) {
+        nodeScene.clear();
+        auto QNode = new QGI_Node(topoNode);
+        QNode->setDrawDetail(true);
+        nodeScene.addItem(QNode);
+    }
 }
 
 void TopoUI::cleanEveryThing() {
     mapScene.clear();
     nodeScene.clear();
-    mapGroup.selfClean();
+    mapFromReading.selfClean();
     uiDockReadMap->cmboMapCandidate->clear();   //TODO use QVariant
     comboBoxMaps.clear();   //TODO WARNNING leak
     buildModeNodes.clear();
@@ -241,6 +247,7 @@ void TopoUI::cleanEveryThing() {
 void TopoUI::changeMode(QAction * action) {
     if (action == mode_READ) {
         cout << "switch to read mode" << endl;
+        CURRENT_MODE = READ_MODE;
         dockReadMap->setShown(true);
         cleanEveryThing();
     } else {
@@ -249,6 +256,7 @@ void TopoUI::changeMode(QAction * action) {
 
     if (action == mode_BUILD) {
         cout << "switch to build mode" << endl;
+        CURRENT_MODE = BUILD_MODE;
         dockBuildMap->setShown(true);
         uiDockBuildMap->btnMakeNewNode->setText("make a new node");
         cleanEveryThing();
@@ -258,6 +266,7 @@ void TopoUI::changeMode(QAction * action) {
 
     if (action == mode_SIMULATION) {
         cout << "switch to simulation mode" << endl;
+        CURRENT_MODE = SIMULATION_MODE;
     }
 }
 
@@ -302,7 +311,7 @@ void TopoUI::buildModeNewNode() {
             nameStr += QString::number(static_cast<int>(ang)) + "|";
         }
         nameStr += "]";
-        mapGroup.addInstanceDirectly(pIns);
+        mapFromBuilding.addInstanceDirectly(pIns);
         uiDockBuildMap->cmboMadeNodes->addItem(nameStr, thePtrVariant);
         uiDockBuildMap->btnMakeNewNode->setText("make a new node");
         uiDockBuildMap->cmboMadeNodes->setEnabled(true);
@@ -316,18 +325,14 @@ void TopoUI::buildModeAddNode2MapView() {
     NodeInstance * pIns =
             static_cast<NodeInstance *>(pBox->itemData(pBox->currentIndex()).value<void*>());
     auto pnode = new TopoNode(pIns);
-    mapGroup.addTopoNodeDirectly(pnode);
+    mapFromBuilding.addTopoNodeDirectly(pnode);
     auto QGI_node = new QGI_Node(pnode);
     QGI_node->setDrawDetail(true);
     QGI_node->setFlag(QGraphicsItem::ItemIsMovable);
     mapGView->scene()->addItem(QGI_node);
 }
 
-void TopoUI::edgeDrawingBtnPressed() {
-    static bool isDrawingEdge = false;
-    if (isDrawingEdge) {
-
-    } else {
-
-    }
+void TopoUI::newEdgeConnected(TopoNode *const ea, uint8_t ga, TopoNode *const eb, uint8_t gb) {
+    mapFromBuilding.getMapCollection().getMaps().front()->addNewEdge(ea, ga, eb, gb);
 }
+
