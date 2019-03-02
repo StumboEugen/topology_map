@@ -48,11 +48,10 @@ void TopoNodeGView::mouseMoveEvent(QMouseEvent *event) {
 void TopoNodeGView::mouseReleaseEvent(QMouseEvent *event) {
     QGraphicsView::mouseReleaseEvent(event);
 
-    //TODO
     if (drawingLine) {
         drawingLine = false;
-        drawingIns->addExit(drawLineStartPos.x() / METER_TO_PIXLE,
-                            -drawLineStartPos.y() / METER_TO_PIXLE,
+        drawingIns->addExit( theDrawingLine->line().x2() / METER_TO_PIXLE,
+                            -theDrawingLine->line().y2() / METER_TO_PIXLE,
                             -theDrawingLine->line().angle() + 90);
     }
 }

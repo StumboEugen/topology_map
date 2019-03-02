@@ -47,6 +47,19 @@
      </layout>
     </item>
     <item>
+     <widget class="QPushButton" name="btnDrawEdge">
+      <property name="text">
+       <string>Draw Edge</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="Line" name="line">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>

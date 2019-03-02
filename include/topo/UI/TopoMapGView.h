@@ -18,12 +18,21 @@ public:
     explicit TopoMapGView(QWidget *parent = nullptr) : QGraphicsView(parent){}
     ~TopoMapGView() override = default;
 
+
+
 protected:
     void wheelEvent(QWheelEvent * event) override ;
     void mousePressEvent(QMouseEvent * event) override ;
 
+private:
+    bool edgeDrawingMode = false;
+    void setNodesMoveable(bool moveable);
+
 Q_SIGNALS:
     void QGI_Node_clicked(TopoNode *);
+
+public Q_SLOTS:
+    void drawingEdge(bool start);
 };
 
 

@@ -38,6 +38,11 @@ public:
 private:
     TopoNode * relatedNodeTOPO;
     bool drawDetail = false;
+
+    static QRect outline() {
+        return {-RECT_SIZE_HALF - 1, -RECT_SIZE_HALF - 1,
+                RECT_SIZE_HALF * 2 + 2, RECT_SIZE_HALF * 2 + 2};
+    }
 };
 
 

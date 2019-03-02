@@ -43,14 +43,11 @@ QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
     }
 }
 
-static QRect outline{-RECT_SIZE_HALF - 1, -RECT_SIZE_HALF - 1,
-                     RECT_SIZE_HALF * 2 + 2, RECT_SIZE_HALF * 2 + 2};
-
 QRectF QGI_Node::boundingRect() const {
     if (drawDetail) {
         return {-100, -100, 200, 200};
     } else {
-        return outline;
+        return outline();
     }
 }
 
@@ -75,7 +72,7 @@ QPainterPath QGI_Node::shape() const {
         path.addEllipse(-20,-20,40,40);
         path.setFillRule(Qt::WindingFill);
     } else {
-        path.addRect(outline);
+        path.addRect(outline());
     }
     return path;
 }

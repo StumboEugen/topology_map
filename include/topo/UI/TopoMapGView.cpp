@@ -46,3 +46,23 @@ void TopoMapGView::mousePressEvent(QMouseEvent *event) {
     }
 }
 
+void TopoMapGView::drawingEdge(bool start) {
+
+    setNodesMoveable(!start);
+    edgeDrawingMode = start;
+
+    if (start) {
+        setCursor(Qt::CrossCursor);
+    } else {
+        setCursor(Qt::ArrowCursor);
+    }
+}
+
+void TopoMapGView::setNodesMoveable(bool move) {
+    for (const auto & item :scene()->items()) {
+        if (auto nodeItem = dynamic_cast<QGI_Node*>(item)) {
+            nodeItem->setFlag(QGraphicsItem::ItemIsMovable, move);
+        }
+    }
+}
+

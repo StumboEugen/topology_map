@@ -120,6 +120,9 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockBuildMap->btnAddNodeIntoMap, SIGNAL(clicked())
             , this, SLOT(buildModeAddNode2MapView()));
 
+    connect(uiDockBuildMap->btnDrawEdge, SIGNAL(clicked(bool))
+            , mapGView, SLOT(drawingEdge(bool)));
+
 }
 
 TopoUI::~TopoUI()
@@ -295,7 +298,8 @@ void TopoUI::buildModeNewNode() {
                 .arg(uiDockBuildMap->cmboMadeNodes->count() + 1)
                 .arg(pIns->sizeOfExits());
         for (const auto & exit : pIns->getExits()) {
-            nameStr += QString::number(static_cast<int>(exit.getOutDir())) + "|";
+            double ang = atan2(exit.getPosY(), exit.getPosX()) * DEG2RAD;
+            nameStr += QString::number(static_cast<int>(ang)) + "|";
         }
         nameStr += "]";
         mapGroup.addInstanceDirectly(pIns);
@@ -317,4 +321,13 @@ void TopoUI::buildModeAddNode2MapView() {
     QGI_node->setDrawDetail(true);
     QGI_node->setFlag(QGraphicsItem::ItemIsMovable);
     mapGView->scene()->addItem(QGI_node);
+}
+
+void TopoUI::edgeDrawingBtnPressed() {
+    static bool isDrawingEdge = false;
+    if (isDrawingEdge) {
+
+    } else {
+
+    }
 }
