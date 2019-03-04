@@ -52,8 +52,9 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
                                        oriEdge->getNodeB()->clonedTo);
         this->edges.insert(clonedEdge);
         /**add the relationships in nodes;*/
-        clonedEdge->getNodeA()->addEdge(clonedEdge->getGateA(), clonedEdge);
-        clonedEdge->getNodeB()->addEdge(clonedEdge->getGateB(), clonedEdge);
+        clonedEdge->registerAtNodes();
+//        clonedEdge->getNodeA()->addEdge(clonedEdge->getGateA(), clonedEdge);
+//        clonedEdge->getNodeB()->addEdge(clonedEdge->getGateB(), clonedEdge);
     }
     /**
      * other details
@@ -181,8 +182,9 @@ MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, TopoNode *const eb, gate
         throw;
     }
     auto newEdge = (* edgeResult.first);
-    ea->addEdge(ga, newEdge);
-    eb->addEdge(gb, newEdge);
+    newEdge->registerAtNodes();
+//    ea->addEdge(ga, newEdge);
+//    eb->addEdge(gb, newEdge);
     return newEdge;
 }
 

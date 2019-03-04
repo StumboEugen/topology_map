@@ -9,6 +9,7 @@
 
 #include "TopoMapGView.h"
 #include "QGI_Node.h"
+#include "QGI_Edge.h"
 #include "topoui.h"
 
 #define SCALE_TIME 1.2
@@ -47,12 +48,18 @@ void TopoMapGView::mousePressEvent(QMouseEvent *event) {
                 const auto & clickPosInItem = item->mapFromScene(clickPosInScene);
                 int exitNumber = nodeItem->whichExitIsAtPos(clickPosInItem);
                 if (exitNumber != -1) {
-                    theDrawingEdge = new QGraphicsLineItem({nodeItem->posOfExitInScene
-                                                            (exitNumber), clickPosInScene});
-                    isDrawingEdge = true;
-                    scene()->addItem(theDrawingEdge);
-                    nodeAofDrawingEdge = nodeItem->getRelatedNodeTOPO();
-                    exitAofDrawingEdge = static_cast<uint8_t>(exitNumber);
+                    if (nodeItem->getRelatedNodeTOPO()->getEdge(
+                            static_cast<gateId>(exitNumber)) == nullptr) {
+
+                        theDrawingEdge = new QGI_Edge(nodeItem,
+                                static_cast<uint8_t>(exitNumber));
+                        isDrawingEdge = true;
+                        const auto & p1 = theDrawingEdge->line().p1();
+                        theDrawingEdge->setLine({p1, p1});
+                        scene()->addItem(theDrawingEdge);
+                        nodeAofDrawingEdge = nodeItem->getRelatedNodeTOPO();
+                        exitAofDrawingEdge = static_cast<uint8_t>(exitNumber);
+                    }
                 }
             }
         }
@@ -79,15 +86,18 @@ void TopoMapGView::mouseReleaseEvent(QMouseEvent *event) {
                 const auto & clickPosInItem = nodeItem->mapFromScene(clickPosInScene);
                 int exitNumber = nodeItem->whichExitIsAtPos(clickPosInItem);
                 if (exitNumber > -1) {
-                    if (nodeItem->getRelatedNodeTOPO()->
-                            getEdgeConnected()[exitNumber] == nullptr) {
-                        Q_EMIT newEdgeConnected(nodeAofDrawingEdge,
-                                                exitAofDrawingEdge,
-                                                nodeItem->getRelatedNodeTOPO(),
-                                                static_cast<uint8_t>(exitNumber));
-                        const auto & firstPos = theDrawingEdge->line().p1();
-                        theDrawingEdge->setLine(
-                                {firstPos, nodeItem->posOfExitInScene(exitNumber)});
+                    if (nodeItem->getRelatedNodeTOPO()->getEdge(
+                            static_cast<gateId>(exitNumber)) == nullptr) {
+                        theDrawingEdge->setNodeB(nodeItem, static_cast<uint8_t>(exitNumber));
+                        auto * edge = new TopoEdge(nodeAofDrawingEdge, exitAofDrawingEdge,
+                                                   nodeItem->getRelatedNodeTOPO(),
+                                                   static_cast<uint8_t>(exitNumber));
+                        edge->registerAtNodes();
+                        theDrawingEdge->setRelatedEdgeTOPO(edge);
+                        Q_EMIT newEdgeConnected(edge);
+//                        const auto & firstPos = theDrawingEdge->line().p1();
+//                        theDrawingEdge->setLine(
+//                                {firstPos, nodeItem->posOfExitInScene(exitNumber)});
                         return;
                     }
                 }
@@ -99,7 +109,7 @@ void TopoMapGView::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 
-void TopoMapGView::drawingEdge(bool start) {
+void TopoMapGView::switch2DrawEdgeMode(bool start) {
 
     setNodesMoveable(!start);
     drawingEdgeMode = start;

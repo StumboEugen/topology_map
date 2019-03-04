@@ -16,7 +16,6 @@ QGI_Edge::QGI_Edge(TopoEdge *edge, QGI_Node *QNodeA, QGI_Node *QNodeB)
 {
     // this means that constructor is called by the build mode
     if (edge != nullptr) {
-        relatedEdgeTOPO = edge;
         if (edge->getNodeA() == QNodeA->getRelatedNodeTOPO()) {
             setNodeA(QNodeA, edge->getGateA());
             setNodeB(QNodeB, edge->getGateB());
@@ -67,10 +66,14 @@ void QGI_Edge::setNodeB(QGI_Node *QNodeB, uint8_t gateB) {
 
 void
 QGI_Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    if (QNodeA != nullptr || QNodeB != nullptr) {
+    if (QNodeA != nullptr && QNodeB != nullptr) {
         const QPointF & pointOfExitA = QNodeA->posOfExitInScene(gateA);
         const QPointF & pointOfExitB = QNodeB->posOfExitInScene(gateB);
         setLine({pointOfExitA, pointOfExitB});
     }
     QGraphicsLineItem::paint(painter, option, widget);
+}
+
+QGI_Edge::QGI_Edge(QGI_Node *QNodeA, uint8_t gate) {
+    setNodeA(QNodeA, gate);
 }

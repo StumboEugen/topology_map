@@ -50,6 +50,13 @@ void TopoNodeGView::mouseReleaseEvent(QMouseEvent *event) {
 
     if (drawingLine) {
         drawingLine = false;
+        for (const auto & exit : drawingIns->getExits()) {
+            QPointF point{exit.getPosX(), -exit.getPosY()};
+            point *= METER_TO_PIXLE;
+            if (QLineF{point, theDrawingLine->line().p2()}.length() < 10) {
+                return;
+            }
+        }
         drawingIns->addExit( theDrawingLine->line().x2() / METER_TO_PIXLE,
                             -theDrawingLine->line().y2() / METER_TO_PIXLE,
                             -theDrawingLine->line().angle() + 90);

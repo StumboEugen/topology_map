@@ -58,6 +58,8 @@ public:
         return gateB;
     }
 
+    void registerAtNodes();
+
     void changeExitTo(TopoNode * oldNode, TopoNode * newNode, unsigned char newGate);
 
     void leaveFromNode(TopoNode *leftnode);

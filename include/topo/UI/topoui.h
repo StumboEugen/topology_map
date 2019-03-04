@@ -77,7 +77,7 @@ private Q_SLOTS:
     void setMapGViewDragMode(bool);
     void buildModeNewNode();
     void buildModeAddNode2MapView();
-    void newEdgeConnected(TopoNode *, uint8_t, TopoNode *, uint8_t);
+    void newEdgeConnected(TopoEdge *);
 };
 
 #endif // TOPOUI_H

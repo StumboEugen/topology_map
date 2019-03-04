@@ -122,10 +122,10 @@ TopoUI::TopoUI(QWidget *parent) :
             , this, SLOT(buildModeAddNode2MapView()));
 
     connect(uiDockBuildMap->btnDrawEdge, SIGNAL(clicked(bool))
-            , mapGView, SLOT(drawingEdge(bool)));
+            , mapGView, SLOT(switch2DrawEdgeMode(bool)));
 
-    connect(mapGView, SIGNAL(newEdgeConnected(TopoNode *, uint8_t, TopoNode *, uint8_t))
-            , this, SLOT(newEdgeConnected(TopoNode *, uint8_t, TopoNode *, uint8_t)));
+    connect(mapGView, SIGNAL(newEdgeConnected(TopoEdge *))
+            , this, SLOT(newEdgeConnected(TopoEdge *)));
 
 }
 
@@ -308,17 +308,19 @@ void TopoUI::buildModeNewNode() {
         uiDockBuildMap->btnAddNodeIntoMap->setEnabled(false);
     /**it was at building, stop building, save the node*/
     } else {
-        QVariant thePtrVariant = QVariant::fromValue((void*)pIns);
-        auto nameStr = QString("#%1 E%2[")
-                .arg(uiDockBuildMap->cmboMadeNodes->count() + 1)
-                .arg(pIns->sizeOfExits());
-        for (const auto & exit : pIns->getExits()) {
-            double ang = atan2(exit.getPosY(), exit.getPosX()) * DEG2RAD;
-            nameStr += QString::number(static_cast<int>(ang)) + "|";
+        if (pIns->sizeOfExits() != 0) {
+            QVariant thePtrVariant = QVariant::fromValue((void*)pIns);
+            auto nameStr = QString("#%1 E%2[")
+                    .arg(uiDockBuildMap->cmboMadeNodes->count() + 1)
+                    .arg(pIns->sizeOfExits());
+            for (const auto & exit : pIns->getExits()) {
+                double ang = atan2(exit.getPosY(), exit.getPosX()) * RAD2DEG;
+                nameStr += QString::number(static_cast<int>(ang)) + "|";
+            }
+            nameStr += "]";
+            mapFromBuilding.addInstanceDirectly(pIns);
+            uiDockBuildMap->cmboMadeNodes->addItem(nameStr, thePtrVariant);
         }
-        nameStr += "]";
-        mapFromBuilding.addInstanceDirectly(pIns);
-        uiDockBuildMap->cmboMadeNodes->addItem(nameStr, thePtrVariant);
         uiDockBuildMap->btnMakeNewNode->setText("make a new node");
         uiDockBuildMap->cmboMadeNodes->setEnabled(true);
         uiDockBuildMap->btnAddNodeIntoMap->setEnabled(true);
@@ -339,7 +341,7 @@ void TopoUI::buildModeAddNode2MapView() {
     mapGView->scene()->addItem(QGI_node);
 }
 
-void TopoUI::newEdgeConnected(TopoNode *const ea, uint8_t ga, TopoNode *const eb, uint8_t gb) {
-    mapFromBuilding.getMapCollection().getMaps().front()->addNewEdge(ea, ga, eb, gb);
+void TopoUI::newEdgeConnected(TopoEdge * newEdge) {
+    mapFromBuilding.getMapCollection().getMaps().front()->addEdgeDirectly(newEdge);
 }
 

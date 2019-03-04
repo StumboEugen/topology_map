@@ -149,3 +149,10 @@ std::pair<double, double> TopoEdge::getOdomData(TopoNode *oriNode) {
         throw;
     }
 }
+
+void TopoEdge::registerAtNodes() {
+    if (exitA != nullptr && exitB != nullptr) {
+        exitA->addEdge(gateA, this);
+        exitB->addEdge(gateB, this);
+    }
+}

@@ -11,6 +11,8 @@
 #include "include/topo/Topo.h"
 #include "QGI_Node.h"
 
+class QGI_Edge;
+
 class TopoMapGView : public QGraphicsView{
     Q_OBJECT
 
@@ -30,16 +32,16 @@ private:
     bool isDrawingEdge = false;
     uint8_t exitAofDrawingEdge;
     TopoNode * nodeAofDrawingEdge;
-    QGraphicsLineItem * theDrawingEdge;
+    QGI_Edge * theDrawingEdge;
 
     void setNodesMoveable(bool moveable);
 
 Q_SIGNALS:
     void QGI_Node_clicked(TopoNode *);
-    void newEdgeConnected(TopoNode *, uint8_t, TopoNode *, uint8_t);
+    void newEdgeConnected(TopoEdge *newEdge);
 
 public Q_SLOTS:
-    void drawingEdge(bool start);
+    void switch2DrawEdgeMode(bool start);
 };
 
 

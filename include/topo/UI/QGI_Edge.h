@@ -15,9 +15,14 @@ class QGI_Edge : public QGraphicsLineItem {
 public:
 
     /**
-     * constructor for building mode
+     * constructor for reading mode
      */
     QGI_Edge(TopoEdge *edge, QGI_Node *QNodeA, QGI_Node *QNodeB);
+
+    /**
+     * constructor for building mode
+     */
+    QGI_Edge(QGI_Node *QNode, uint8_t gate);
 
     void setRelatedEdgeTOPO(TopoEdge *relatedEdgeTOPO);
 
@@ -31,9 +36,9 @@ private:
 private:
     QRectF boundingRect() const override;
 
-    TopoEdge *relatedEdgeTOPO;
-    QGI_Node *QNodeA;
-    QGI_Node *QNodeB;
+    TopoEdge *relatedEdgeTOPO = nullptr;
+    QGI_Node *QNodeA = nullptr;
+    QGI_Node *QNodeB = nullptr;
     uint8_t gateA;
     uint8_t gateB;
 
