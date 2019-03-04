@@ -8,14 +8,18 @@
 #include "topo/Topo.h"
 
 #include <QPainter>
+#include <QStyleOptionGraphicsItem>
+#include <QMessageBox>
+
+#include "topoui.h"
+
+extern TopoUI * bigBrother;
 
 QGI_Edge::QGI_Edge(TopoEdge *edge, QGI_Node *QNodeA, QGI_Node *QNodeB)
-        :relatedEdgeTOPO(edge)
-        ,QNodeA(QNodeA)
-        ,QNodeB(QNodeB)
 {
     // this means that constructor is called by the build mode
     if (edge != nullptr) {
+        setRelatedEdgeTOPO(edge);
         if (edge->getNodeA() == QNodeA->getRelatedNodeTOPO()) {
             setNodeA(QNodeA, edge->getGateA());
             setNodeB(QNodeB, edge->getGateB());
@@ -26,6 +30,7 @@ QGI_Edge::QGI_Edge(TopoEdge *edge, QGI_Node *QNodeA, QGI_Node *QNodeB)
         }
     }
 
+    setFlag(ItemIsSelectable);
     this->setZValue(1);
 }
 
@@ -44,6 +49,7 @@ QRectF QGI_Edge::boundingRect() const {
 
 void QGI_Edge::setRelatedEdgeTOPO(TopoEdge *relatedEdgeTOPO) {
     QGI_Edge::relatedEdgeTOPO = relatedEdgeTOPO;
+    length = QLineF(0, 0, relatedEdgeTOPO->getOdomX(), relatedEdgeTOPO->getOdomY()).length();
 }
 
 void QGI_Edge::setNodeA(QGI_Node *QNodeA, uint8_t gateA) {
@@ -71,9 +77,46 @@ QGI_Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         const QPointF & pointOfExitB = QNodeB->posOfExitInScene(gateB);
         setLine({pointOfExitA, pointOfExitB});
     }
+    if (option->state & QStyle::State_Selected) {
+        this->setPen(QPen(Qt::black, 7));
+    } else {
+        this->setPen(QPen(Qt::black, 3));
+    }
     QGraphicsLineItem::paint(painter, option, widget);
 }
 
 QGI_Edge::QGI_Edge(QGI_Node *QNodeA, uint8_t gate) {
     setNodeA(QNodeA, gate);
+    setFlag(ItemIsSelectable);
+    setZValue(1);
+}
+
+void QGI_Edge::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
+    QGraphicsItem::mouseDoubleClickEvent(event);
+    bigBrother->setMsg("Edge Len: " + QString::number(length));
+}
+
+QPainterPath QGI_Edge::shape() const {
+//    const QPointF & pointOfExitA = mapFromScene(QNodeA->posOfExitInScene(gateA));
+//    const QPointF & pointOfExitB = mapFromScene(QNodeB->posOfExitInScene(gateB));
+    QPainterPath path;
+    path.moveTo(line().p1());
+    path.lineTo(line().p2());
+    QPainterPathStroker stroker;
+    stroker.setWidth(30);
+    return stroker.createStroke(path);
+}
+
+void QGI_Edge::focusInEvent(QFocusEvent *event) {
+    QGraphicsItem::focusInEvent(event);
+    cout << "focus" << endl;
+}
+
+void QGI_Edge::focusOutEvent(QFocusEvent *event) {
+    QGraphicsItem::focusOutEvent(event);
+    cout << "out foc" << endl;
+}
+
+void QGI_Edge::setLength(double length) {
+    QGI_Edge::length = length;
 }

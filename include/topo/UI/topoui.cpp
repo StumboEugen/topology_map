@@ -8,6 +8,7 @@
 #include <QSizePolicy>
 #include <QGraphicsItem>
 #include <QWheelEvent>
+#include <QValidator>
 
 #include "topoui.h"
 #include "ui_topoui.h"
@@ -25,6 +26,7 @@
 using namespace std;
 
 UIMode CURRENT_MODE = READ_MODE;
+TopoUI * bigBrother;
 
 TopoUI::TopoUI(QWidget *parent) :
     QMainWindow(parent),
@@ -32,6 +34,8 @@ TopoUI::TopoUI(QWidget *parent) :
     uiDockReadMap(new Ui::DockReadMapUI),
     uiDockBuildMap(new Ui::DockBuildMapUI)
 {
+    bigBrother = this;
+
     uiMain->setupUi(this);
     setWindowTitle("TOPO Simulator");
 
@@ -100,6 +104,8 @@ TopoUI::TopoUI(QWidget *parent) :
 
     dockBuildMap = initTheDock("DockBuildMap");
     uiDockBuildMap->setupUi(dockBuildMap);
+    QRegExp regx("[0-9\\.]+$");
+    uiDockBuildMap->leEdgeLen->setValidator(new QRegExpValidator(regx, this));
     addDockWidget(Qt::RightDockWidgetArea, dockBuildMap);
     dockBuildMap->setShown(false);
 
@@ -126,6 +132,9 @@ TopoUI::TopoUI(QWidget *parent) :
 
     connect(mapGView, SIGNAL(newEdgeConnected(TopoEdge *))
             , this, SLOT(newEdgeConnected(TopoEdge *)));
+
+    connect(uiDockBuildMap->btnSetEdgeLen, SIGNAL(clicked())
+            , this, SLOT(setEdgeLen()));
 
 }
 
@@ -251,13 +260,16 @@ void TopoUI::cleanEveryThing() {
 }
 
 void TopoUI::changeMode(QAction * action) {
+    dockBuildMap->setShown(false);
+    dockReadMap->setShown(false);
+
     if (action == mode_READ) {
         cout << "switch to read mode" << endl;
         CURRENT_MODE = READ_MODE;
         dockReadMap->setShown(true);
         cleanEveryThing();
     } else {
-        dockReadMap->setShown(false);
+
     }
 
     if (action == mode_BUILD) {
@@ -267,7 +279,7 @@ void TopoUI::changeMode(QAction * action) {
         uiDockBuildMap->btnMakeNewNode->setText("make a new node");
         cleanEveryThing();
     } else {
-        dockBuildMap->setShown(false);
+
     }
 
     if (action == mode_SIMULATION) {
@@ -344,4 +356,38 @@ void TopoUI::buildModeAddNode2MapView() {
 void TopoUI::newEdgeConnected(TopoEdge * newEdge) {
     mapFromBuilding.getMapCollection().getMaps().front()->addEdgeDirectly(newEdge);
 }
+
+void TopoUI::setMsg(const QString & msg) {
+    infoView->setText(msg);
+}
+
+void TopoUI::appendMsg(const QString & msg) {
+    infoView->append(msg);
+}
+
+void TopoUI::setEdgeLen() {
+    bool pass = false;
+    double len = uiDockBuildMap->leEdgeLen->text().toDouble(&pass);
+
+    if (pass) {
+        const auto & list = mapGView->scene()->selectedItems();
+        if (!list.isEmpty()) {
+            for (auto & item: list) {
+                if (auto edgeItem = dynamic_cast<QGI_Edge*> (item)) {
+                    edgeItem->setLength(len);
+                }
+            }
+        } else {
+            for (auto & item: mapGView->scene()->items()) {
+                if (auto edgeItem = dynamic_cast<QGI_Edge*> (item)) {
+                    edgeItem->setLength(len);
+                }
+            }
+        }
+    } else {
+        bigBrother->setMsg("Please enter a correct number");
+    }
+}
+
+
 

@@ -30,10 +30,21 @@ public:
 
     void setNodeB(QGI_Node *QNodeB, uint8_t gateB);
 
-private:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    QPainterPath shape() const override ;
+
+    void setLength(double length);
+
+protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+
+    void focusInEvent(QFocusEvent *event) override;
+
+    void focusOutEvent(QFocusEvent *event) override;
 
 private:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+               QWidget *widget) override;
+
     QRectF boundingRect() const override;
 
     TopoEdge *relatedEdgeTOPO = nullptr;
@@ -42,7 +53,10 @@ private:
     uint8_t gateA;
     uint8_t gateB;
 
-    bool movingWithNode;
+    double odomX = 0.0;
+    double odomY = 0.0;
+    double length = 0.0;
+
 };
 
 

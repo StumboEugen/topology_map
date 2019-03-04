@@ -32,6 +32,9 @@ public:
     explicit TopoUI(QWidget *parent = nullptr);
     ~TopoUI() override;
 
+    void appendMsg(const QString & msg);
+    void setMsg(const QString & msg);
+
 private:
 
     Ui::TopoUI *uiMain;
@@ -78,6 +81,7 @@ private Q_SLOTS:
     void buildModeNewNode();
     void buildModeAddNode2MapView();
     void newEdgeConnected(TopoEdge *);
+    void setEdgeLen();
 };
 
 #endif // TOPOUI_H
