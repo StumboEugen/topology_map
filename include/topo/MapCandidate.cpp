@@ -48,12 +48,12 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
      */
     for (auto oriEdge: copyFrom.edges) {
         auto clonedEdge = new TopoEdge(*oriEdge,
-                                       oriEdge->getExitA()->clonedTo,
-                                       oriEdge->getExitB()->clonedTo);
+                                       oriEdge->getNodeA()->clonedTo,
+                                       oriEdge->getNodeB()->clonedTo);
         this->edges.insert(clonedEdge);
         /**add the relationships in nodes;*/
-        clonedEdge->getExitA()->addEdge(clonedEdge->getGateA(), clonedEdge);
-        clonedEdge->getExitB()->addEdge(clonedEdge->getGateB(), clonedEdge);
+        clonedEdge->getNodeA()->addEdge(clonedEdge->getGateA(), clonedEdge);
+        clonedEdge->getNodeB()->addEdge(clonedEdge->getGateB(), clonedEdge);
     }
     /**
      * other details
@@ -61,7 +61,7 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
      currentNode = copyFrom.currentNode->clonedTo;
      if (copyFrom.currentEdge != nullptr) {
          /**find the current edge from the node -> new node -> new edge*/
-         currentEdge = copyFrom.currentEdge->getExitA()->
+         currentEdge = copyFrom.currentEdge->getNodeA()->
                  clonedTo->getEdge(copyFrom.currentEdge->getGateA());
      } else {
          currentEdge = nullptr;

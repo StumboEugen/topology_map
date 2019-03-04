@@ -10,10 +10,20 @@
 
 class QGI_Node;
 
-class QGI_Edge : public QGraphicsItem {
+class QGI_Edge : public QGraphicsLineItem {
 
 public:
+
+    /**
+     * constructor for building mode
+     */
     QGI_Edge(TopoEdge *edge, QGI_Node *QNodeA, QGI_Node *QNodeB);
+
+    void setRelatedEdgeTOPO(TopoEdge *relatedEdgeTOPO);
+
+    void setNodeA(QGI_Node *QNodeA, uint8_t gateA);
+
+    void setNodeB(QGI_Node *QNodeB, uint8_t gateB);
 
 private:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -24,6 +34,10 @@ private:
     TopoEdge *relatedEdgeTOPO;
     QGI_Node *QNodeA;
     QGI_Node *QNodeB;
+    uint8_t gateA;
+    uint8_t gateB;
+
+    bool movingWithNode;
 };
 
 

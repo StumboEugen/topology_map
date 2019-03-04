@@ -91,7 +91,7 @@ void MapCollection::addEdgeDirectly(TopoEdge * edge) {
     }
 
     if (maps.empty()) {
-        maps.push_back(new MapCandidate(edge->getExitA()->getInsCorrespond()));
+        maps.push_back(new MapCandidate(edge->getNodeA()->getInsCorrespond()));
     }
 
     maps.front()->addEdgeDirectly(edge);

@@ -110,7 +110,7 @@ TopoUI::TopoUI(QWidget *parent) :
             , this, SLOT(displayTheActivitedMap(int)));
 
     connect(mapGView, SIGNAL(QGI_Node_clicked(TopoNode*))
-            , this, SLOT(drawTopoNode(TopoNode*)));
+            , this, SLOT(drawTopoNodeDetailAtnodeGView(TopoNode * )));
 
     connect(modeGroup, SIGNAL(triggered(QAction*))
             , this, SLOT(changeMode(QAction*)));
@@ -190,13 +190,14 @@ void TopoUI::displayTheActivitedMap(int index) {
             }
 
             TopoNode * anotherNode = curEdge->getAnotherNode(curNode);
-            anotherNode->setFlag(curEdge->getAnotherGate(curNode));
+            uint8_t anotherGate = curEdge->getAnotherGate(curNode);
+            anotherNode->setFlag(anotherGate);
 
             //means the "anotherNode" has been drawn
             if (anotherNode->getAssistPtr() != nullptr) {
-                auto edge2Draw = new QGI_Edge(curEdge
-                        , static_cast<QGI_Node *>(curNode->getAssistPtr())
-                        , static_cast<QGI_Node *>(anotherNode->getAssistPtr()));
+                auto edge2Draw = new QGI_Edge(curEdge,
+                        static_cast<QGI_Node *>(curNode->getAssistPtr()),
+                        static_cast<QGI_Node *>(anotherNode->getAssistPtr()));
                 mapScene.addItem(edge2Draw);
                 continue;
             }
@@ -204,6 +205,11 @@ void TopoUI::displayTheActivitedMap(int index) {
             //draw another node
             auto odomData = curEdge->getOdomData(curNode);
             QPointF dist{odomData.first, -odomData.second}; //ENU is different with the UI coor
+//            const auto exitOfAnotherSide =
+//                    anotherNode->getInsCorrespond()->getExits()[anotherGate];
+//            QPointF disInAnotherNode{exitOfAnotherSide.getPosX(), -exitOfAnotherSide.getPosY()};
+//            dist += disInAnotherNode;
+            //TODO up
             nodeQGI = new QGI_Node(anotherNode);
             anotherNode->setAssistPtr(nodeQGI);
             nodeQGI->setPos(curPos + dist * METER_TO_PIXLE);
@@ -226,7 +232,7 @@ void TopoUI::displayTheActivitedMap(int index) {
 //    cout << "it complete" << endl;
 }
 
-void TopoUI::drawTopoNode(TopoNode * topoNode) {
+void TopoUI::drawTopoNodeDetailAtnodeGView(TopoNode *topoNode) {
     if (CURRENT_MODE == READ_MODE) {
         nodeScene.clear();
         auto QNode = new QGI_Node(topoNode);
@@ -329,6 +335,7 @@ void TopoUI::buildModeAddNode2MapView() {
     auto QGI_node = new QGI_Node(pnode);
     QGI_node->setDrawDetail(true);
     QGI_node->setFlag(QGraphicsItem::ItemIsMovable);
+    QGI_node->setAcceptDrops(true);
     mapGView->scene()->addItem(QGI_node);
 }
 

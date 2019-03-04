@@ -42,11 +42,11 @@ public:
         throw;
     }
 
-    TopoNode *const getExitA() const {
+    TopoNode *const getNodeA() const {
         return exitA;
     }
 
-    TopoNode *const getExitB() const {
+    TopoNode *const getNodeB() const {
         return exitB;
     }
 

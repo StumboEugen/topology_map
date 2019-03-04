@@ -13,7 +13,6 @@
 
 class QGI_Node : public QGraphicsItem {
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
 public:
     explicit QGI_Node(TopoNode * node);
@@ -25,6 +24,9 @@ public:
     int whichExitIsAtPos(const QPointF &);
     QPointF posOfExitInItem(int index);
     QPointF posOfExitInScene(int index);
+
+
+public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override;

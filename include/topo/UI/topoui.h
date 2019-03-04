@@ -72,7 +72,7 @@ private:
 private Q_SLOTS:
     void loadMapFromFile();
     void displayTheActivitedMap(int);
-    void drawTopoNode(TopoNode *);
+    void drawTopoNodeDetailAtnodeGView(TopoNode *);
     void changeMode(QAction *);
     void setMapGViewDragMode(bool);
     void buildModeNewNode();

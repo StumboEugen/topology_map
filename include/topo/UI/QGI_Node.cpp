@@ -35,11 +35,11 @@ QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 //            painter->restore();
         }
     } else {
-        if (option->state & QStyle::State_Selected) {
+//        if (option->state & QStyle::State_Selected) {
             painter->setPen(Qt::red);
             painter->drawRect(rect.adjusted(-1, -1, 0, 0));
-        }
-        painter->fillRect(rect, Qt::gray);
+//        }
+//        painter->fillRect(rect, Qt::gray);
     }
 }
 
@@ -49,10 +49,6 @@ QRectF QGI_Node::boundingRect() const {
     } else {
         return outline();
     }
-}
-
-void QGI_Node::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-    QGraphicsItem::mousePressEvent(event);
 }
 
 QGI_Node::QGI_Node(TopoNode * node)
