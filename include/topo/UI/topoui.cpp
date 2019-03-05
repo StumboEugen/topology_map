@@ -14,11 +14,17 @@
 #include "ui_topoui.h"
 #include "ui_dockreadmap.h"
 #include "ui_dockbuildmap.h"
+#include "ui_docksimulation.h"
 #include "topo/Topo.h"
 
 #include "TopoMapGView.h"
 #include "QGI_Node.h"
 #include "QGI_Edge.h"
+#include "QGI_Robot.h"
+
+#ifndef Q_MOC_RUN
+#include <ros/ros.h>
+#endif
 
 #include <map>
 #include <queue>
@@ -32,7 +38,8 @@ TopoUI::TopoUI(QWidget *parent) :
     QMainWindow(parent),
     uiMain(new Ui::TopoUI),
     uiDockReadMap(new Ui::DockReadMapUI),
-    uiDockBuildMap(new Ui::DockBuildMapUI)
+    uiDockBuildMap(new Ui::DockBuildMapUI),
+    uiDockSimulation(new Ui::DockSimulationUI)
 {
     bigBrother = this;
 
@@ -109,14 +116,19 @@ TopoUI::TopoUI(QWidget *parent) :
     addDockWidget(Qt::RightDockWidgetArea, dockBuildMap);
     dockBuildMap->setShown(false);
 
+    dockSimulation = initTheDock("DockSimulation");
+    uiDockSimulation->setupUi(dockSimulation);
+    addDockWidget(Qt::LeftDockWidgetArea, dockSimulation);
+    dockSimulation->setShown(false);
+
     connect(uiDockReadMap->btnInputMap, SIGNAL(clicked())
             , this, SLOT(loadReadingMap()));
 
     connect(uiDockReadMap->cmboMapCandidate, SIGNAL(activated(int))
             , this, SLOT(displayTheActivitedMap(int)));
 
-    connect(mapGView, SIGNAL(QGI_Node_clicked(TopoNode*))
-            , this, SLOT(drawTopoNodeDetailAtnodeGView(TopoNode * )));
+    connect(mapGView, SIGNAL(QGI_Node_clicked(QGI_Node*))
+            , this, SLOT(onQGI_NodeClicked(QGI_Node * )));
 
     connect(modeGroup, SIGNAL(triggered(QAction*))
             , this, SLOT(changeMode(QAction*)));
@@ -142,6 +154,11 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockBuildMap->btnLoadMap, SIGNAL(clicked())
             , this, SLOT(loadBuiltMap()));
 
+    connect(uiDockSimulation->btnConnectToROS, SIGNAL(clicked())
+            , this, SLOT(initROS()));
+
+    connect(uiDockSimulation->btnConnectToROS, SIGNAL(clicked())
+            , this, SLOT(initROS()));
 }
 
 TopoUI::~TopoUI()
@@ -213,18 +230,29 @@ void TopoUI::loadBuiltMap() {
     }
 }
 
-void TopoUI::drawTopoNodeDetailAtnodeGView(TopoNode *topoNode) {
+void TopoUI::onQGI_NodeClicked(QGI_Node *qgiNode) {
     if (CURRENT_MODE == READ_MODE) {
         nodeScene.clear();
-        auto QNode = new QGI_Node(topoNode);
+        auto QNode = new QGI_Node(qgiNode->getRelatedNodeTOPO());
         QNode->setDrawDetail(true);
         nodeScene.addItem(QNode);
+    }
+    if (CURRENT_MODE == SIMULATION_MODE) {
+        if (uiDockSimulation->btnPlaceRobot->isChecked()) {
+            uiDockSimulation->btnPlaceRobot->setEnabled(false);
+            uiDockSimulation->btnPlaceRobot->setChecked(false);
+            auto robot = new QGI_Robot();
+            robot->setZValue(3);
+            robot->setPos(qgiNode->pos());
+            mapGView->scene()->addItem(robot);
+        }
     }
 }
 
 void TopoUI::changeMode(QAction * action) {
     dockBuildMap->setShown(false);
     dockReadMap->setShown(false);
+    dockSimulation->setShown(false);
 
     infoView->clear();
 
@@ -250,6 +278,7 @@ void TopoUI::changeMode(QAction * action) {
     if (action == mode_SIMULATION) {
         cout << "switch to simulation mode" << endl;
         CURRENT_MODE = SIMULATION_MODE;
+        dockSimulation->setShown(true);
     }
 }
 
@@ -396,8 +425,8 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
             //means the "anotherNode" has been drawn
             if (anotherNode->getAssistPtr() != nullptr) {
                 auto edge2Draw = new QGI_Edge(curEdge,
-                                              static_cast<QGI_Node *>(curNode->getAssistPtr()),
-                                              static_cast<QGI_Node *>(anotherNode->getAssistPtr()));
+                        static_cast<QGI_Node *>(curNode->getAssistPtr()),
+                        static_cast<QGI_Node *>(anotherNode->getAssistPtr()));
                 mapScene.addItem(edge2Draw);
                 continue;
             }
@@ -446,6 +475,21 @@ void TopoUI::cleanReadDock() {
 
 bool TopoUI::loadMapGroupFromFile(const QString & fileName, MapArranger & dist) {
     return dist.reloadFromFile(fileName.toStdString());
+}
+
+void TopoUI::initROS() {
+    int argc = 0;
+    char ** argv = nullptr;
+    ros::init(argc, argv, "TopoUINode");
+    if (!ros::master::check()) {
+        infoView->setText("CANT find the ROS master, plz run roscore and try again");
+        return;
+    }
+    infoView->setText("ROS connect success!");
+    ros::start();
+    ros::NodeHandle n;
+
+    uiDockSimulation->btnConnectToROS->setEnabled(false);
 }
 
 

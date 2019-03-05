@@ -42,7 +42,7 @@ void TopoMapGView::mousePressEvent(QMouseEvent *event) {
     if (item != nullptr) {
 
         if (auto nodeItem = dynamic_cast<QGI_Node*>(item)) {
-            Q_EMIT QGI_Node_clicked(nodeItem->getRelatedNodeTOPO());
+            Q_EMIT QGI_Node_clicked(nodeItem);
 
             if (CURRENT_MODE == BUILD_MODE && drawingEdgeMode) {
                 const auto & clickPosInItem = item->mapFromScene(clickPosInScene);

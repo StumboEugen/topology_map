@@ -12,8 +12,6 @@
 #include "topo/Topo.h"
 
 class QGI_Node : public QGraphicsItem {
-protected:
-
 public:
     explicit QGI_Node(TopoNode * node);
 

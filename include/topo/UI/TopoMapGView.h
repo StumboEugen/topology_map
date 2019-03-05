@@ -37,7 +37,7 @@ private:
     void setNodesMoveable(bool moveable);
 
 Q_SIGNALS:
-    void QGI_Node_clicked(TopoNode *);
+    void QGI_Node_clicked(QGI_Node *);
     void newEdgeConnected(TopoEdge *newEdge);
 
 public Q_SLOTS:

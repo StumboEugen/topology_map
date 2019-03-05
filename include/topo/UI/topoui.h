@@ -22,6 +22,7 @@ namespace Ui {
     class TopoUI;
     class DockReadMapUI;
     class DockBuildMapUI;
+    class DockSimulationUI;
 }
 
 class TopoUI : public QMainWindow
@@ -68,6 +69,9 @@ private:
     QDockWidget * dockBuildMap;
     std::vector<TopoNode *> buildModeNodes;
 
+    Ui::DockSimulationUI * uiDockSimulation;
+    QDockWidget * dockSimulation;
+
     void cleanTableView();
     void cleanReadDock();
 
@@ -80,7 +84,7 @@ private:
 private Q_SLOTS:
     void loadReadingMap();
     void displayTheActivitedMap(int);
-    void drawTopoNodeDetailAtnodeGView(TopoNode *);
+    void onQGI_NodeClicked(QGI_Node *);
     void changeMode(QAction *);
     void setMapGViewDragMode(bool);
     void buildModeNewNode();
@@ -89,6 +93,7 @@ private Q_SLOTS:
     void setEdgeLen();
     void saveBuiltMap();
     void loadBuiltMap();
+    void initROS();
 };
 
 #endif // TOPOUI_H
