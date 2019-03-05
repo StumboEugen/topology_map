@@ -76,19 +76,19 @@ uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, TopoNode * leftNode) 
         cerr << "addOdomData no matching Exit FAILURE" << endl;
         throw;
     }
-    if (odomAverage != 0) {
+    if (odomCount != 0) {
         double odomDis = sqrt(odomX * odomX + odomY * odomY);
         if (abs(dis_x - odomX) + abs(dis_y - odomY) > odomDis / 10.0) {
             cout << "edge not match well\nrecorded: " << odomX << " " << odomY
                  << "current :" << odomX << " " << odomY << endl;
         }
     }
-    double x = (odomX * odomAverage) + dis_x;
-    double y = (odomY * odomAverage) + dis_y;
-    odomAverage ++;
-    odomX = x / odomAverage;
-    odomY = y / odomAverage;
-    return odomAverage;
+    double x = (odomX * odomCount) + dis_x;
+    double y = (odomY * odomCount) + dis_y;
+    odomCount ++;
+    odomX = x / odomCount;
+    odomY = y / odomCount;
+    return odomCount;
 }
 
 /**
@@ -106,7 +106,7 @@ TopoEdge::TopoEdge(const TopoEdge &edge, TopoNode *const ea, TopoNode *const eb)
          a2bMoved(edge.a2bMoved),
          odomX(edge.odomX),
          odomY(edge.odomY),
-         odomAverage(edge.odomAverage)
+         odomCount(edge.odomCount)
 {}
 
 TopoEdge::TopoEdge(TopoNode *const ea, uint8_t ga, TopoNode *const eb, uint8_t gb)
@@ -118,7 +118,7 @@ TopoEdge::TopoEdge(TopoNode *const ea, uint8_t ga, TopoNode *const eb, uint8_t g
          a2bMoved(true),
          odomX(0.0),
          odomY(0.0),
-         odomAverage(0)
+         odomCount(0)
 //TODO set moved from a2bMoved b2aMoved
 {}
 
@@ -130,7 +130,7 @@ JSobj TopoEdge::toJS() const {
     obj["Gb"] = gateB;
     obj["Ox"] = odomX;
     obj["Oy"] = odomY;
-    obj["Oa"] = odomAverage;
+    obj["Oa"] = odomCount;
     return std::move(obj);
 }
 
@@ -155,4 +155,10 @@ void TopoEdge::registerAtNodes() {
         exitA->addEdge(gateA, this);
         exitB->addEdge(gateB, this);
     }
+}
+
+void TopoEdge::setOdomDataDirectly(double x, double y) {
+    odomCount = 0;
+    odomX = x;
+    odomY = y;
 }

@@ -34,6 +34,8 @@ public:
 
     void setLength(double length);
 
+    void refreshOdom();
+
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
@@ -46,6 +48,8 @@ private:
                QWidget *widget) override;
 
     QRectF boundingRect() const override;
+
+    void showMsg();
 
     TopoEdge *relatedEdgeTOPO = nullptr;
     QGI_Node *QNodeA = nullptr;

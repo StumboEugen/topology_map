@@ -23,7 +23,7 @@ void TopoNodeGView::startDrawingIns() {
     delete drawingIns;
     scene()->clear();
 
-    drawingIns = new NodeInstance();
+    drawingIns = new NodeInstance(false);
     scene()->addItem(new QGraphicsRectItem(-90, -90, 180, 180));
 }
 

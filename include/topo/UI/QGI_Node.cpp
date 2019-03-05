@@ -10,6 +10,9 @@
 #include <QStyleOptionGraphicsItem>
 
 #include "UITOOLS.h"
+#include "topoui.h"
+
+extern TopoUI * bigBrother;
 
 void
 QGI_Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -96,4 +99,11 @@ QPointF QGI_Node::posOfExitInItem(int i) {
 
 QPointF QGI_Node::posOfExitInScene(int index) {
     return mapToScene(posOfExitInItem(index));
+}
+
+void QGI_Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
+    QGraphicsItem::mouseDoubleClickEvent(event);
+    bigBrother->setMsg("POS: " +
+                       QString::number(pos().x()) + " : " +
+                       QString::number(pos().y()));
 }

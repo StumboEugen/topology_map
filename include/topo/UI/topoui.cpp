@@ -136,6 +136,9 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockBuildMap->btnSetEdgeLen, SIGNAL(clicked())
             , this, SLOT(setEdgeLen()));
 
+    connect(uiDockBuildMap->btnSaveMap, SIGNAL(clicked())
+            , this, SLOT(saveBuiltMap()));
+
 }
 
 TopoUI::~TopoUI()
@@ -214,11 +217,13 @@ void TopoUI::displayTheActivitedMap(int index) {
             //draw another node
             auto odomData = curEdge->getOdomData(curNode);
             QPointF dist{odomData.first, -odomData.second}; //ENU is different with the UI coor
-//            const auto exitOfAnotherSide =
-//                    anotherNode->getInsCorrespond()->getExits()[anotherGate];
-//            QPointF disInAnotherNode{exitOfAnotherSide.getPosX(), -exitOfAnotherSide.getPosY()};
-//            dist += disInAnotherNode;
-            //TODO up
+            const auto & exitOfAnotherNode =
+                    anotherNode->getInsCorrespond()->getExits()[anotherGate];
+            QPointF disInAnotherNode{exitOfAnotherNode.getPosX(), -exitOfAnotherNode.getPosY()};
+            dist -= disInAnotherNode;
+            const auto & exitOfThisNode =
+                    curNode->getInsCorrespond()->getExits()[edgeNo];
+            dist += {exitOfThisNode.getPosX(), -exitOfThisNode.getPosY()};
             nodeQGI = new QGI_Node(anotherNode);
             anotherNode->setAssistPtr(nodeQGI);
             nodeQGI->setPos(curPos + dist * METER_TO_PIXLE);
@@ -262,6 +267,8 @@ void TopoUI::cleanEveryThing() {
 void TopoUI::changeMode(QAction * action) {
     dockBuildMap->setShown(false);
     dockReadMap->setShown(false);
+
+    infoView->clear();
 
     if (action == mode_READ) {
         cout << "switch to read mode" << endl;
@@ -330,8 +337,10 @@ void TopoUI::buildModeNewNode() {
                 nameStr += QString::number(static_cast<int>(ang)) + "|";
             }
             nameStr += "]";
-            mapFromBuilding.addInstanceDirectly(pIns);
+//            mapFromBuilding.addInstanceDirectly(pIns);
             uiDockBuildMap->cmboMadeNodes->addItem(nameStr, thePtrVariant);
+            uiDockBuildMap->cmboMadeNodes->setCurrentIndex(
+                    uiDockBuildMap->cmboMadeNodes->count() - 1);
         }
         uiDockBuildMap->btnMakeNewNode->setText("make a new node");
         uiDockBuildMap->cmboMadeNodes->setEnabled(true);
@@ -342,10 +351,12 @@ void TopoUI::buildModeNewNode() {
 
 void TopoUI::buildModeAddNode2MapView() {
     auto pBox = uiDockBuildMap->cmboMadeNodes;
-    NodeInstance * pIns =
+    NodeInstance * sampleIns =
             static_cast<NodeInstance *>(pBox->itemData(pBox->currentIndex()).value<void*>());
+    auto * pIns = new NodeInstance(*sampleIns);
     auto pnode = new TopoNode(pIns);
     mapFromBuilding.addTopoNodeDirectly(pnode);
+    mapFromBuilding.addInstanceDirectly(pIns);
     auto QGI_node = new QGI_Node(pnode);
     QGI_node->setDrawDetail(true);
     QGI_node->setFlag(QGraphicsItem::ItemIsMovable);
@@ -362,7 +373,7 @@ void TopoUI::setMsg(const QString & msg) {
 }
 
 void TopoUI::appendMsg(const QString & msg) {
-    infoView->append(msg);
+    infoView->append("\n" + msg);
 }
 
 void TopoUI::setEdgeLen() {
@@ -387,6 +398,12 @@ void TopoUI::setEdgeLen() {
     } else {
         bigBrother->setMsg("Please enter a correct number");
     }
+}
+
+void TopoUI::saveBuiltMap() {
+    TopoFile topoFile{"built"};
+    topoFile.open();
+    topoFile.outputMap(mapFromBuilding);
 }
 
 

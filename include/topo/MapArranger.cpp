@@ -98,7 +98,7 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
     try {
         std::vector<NodeInstance *> nodeInsesDict(JSnodeInses.size(), nullptr);
         for (int i = 0; i < JSnodeInses.size(); i++) {
-            auto ins = new NodeInstance();
+            auto ins = new NodeInstance(false);
             auto & JSIns = JSnodeInses[i];
             auto & JSexits = JSIns["Exits"];
             for (int j = 0; j < JSexits.size(); j++) {
@@ -113,6 +113,7 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
                 nodeInsesDict.push_back(nullptr);
             }
             nodeInsesDict[No] = ins;
+            ins->setSerialNumber(static_cast<size_t>(No));
         }
 
         /**
@@ -128,7 +129,9 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
          * construct the node collection
          */
         for (const auto & theIns: nodeInsesDict) {
-            nodeCollection.addInstanceDirectly(theIns);
+            if (theIns != nullptr) {
+                nodeCollection.addInstanceDirectly(theIns);
+            }
         }
     } catch (exception & e) {
         cerr << "decode JSON file FAIL!\n" << e.what() << endl;

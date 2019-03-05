@@ -27,7 +27,9 @@ using std::string;
  */
 class NodeInstance {
 public:
-    NodeInstance();
+    explicit NodeInstance(bool registerSerial = true);
+
+    NodeInstance(const NodeInstance &, bool registerSerial = true);
     
     /**
      * add an exit to this instance (ENU)

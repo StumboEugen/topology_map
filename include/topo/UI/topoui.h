@@ -82,6 +82,7 @@ private Q_SLOTS:
     void buildModeAddNode2MapView();
     void newEdgeConnected(TopoEdge *);
     void setEdgeLen();
+    void saveBuiltMap();
 };
 
 #endif // TOPOUI_H

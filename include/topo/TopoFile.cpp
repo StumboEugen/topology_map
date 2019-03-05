@@ -136,3 +136,11 @@ int TopoFile::inputMap(MapArranger &mapGroup) {
     }
 
 }
+
+int TopoFile::close() {
+    fs.close();
+}
+
+TopoFile::~TopoFile() {
+    this->close();
+}

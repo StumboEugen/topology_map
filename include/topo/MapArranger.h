@@ -28,6 +28,10 @@ public:
         return mapName;
     }
 
+    void setMapName(const string & mapName) {
+        MapArranger::mapName = mapName;
+    }
+
     const NodeCollection &getNodeCollection() const {
         return nodeCollection;
     }

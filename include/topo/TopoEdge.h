@@ -68,6 +68,8 @@ public:
 
     uint16_t addOdomData(double dis_x, double dis_y, TopoNode * leftNode);
 
+    void setOdomDataDirectly(double x, double y);
+
     std::pair<double, double> getOdomData(TopoNode * oriNode);
 
     double getOdomX() const {
@@ -89,7 +91,7 @@ private:
     bool b2aMoved;
     double odomX;
     double odomY;
-    uint16_t odomAverage;
+    uint16_t odomCount;
 };
 
 

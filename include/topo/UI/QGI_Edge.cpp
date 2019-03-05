@@ -76,6 +76,7 @@ QGI_Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
         const QPointF & pointOfExitA = QNodeA->posOfExitInScene(gateA);
         const QPointF & pointOfExitB = QNodeB->posOfExitInScene(gateB);
         setLine({pointOfExitA, pointOfExitB});
+        refreshOdom();
     }
     if (option->state & QStyle::State_Selected) {
         this->setPen(QPen(Qt::black, 7));
@@ -93,7 +94,7 @@ QGI_Edge::QGI_Edge(QGI_Node *QNodeA, uint8_t gate) {
 
 void QGI_Edge::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsItem::mouseDoubleClickEvent(event);
-    bigBrother->setMsg("Edge Len: " + QString::number(length));
+    showMsg();
 }
 
 QPainterPath QGI_Edge::shape() const {
@@ -119,4 +120,21 @@ void QGI_Edge::focusOutEvent(QFocusEvent *event) {
 
 void QGI_Edge::setLength(double length) {
     QGI_Edge::length = length;
+    showMsg();
+}
+
+void QGI_Edge::refreshOdom() {
+    double odomx = line().dx() / METER_TO_PIXLE;
+    double odomy = -line().dy() / METER_TO_PIXLE;
+    if (abs(odomx) < 0.01) odomx = 0.0;
+    if (abs(odomy) < 0.01) odomy = 0.0;
+    relatedEdgeTOPO->setOdomDataDirectly(odomx, odomy);
+    length = line().length() / METER_TO_PIXLE;
+//    showMsg();
+}
+
+void QGI_Edge::showMsg() {
+    bigBrother->setMsg("Edge Len: " + QString::number(length));
+    bigBrother->appendMsg("OdomX:" + QString::number(relatedEdgeTOPO->getOdomX()));
+    bigBrother->appendMsg("OdomY:" + QString::number(relatedEdgeTOPO->getOdomY()));
 }

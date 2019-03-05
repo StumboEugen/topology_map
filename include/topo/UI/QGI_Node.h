@@ -5,7 +5,7 @@
 #ifndef TOPOLOGY_MAP_QGI_NODE_H
 #define TOPOLOGY_MAP_QGI_NODE_H
 
-#define RECT_SIZE_HALF 35
+#define RECT_SIZE_HALF 30
 #define QGI_NODE_TYPE 2000
 
 #include <QGraphicsItem>
@@ -44,6 +44,11 @@ public:
 private:
     TopoNode * relatedNodeTOPO;
     bool drawDetail = false;
+
+protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+
+private:
 
     static QRect outline() {
         return {-RECT_SIZE_HALF - 1, -RECT_SIZE_HALF - 1,

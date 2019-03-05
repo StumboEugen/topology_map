@@ -56,6 +56,10 @@ public:
 
     int inputMap(MapArranger &mapGroup);
 
+    int close();
+
+    virtual ~TopoFile();
+
 private:
 //    std::string spliter = ",";
     std::string filePath;

@@ -49,7 +49,7 @@ void NodeInstance::removeUseage(MapCandidate *map2unbind) {
 
 
 bool NodeInstance::alike(const NodeInstance & rnode) const {
-    const NodeInstance & lnode = *this;
+    const NodeInstance * lnode = this; //TODO will this result in serial++?
 
     /**the instance should be added complete*/
     if (!this->addComplete || !rnode.isAddComplete()) {
@@ -58,12 +58,12 @@ bool NodeInstance::alike(const NodeInstance & rnode) const {
     }
 
     /**check if the special msg is the same*/
-    if (lnode.extraMsg != rnode.extraMsg) {
+    if (lnode->extraMsg != rnode.extraMsg) {
         return false;
     }
 
     /**check the exit numbers*/
-    auto & lExits = lnode.exits;
+    auto & lExits = lnode->exits;
     auto & rExits = rnode.exits;
     if (lExits.size() != rExits.size()) {
         return false;
@@ -136,10 +136,12 @@ bool NodeInstance::alike(const NodeInstance & rnode) const {
     return true;
 }
 
-NodeInstance::NodeInstance()
+NodeInstance::NodeInstance(bool registerSerial)
         : serialNumber(serialCount)
 {
-    serialCount++;
+    if (registerSerial) {
+        serialNumber = serialCount++;
+    }
 }
 
 /**
@@ -178,5 +180,15 @@ JSobj NodeInstance::toJS() const {
         exitJS.append(exit.toJS());
     }
     return std::move(obj);
+}
+
+NodeInstance::NodeInstance(const NodeInstance & lIns, bool registerSerial)
+        :exitNums(lIns.exitNums),
+         extraMsg(lIns.extraMsg),
+         exits(lIns.exits),
+         addComplete(lIns.addComplete){
+    if (registerSerial) {
+        serialNumber = serialCount++;
+    }
 }
 
