@@ -68,12 +68,17 @@ private:
     QDockWidget * dockBuildMap;
     std::vector<TopoNode *> buildModeNodes;
 
-    void cleanEveryThing();
+    void cleanTableView();
+    void cleanReadDock();
 
     QDockWidget * initTheDock(const char *objectName);
 
+    void displayMapAtMapGV(MapCandidate &);
+
+    bool loadMapGroupFromFile(const QString & fileName, MapArranger & dist);
+
 private Q_SLOTS:
-    void loadMapFromFile();
+    void loadReadingMap();
     void displayTheActivitedMap(int);
     void drawTopoNodeDetailAtnodeGView(TopoNode *);
     void changeMode(QAction *);
@@ -83,6 +88,7 @@ private Q_SLOTS:
     void newEdgeConnected(TopoEdge *);
     void setEdgeLen();
     void saveBuiltMap();
+    void loadBuiltMap();
 };
 
 #endif // TOPOUI_H

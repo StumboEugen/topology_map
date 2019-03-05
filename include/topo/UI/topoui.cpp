@@ -110,7 +110,7 @@ TopoUI::TopoUI(QWidget *parent) :
     dockBuildMap->setShown(false);
 
     connect(uiDockReadMap->btnInputMap, SIGNAL(clicked())
-            , this, SLOT(loadMapFromFile()));
+            , this, SLOT(loadReadingMap()));
 
     connect(uiDockReadMap->cmboMapCandidate, SIGNAL(activated(int))
             , this, SLOT(displayTheActivitedMap(int)));
@@ -139,6 +139,9 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockBuildMap->btnSaveMap, SIGNAL(clicked())
             , this, SLOT(saveBuiltMap()));
 
+    connect(uiDockBuildMap->btnLoadMap, SIGNAL(clicked())
+            , this, SLOT(loadBuiltMap()));
+
 }
 
 TopoUI::~TopoUI()
@@ -146,10 +149,15 @@ TopoUI::~TopoUI()
     delete uiMain;
 }
 
-void TopoUI::loadMapFromFile() {
-    cleanEveryThing(); //TODO
+void TopoUI::loadReadingMap() {
+    cleanReadDock(); //TODO
 
-    if (mapFromReading.reloadFromFile(uiDockReadMap->etInputMap->text().toStdString())) {
+    QString name = uiDockReadMap->etInputMap->text();
+    if (name.isEmpty()) {
+        name = "map";
+    }
+
+    if (loadMapGroupFromFile(name, mapFromReading)) {
         cout << "UI load map successful" << endl;
 
         int mapCounts = 0;
@@ -158,7 +166,7 @@ void TopoUI::loadMapFromFile() {
             QString comboInfo = QString("#%1 fullEdge:%2")
                     .arg(mapCounts).arg(mapCand->getFullEdgeNumber());
             comboBoxMaps.push_back(mapCand);
-            uiDockReadMap->cmboMapCandidate->addItem(comboInfo);
+            uiDockReadMap->cmboMapCandidate->addItem(comboInfo); // TODO use variant
             mapCounts++;
         }
 
@@ -168,82 +176,41 @@ void TopoUI::loadMapFromFile() {
 }
 
 void TopoUI::displayTheActivitedMap(int index) {
-    mapScene.clear();
+
+    cleanTableView();
 
     MapCandidate & map2Draw = *comboBoxMaps[index];
-    map2Draw.cleanAllNodeFlags();
 
-    auto beginNode = map2Draw.getOneTopoNode();
+    displayMapAtMapGV(map2Draw);
+}
 
-    queue<TopoNode*> lookupQueue;
-
-    auto nodeQGI = new QGI_Node(beginNode);
-    beginNode->setAssistPtr(nodeQGI);
-    mapScene.addItem(nodeQGI);
-    lookupQueue.push(beginNode);
-
-    while(!lookupQueue.empty()) {
-        auto & curNode = lookupQueue.front();
-        lookupQueue.pop();
-        QPointF curPos = static_cast<QGI_Node*>(curNode->getAssistPtr())->pos();
-
-        //look into every edge
-        for (gateId edgeNo = 0; edgeNo < curNode->getInsCorrespond()->sizeOfExits(); edgeNo++) {
-
-//            //means this edge have been drawn
-//            if (curNode->chkFlag(edgeNo)) {
-//                continue;
-//            }
-
-            auto curEdge = curNode->getEdge(edgeNo);
-            //means this edge has never been moved through
-            if (curEdge == nullptr) {
-                continue;
-            }
-
-            TopoNode * anotherNode = curEdge->getAnotherNode(curNode);
-            uint8_t anotherGate = curEdge->getAnotherGate(curNode);
-            anotherNode->setFlag(anotherGate);
-
-            //means the "anotherNode" has been drawn
-            if (anotherNode->getAssistPtr() != nullptr) {
-                auto edge2Draw = new QGI_Edge(curEdge,
-                        static_cast<QGI_Node *>(curNode->getAssistPtr()),
-                        static_cast<QGI_Node *>(anotherNode->getAssistPtr()));
-                mapScene.addItem(edge2Draw);
-                continue;
-            }
-
-            //draw another node
-            auto odomData = curEdge->getOdomData(curNode);
-            QPointF dist{odomData.first, -odomData.second}; //ENU is different with the UI coor
-            const auto & exitOfAnotherNode =
-                    anotherNode->getInsCorrespond()->getExits()[anotherGate];
-            QPointF disInAnotherNode{exitOfAnotherNode.getPosX(), -exitOfAnotherNode.getPosY()};
-            dist -= disInAnotherNode;
-            const auto & exitOfThisNode =
-                    curNode->getInsCorrespond()->getExits()[edgeNo];
-            dist += {exitOfThisNode.getPosX(), -exitOfThisNode.getPosY()};
-            nodeQGI = new QGI_Node(anotherNode);
-            anotherNode->setAssistPtr(nodeQGI);
-            nodeQGI->setPos(curPos + dist * METER_TO_PIXLE);
-            mapScene.addItem(nodeQGI);
-
-            lookupQueue.push(anotherNode);
-        }
+void TopoUI::saveBuiltMap() {
+    QString name = uiDockBuildMap->etFileName->text();
+    if (name.isEmpty()) {
+        name = "built";
     }
+    TopoFile topoFile{name.toStdString()};
+    topoFile.open();
+    topoFile.outputMap(mapFromBuilding);
+}
 
-    for (const auto & node: map2Draw.getNodes()) {
-        auto tempIns = node->getInsCorrespond();
-        QString tempStr = "(";
-        for (const auto exit: tempIns->getExits()) {
-            tempStr.append(QString::number(exit.getOutDir()) + ",");
-        }
-        tempStr.append(")");
-        qDebug() << tempStr << ", " << static_cast<QGI_Node*>(node->getAssistPtr())->pos();
+void TopoUI::loadBuiltMap() {
+    cleanTableView();
+    QString name = uiDockBuildMap->etFileName->text();
+    if (name.isEmpty()) {
+        name = "built";
     }
-
-//    cout << "it complete" << endl;
+    mapFromBuilding.selfClean();
+    if (loadMapGroupFromFile(name, mapFromBuilding)) {
+        const auto & maps = mapFromBuilding.getMapCollection().getMaps();
+        if (maps.size() > 1) {
+            bigBrother->setMsg("get more than 1 map candidate from built map, "
+                               "ARE YOU SURE? Now we just display the first map");
+        }
+        displayMapAtMapGV(*maps.front());
+    } else {
+        bigBrother->setMsg("ERROR! CANT read the map:" + name);
+    }
 }
 
 void TopoUI::drawTopoNodeDetailAtnodeGView(TopoNode *topoNode) {
@@ -253,15 +220,6 @@ void TopoUI::drawTopoNodeDetailAtnodeGView(TopoNode *topoNode) {
         QNode->setDrawDetail(true);
         nodeScene.addItem(QNode);
     }
-}
-
-void TopoUI::cleanEveryThing() {
-    mapScene.clear();
-    nodeScene.clear();
-    mapFromReading.selfClean();
-    uiDockReadMap->cmboMapCandidate->clear();   //TODO use QVariant
-    comboBoxMaps.clear();   //TODO WARNNING leak
-    buildModeNodes.clear();
 }
 
 void TopoUI::changeMode(QAction * action) {
@@ -274,7 +232,7 @@ void TopoUI::changeMode(QAction * action) {
         cout << "switch to read mode" << endl;
         CURRENT_MODE = READ_MODE;
         dockReadMap->setShown(true);
-        cleanEveryThing();
+        cleanTableView();
     } else {
 
     }
@@ -284,7 +242,7 @@ void TopoUI::changeMode(QAction * action) {
         CURRENT_MODE = BUILD_MODE;
         dockBuildMap->setShown(true);
         uiDockBuildMap->btnMakeNewNode->setText("make a new node");
-        cleanEveryThing();
+        cleanTableView();
     } else {
 
     }
@@ -400,10 +358,94 @@ void TopoUI::setEdgeLen() {
     }
 }
 
-void TopoUI::saveBuiltMap() {
-    TopoFile topoFile{"built"};
-    topoFile.open();
-    topoFile.outputMap(mapFromBuilding);
+void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
+    map2Draw.cleanAllNodeFlags();
+
+    auto beginNode = map2Draw.getOneTopoNode();
+
+    queue<TopoNode*> lookupQueue;
+
+    auto nodeQGI = new QGI_Node(beginNode);
+    beginNode->setAssistPtr(nodeQGI);
+    mapScene.addItem(nodeQGI);
+    lookupQueue.push(beginNode);
+
+    while(!lookupQueue.empty()) {
+        auto & curNode = lookupQueue.front();
+        lookupQueue.pop();
+        QPointF curPos = static_cast<QGI_Node*>(curNode->getAssistPtr())->pos();
+
+        //look into every edge
+        for (gateId edgeNo = 0; edgeNo < curNode->getInsCorrespond()->sizeOfExits(); edgeNo++) {
+
+//            //means this edge have been drawn
+//            if (curNode->chkFlag(edgeNo)) {
+//                continue;
+//            }
+
+            auto curEdge = curNode->getEdge(edgeNo);
+            //means this edge has never been moved through
+            if (curEdge == nullptr) {
+                continue;
+            }
+
+            TopoNode * anotherNode = curEdge->getAnotherNode(curNode);
+            uint8_t anotherGate = curEdge->getAnotherGate(curNode);
+            anotherNode->setFlag(anotherGate);
+
+            //means the "anotherNode" has been drawn
+            if (anotherNode->getAssistPtr() != nullptr) {
+                auto edge2Draw = new QGI_Edge(curEdge,
+                                              static_cast<QGI_Node *>(curNode->getAssistPtr()),
+                                              static_cast<QGI_Node *>(anotherNode->getAssistPtr()));
+                mapScene.addItem(edge2Draw);
+                continue;
+            }
+
+            //draw another node
+            auto odomData = curEdge->getOdomData(curNode);
+            QPointF dist{odomData.first, -odomData.second}; //ENU is different with the UI coor
+            const auto & exitOfAnotherNode =
+                    anotherNode->getInsCorrespond()->getExits()[anotherGate];
+            QPointF disInAnotherNode{exitOfAnotherNode.getPosX(), -exitOfAnotherNode.getPosY()};
+            dist -= disInAnotherNode;
+            const auto & exitOfThisNode =
+                    curNode->getInsCorrespond()->getExits()[edgeNo];
+            dist += {exitOfThisNode.getPosX(), -exitOfThisNode.getPosY()};
+            nodeQGI = new QGI_Node(anotherNode);
+            anotherNode->setAssistPtr(nodeQGI);
+            nodeQGI->setPos(curPos + dist * METER_TO_PIXLE);
+            mapScene.addItem(nodeQGI);
+
+            lookupQueue.push(anotherNode);
+        }
+    }
+
+    for (const auto & node: map2Draw.getNodes()) {
+        auto tempIns = node->getInsCorrespond();
+        QString tempStr = "(";
+        for (const auto exit: tempIns->getExits()) {
+            tempStr.append(QString::number(exit.getOutDir()) + ",");
+        }
+        tempStr.append(")");
+//        qDebug() << tempStr << ", " << static_cast<QGI_Node*>(node->getAssistPtr())->pos();
+    }
+}
+
+void TopoUI::cleanTableView() {
+    mapScene.clear();
+    nodeScene.clear();
+    infoView->clear();
+}
+
+void TopoUI::cleanReadDock() {
+    mapFromReading.selfClean();
+    uiDockReadMap->cmboMapCandidate->clear();   //TODO use QVariant
+    comboBoxMaps.clear();   //TODO WARNNING leak
+}
+
+bool TopoUI::loadMapGroupFromFile(const QString & fileName, MapArranger & dist) {
+    return dist.reloadFromFile(fileName.toStdString());
 }
 
 
