@@ -66,11 +66,18 @@ public:
 
     bool haveLeftFromNode(TopoNode *leftnode);
 
-    uint16_t addOdomData(double dis_x, double dis_y, TopoNode * leftNode);
+    /**
+     * @param dis_x right
+     * @param dis_y forward
+     * @param yaw turn yaw, conter clockwise is +, in RAD
+     * @param leftNode
+     * @return
+     */
+    uint16_t addOdomData(double dis_x, double dis_y, double yaw, TopoNode *leftNode);
 
-    void setOdomDataDirectly(double x, double y);
+    void setOdomDataDirectly(double x, double y, double yaw);
 
-    std::pair<double, double> getOdomData(TopoNode * oriNode);
+    std::array<double, 3> getOdomData(TopoNode *oriNode);
 
     double getOdomX() const {
         return odomX;
@@ -78,6 +85,10 @@ public:
 
     double getOdomY() const {
         return odomY;
+    }
+
+    double getYawOdom() const {
+        return yawOdom;
     }
 
     JSobj toJS() const;
@@ -91,6 +102,8 @@ private:
     bool b2aMoved;
     double odomX;
     double odomY;
+    /// in RAD
+    double yawOdom;
     uint16_t odomCount;
 };
 

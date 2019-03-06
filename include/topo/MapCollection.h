@@ -16,7 +16,8 @@
  */
 class MapCollection {
 public:
-    void arriveNodeInstance(NodeInstance *, uint8_t arriveAt, double dis_x, double dis_y);
+    void arriveNodeInstance(NodeInstance *, uint8_t arriveAt, double dis_x, double dis_y,
+                                double yaw);
     std::list<MapCandidate *>::iterator addNewMap
             (std::list<MapCandidate *>::iterator pos2Insert, MapCandidate *);
     void everyMapThroughGate(gateId exit);

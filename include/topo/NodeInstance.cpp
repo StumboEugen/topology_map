@@ -152,8 +152,9 @@ NodeInstance::NodeInstance(bool registerSerial)
  * @param odomY
  * @return
  */
-topology_map::NewNodeMsgPtr NodeInstance::encode2ROSmsg(unsigned char arriveAt,
-                                                        float odomX, float odomY) {
+topology_map::NewNodeMsgPtr
+NodeInstance::encode2ROSmsg(unsigned char arriveAt,
+                            float odomX, float odomY, float yaw) {
     if (!addComplete) {
         cout << "[NodeInstance::encode2ROSmsg] w: add is not complete!" << endl;
     }
@@ -167,6 +168,7 @@ topology_map::NewNodeMsgPtr NodeInstance::encode2ROSmsg(unsigned char arriveAt,
     }
     msgPtr->odomX = odomX;
     msgPtr->odomY = odomY;
+    msgPtr->odomYaw = yaw;
     msgPtr->arriveAt = arriveAt;
     return msgPtr;
 }

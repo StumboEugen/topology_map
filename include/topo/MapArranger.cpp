@@ -9,14 +9,15 @@ using namespace std;
 #include "MapArranger.h"
 
 void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
-                                 double odomX, double odomY) {
+                                 double odomX, double odomY, double yaw) {
     if (!instance->isAddComplete()) {
-        cout << "[MapArranger::arriveInstance] You add a uncompleted node to the collection!" << endl;
+        cout << "[MapArranger::arriveInstance] "
+                "You add a uncompleted node to the collection!" << endl;
     }
     /**
      * firstly apply this move to every map
      */
-    mapCollection.arriveNodeInstance(instance, arriveAt, odomX, odomY);
+    mapCollection.arriveNodeInstance(instance, arriveAt, odomX, odomY, yaw);
     /**
      * secondly find the similiar ones
      */

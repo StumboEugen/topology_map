@@ -67,8 +67,8 @@ public:
 
     // TODO slove the problem of switch between gateID and ExitPos
 
-    topology_map::NewNodeMsgPtr encode2ROSmsg(unsigned char arriveAt,
-                                              float odomX, float odomY);
+    topology_map::NewNodeMsgPtr
+    encode2ROSmsg(unsigned char arriveAt, float odomX, float odomY, float yaw);
     // TODO split this(ROS related) out of the lib
 
     const uint8_t sizeOfExits() const {

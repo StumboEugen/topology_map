@@ -453,8 +453,8 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
 
             //draw the other node
             if (anotherNode->getAssistPtr() == nullptr) {
-                auto odomData = curEdge->getOdomData(curNode);
-                QPointF dist{odomData.first, -odomData.second};
+                auto odomData = curEdge->getOdomData(curNode);  //todo
+                QPointF dist{odomData[0], -odomData[1]};
                 //ENU is different with the UI coor
                 const auto & exitOfAnotherNode =
                         anotherNode->getInsCorrespond()->getExits()[anotherGate];

@@ -66,7 +66,7 @@ bool TopoEdge::haveLeftFromNode(TopoNode *leftnode) {
  * add odom data to this edge
  * @return the experience on this node
  */
-uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, TopoNode * leftNode) {
+uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, double yaw, TopoNode *leftNode) {
     using std::abs;
     if (leftNode == exitB) {
         dis_x *= -1.0;
@@ -79,15 +79,18 @@ uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, TopoNode * leftNode) 
     if (odomCount != 0) {
         double odomDis = sqrt(odomX * odomX + odomY * odomY);
         if (abs(dis_x - odomX) + abs(dis_y - odomY) > odomDis / 10.0) {
-            cout << "edge not match well\nrecorded: " << odomX << " " << odomY
-                 << "current :" << odomX << " " << odomY << endl;
+            cout << "[TopoEdge::addOdomData]edge not match well\n"
+                    "recorded: " << odomX << " " << odomY
+                 << "current :" << dis_x << " " << dis_y << endl;
         }
     }
     double x = (odomX * odomCount) + dis_x;
     double y = (odomY * odomCount) + dis_y;
+    double turn = (yawOdom * odomCount) + yaw;
     odomCount ++;
     odomX = x / odomCount;
     odomY = y / odomCount;
+    yawOdom = turn / odomCount;
     return odomCount;
 }
 
@@ -106,6 +109,7 @@ TopoEdge::TopoEdge(const TopoEdge &edge, TopoNode *const ea, TopoNode *const eb)
          a2bMoved(edge.a2bMoved),
          odomX(edge.odomX),
          odomY(edge.odomY),
+         yawOdom(edge.yawOdom),
          odomCount(edge.odomCount)
 {}
 
@@ -118,6 +122,7 @@ TopoEdge::TopoEdge(TopoNode *const ea, uint8_t ga, TopoNode *const eb, uint8_t g
          a2bMoved(true),
          odomX(0.0),
          odomY(0.0),
+         yawOdom(0.0),
          odomCount(0)
 //TODO set moved from a2bMoved b2aMoved
 {}
@@ -129,6 +134,7 @@ JSobj TopoEdge::toJS() const {
     obj["Ga"] = gateA;
     obj["Gb"] = gateB;
     obj["Ox"] = odomX;
+    obj["yaw"] = yawOdom;
     obj["Oy"] = odomY;
     obj["Oa"] = odomCount;
     return std::move(obj);
@@ -139,11 +145,11 @@ JSobj TopoEdge::toJS() const {
  * @param oriNode
  * @return the odominfo in std::pair<double(x), double(y)> ENU
  */
-std::pair<double, double> TopoEdge::getOdomData(TopoNode *oriNode) {
+array<double, 3> TopoEdge::getOdomData(TopoNode *oriNode) {
     if (oriNode == exitA) {
-        return {odomX, odomY};
+        return {odomX, odomY, yawOdom};
     } else if (oriNode == exitB) {
-        return {-odomX, -odomY};
+        return {-odomX, -odomY, yawOdom};
     } else {
         cerr << "TopoEdge::getOdomData no matching Exit FAILURE" << endl;
         throw;
@@ -157,8 +163,9 @@ void TopoEdge::registerAtNodes() {
     }
 }
 
-void TopoEdge::setOdomDataDirectly(double x, double y) {
-    odomCount = 0;
+void TopoEdge::setOdomDataDirectly(double x, double y, double yaw) {
+    odomCount = 1;
     odomX = x;
     odomY = y;
+    yawOdom = yaw;
 }

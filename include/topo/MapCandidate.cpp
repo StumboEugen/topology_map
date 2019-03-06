@@ -88,11 +88,11 @@ inline void MapCandidate::arriveNewNode(NodeInstance *const instance, gateId arr
  * @return if the arrivial is OK for this map
  */
 bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
-                                const double dis_x, const double dis_y) {
+                                const double dis_x, const double dis_y, const double yaw) {
     if (currentEdge == nullptr) {
         arriveNewNode(instance, arriveAt);
         // last Edge will not be null after arriveNewNode function
-        currentEdge->addOdomData(dis_x, dis_y, currentEdge->getAnotherNode(currentNode));
+        currentEdge->addOdomData(dis_x, dis_y, yaw, currentEdge->getAnotherNode(currentNode));
         lastEdgeIsOldEdge = false;
     } else {
         TopoNode * shouldToNode = currentEdge->getAnotherNode(currentNode);
@@ -101,7 +101,7 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
         if (instance->alike(*shouldToNode->getInsCorrespond())
             && arriveAt == currentEdge->getAnotherGate(currentNode)) {
             currentEdge->leaveFromNode(currentNode);
-            currentEdge->addOdomData(dis_x, dis_y, currentNode);
+            currentEdge->addOdomData(dis_x, dis_y, yaw, currentNode);
             currentNode = shouldToNode;
             lastEdgeIsOldEdge = true;
         } else {
@@ -255,8 +255,10 @@ MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
                 nodeDict[serial_A], static_cast<gateId>(JSedge["Ga"].asUInt()),
                 nodeDict[serial_B], static_cast<gateId>(JSedge["Gb"].asUInt()));
 
-        tempEdgePtr->addOdomData(
-                JSedge["Ox"].asDouble(), JSedge["Oy"].asDouble(), nodeDict[serial_A]);
+        tempEdgePtr->addOdomData(JSedge["Ox"].asDouble(),
+                                 JSedge["Oy"].asDouble(),
+                                 JSedge["yaw"].asDouble(),
+                                 nodeDict[serial_A]);
         //TODO add directly
 
         if (JSedge.isMember("cur")) {

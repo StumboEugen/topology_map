@@ -11,8 +11,8 @@
  * @param dis_x distance x since last move
  * @param dis_y distance y since last move
  */
-void MapCollection::arriveNodeInstance(NodeInstance * instance, uint8_t arriveAt,
-                                       double dis_x, double dis_y) {
+void MapCollection::arriveNodeInstance(NodeInstance *instance, uint8_t arriveAt,
+                                       double dis_x, double dis_y, double yaw) {
     if (maps.empty()) {
         auto firstMap = new MapCandidate(instance);
         maps.emplace_back(firstMap);
@@ -21,7 +21,7 @@ void MapCollection::arriveNodeInstance(NodeInstance * instance, uint8_t arriveAt
         auto iter = maps.begin();
         while (iter != maps.end()) {
             auto & map = *iter;
-            if(!map->arriveAtNode(instance, arriveAt, dis_x, dis_y)) {  //TODO sort pos
+            if(!map->arriveAtNode(instance, arriveAt, dis_x, dis_y, yaw)) {  //TODO sort pos
                 map->removeUseages();
                 delete map;
                 iter = maps.erase(iter);

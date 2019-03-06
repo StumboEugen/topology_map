@@ -16,8 +16,8 @@ class MapArranger {
 public:
     MapArranger();
 
-    void arriveInstance(NodeInstance * instance, gateId arriveAt,
-                        double odomX, double odomY);
+    void arriveInstance(NodeInstance *instance, gateId arriveAt, double odomX, double odomY,
+                            double yaw);
     void moveThroughGate(gateId gate);
     size_t getMapNumbers();
     size_t experienceNum() {

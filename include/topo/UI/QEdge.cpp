@@ -132,7 +132,7 @@ void QEdge::refreshOdom() {
     double odomy = -line().dy() / METER_TO_PIXLE;
     if (abs(odomx) < 0.01) odomx = 0.0;
     if (abs(odomy) < 0.01) odomy = 0.0;
-    relatedEdgeTOPO->setOdomDataDirectly(odomx, odomy);
+    relatedEdgeTOPO->setOdomDataDirectly(odomx, odomy, 0); //TODO
     length = line().length() / METER_TO_PIXLE;
 //    showMsg();
 }

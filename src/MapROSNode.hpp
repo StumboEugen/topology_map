@@ -64,8 +64,8 @@ void MapROSNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
         nodeInstance->addExit(msgP.midPosXs[i], msgP.midPosYs[i], msgP.outDirs[i]);
     }
     nodeInstance->completeAdding();
-    mapGroup.arriveInstance(nodeInstance, static_cast<gateId>(msgP.arriveAt),
-                            msgP.odomX, msgP.odomY);
+    mapGroup.arriveInstance(nodeInstance, static_cast<gateId>(msgP.arriveAt), msgP.odomX,
+                            msgP.odomY, msgP.odomYaw);
     cout << "rec new node" << endl;
 }
 

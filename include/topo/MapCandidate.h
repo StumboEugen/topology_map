@@ -24,7 +24,8 @@ public:
     explicit MapCandidate(NodeInstance *);
     MapCandidate(const MapCandidate&);
     void setLeaveFrom(gateId exit);
-    bool arriveAtNode(NodeInstance * instance, gateId arriveAt, double dis_x, double dis_y);
+    bool arriveAtNode(NodeInstance *const instance, gateId arriveAt, const double dis_x,
+                          const double dis_y, const double yaw);
     MapCandidate *const arriveAtSimiliar(TopoNode *arriveNode, gateId arriveGate);
 
     size_t getFullEdgeNumber() const {
