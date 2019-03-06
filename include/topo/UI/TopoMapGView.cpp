@@ -8,8 +8,8 @@
 #include <QDebug>
 
 #include "TopoMapGView.h"
-#include "QGI_Node.h"
-#include "QGI_Edge.h"
+#include "QNode.h"
+#include "QEdge.h"
 #include "topoui.h"
 
 #define SCALE_TIME 1.2
@@ -41,8 +41,17 @@ void TopoMapGView::mousePressEvent(QMouseEvent *event) {
 
     if (item != nullptr) {
 
-        if (auto nodeItem = dynamic_cast<QGI_Node*>(item)) {
-            Q_EMIT QGI_Node_clicked(nodeItem);
+        if (auto nodeItem = dynamic_cast<QNode*>(item)) {
+            switch (event->button()) {
+                case Qt::MouseButton::LeftButton:
+                    Q_EMIT QGI_Node_clicked(nodeItem);
+                    break;
+                case Qt::MouseButton ::RightButton:
+                    Q_EMIT rightClickOn_QGI_Node(nodeItem);
+                    break;
+                default:
+                    break;
+            }
 
             if (CURRENT_MODE == BUILD_MODE && drawingEdgeMode) {
                 const auto & clickPosInItem = item->mapFromScene(clickPosInScene);
@@ -51,7 +60,7 @@ void TopoMapGView::mousePressEvent(QMouseEvent *event) {
                     if (nodeItem->getRelatedNodeTOPO()->getEdge(
                             static_cast<gateId>(exitNumber)) == nullptr) {
 
-                        theDrawingEdge = new QGI_Edge(nodeItem,
+                        theDrawingEdge = new QEdge(nodeItem,
                                 static_cast<uint8_t>(exitNumber));
                         isDrawingEdge = true;
                         const auto & p1 = theDrawingEdge->line().p1();
@@ -82,7 +91,7 @@ void TopoMapGView::mouseReleaseEvent(QMouseEvent *event) {
         const auto & clickPosInScene = mapToScene(event->pos());
         auto clickedItem = scene()->itemAt(clickPosInScene);
         if (clickedItem != nullptr) {
-            if (const auto & nodeItem = dynamic_cast<QGI_Node*>(clickedItem)) {
+            if (const auto & nodeItem = dynamic_cast<QNode*>(clickedItem)) {
                 const auto & clickPosInItem = nodeItem->mapFromScene(clickPosInScene);
                 int exitNumber = nodeItem->whichExitIsAtPos(clickPosInItem);
                 if (exitNumber > -1) {
@@ -123,7 +132,7 @@ void TopoMapGView::switch2DrawEdgeMode(bool start) {
 
 void TopoMapGView::setNodesMoveable(bool move) {
     for (const auto & item :scene()->items()) {
-        if (auto nodeItem = dynamic_cast<QGI_Node*>(item)) {
+        if (auto nodeItem = dynamic_cast<QNode*>(item)) {
             nodeItem->setFlag(QGraphicsItem::ItemIsMovable, move);
         }
     }

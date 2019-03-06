@@ -14,6 +14,7 @@
 #include "TopoMapGView.h"
 #include "TopoNodeGView.h"
 #include "UITOOLS.h"
+#include "QRobot.h"
 
 #include <vector>
 #include <iostream>
@@ -43,6 +44,8 @@ private:
     QAction * mode_READ;
     QAction * mode_BUILD;
     QAction * mode_SIMULATION;
+
+    QRobot * robot;
 
     /**
      * in different mode, it has differen't function
@@ -84,7 +87,8 @@ private:
 private Q_SLOTS:
     void loadReadingMap();
     void displayTheActivitedMap(int);
-    void onQGI_NodeClicked(QGI_Node *);
+    void onQGI_NodeLeftClicked(QNode *);
+    void onQGI_NodeRightClicked(QNode *);
     void changeMode(QAction *);
     void setMapGViewDragMode(bool);
     void buildModeNewNode();

@@ -10,7 +10,7 @@
 #include <QPointF>
 
 #include "include/topo/Topo.h"
-#include "QGI_Node.h"
+#include "QNode.h"
 
 class TopoNodeGView : public QGraphicsView {
     Q_OBJECT

@@ -9,11 +9,16 @@
 #define QGI_NODE_TYPE 2000
 
 #include <QGraphicsItem>
+
+#include <vector>
+
 #include "topo/Topo.h"
 
-class QGI_Node : public QGraphicsItem {
+class QEdge;
+
+class QNode : public QGraphicsItem {
 public:
-    explicit QGI_Node(TopoNode * node);
+    explicit QNode(TopoNode * node);
 
     QRectF boundingRect() const override;
 
@@ -23,9 +28,6 @@ public:
     QPointF posOfExitInItem(int index);
     QPointF posOfExitInScene(int index);
 
-
-public:
-
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                QWidget *widget) override;
 
@@ -34,24 +36,34 @@ public:
     }
 
     void setDrawDetail(bool drawDetail) {
-        QGI_Node::drawDetail = drawDetail;
+        QNode::drawDetail = drawDetail;
     }
 
     int type() const override;
 
-private:
-    TopoNode * relatedNodeTOPO;
-    bool drawDetail = false;
+    void setQEdge(int index, QEdge * edge);
+
+    QEdge * getQEdgeAtExit(int index) {
+        return connectedEdges[index];
+    }
+
+    QNode * getQNodeAtExit(int index);
+
+    int getExitNums();
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
+    TopoNode * relatedNodeTOPO;
+    bool drawDetail = false;
 
     static QRect outline() {
         return {-RECT_SIZE_HALF - 1, -RECT_SIZE_HALF - 1,
                 RECT_SIZE_HALF * 2 + 2, RECT_SIZE_HALF * 2 + 2};
     }
+
+    std::vector<QEdge*> connectedEdges;
 };
 
 

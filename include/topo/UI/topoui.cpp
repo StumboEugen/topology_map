@@ -18,9 +18,9 @@
 #include "topo/Topo.h"
 
 #include "TopoMapGView.h"
-#include "QGI_Node.h"
-#include "QGI_Edge.h"
-#include "QGI_Robot.h"
+#include "QNode.h"
+#include "QEdge.h"
+#include "QRobot.h"
 
 #ifndef Q_MOC_RUN
 #include <ros/ros.h>
@@ -127,8 +127,8 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockReadMap->cmboMapCandidate, SIGNAL(activated(int))
             , this, SLOT(displayTheActivitedMap(int)));
 
-    connect(mapGView, SIGNAL(QGI_Node_clicked(QGI_Node*))
-            , this, SLOT(onQGI_NodeClicked(QGI_Node * )));
+    connect(mapGView, SIGNAL(QGI_Node_clicked(QNode *))
+            , this, SLOT(onQGI_NodeLeftClicked(QNode * )));
 
     connect(modeGroup, SIGNAL(triggered(QAction*))
             , this, SLOT(changeMode(QAction*)));
@@ -157,8 +157,8 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockSimulation->btnConnectToROS, SIGNAL(clicked())
             , this, SLOT(initROS()));
 
-    connect(uiDockSimulation->btnConnectToROS, SIGNAL(clicked())
-            , this, SLOT(initROS()));
+    connect(mapGView, SIGNAL(rightClickOn_QGI_Node(QNode *))
+            , this, SLOT(onQGI_NodeRightClicked(QNode *)));
 }
 
 TopoUI::~TopoUI()
@@ -230,21 +230,49 @@ void TopoUI::loadBuiltMap() {
     }
 }
 
-void TopoUI::onQGI_NodeClicked(QGI_Node *qgiNode) {
+void TopoUI::onQGI_NodeLeftClicked(QNode *qgiNode) {
     if (CURRENT_MODE == READ_MODE) {
         nodeScene.clear();
-        auto QNode = new QGI_Node(qgiNode->getRelatedNodeTOPO());
-        QNode->setDrawDetail(true);
-        nodeScene.addItem(QNode);
+        auto nodeJustForDisplay = new QNode(qgiNode->getRelatedNodeTOPO());
+        nodeJustForDisplay->setDrawDetail(true);
+        nodeScene.addItem(nodeJustForDisplay);
     }
     if (CURRENT_MODE == SIMULATION_MODE) {
         if (uiDockSimulation->btnPlaceRobot->isChecked()) {
             uiDockSimulation->btnPlaceRobot->setEnabled(false);
             uiDockSimulation->btnPlaceRobot->setChecked(false);
-            auto robot = new QGI_Robot();
-            robot->setZValue(3);
-            robot->setPos(qgiNode->pos());
+            robot = new QRobot(qgiNode);
             mapGView->scene()->addItem(robot);
+        }
+    }
+}
+
+void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
+    if (CURRENT_MODE == SIMULATION_MODE) {
+        int nums = clickedNode->getExitNums();
+        if (robot != nullptr) {
+            auto currentAt = robot->getCurrentAt();
+            if (auto nodeWithRobot = dynamic_cast<QNode*>(currentAt)) {
+                for (int i = 0; i < nums; i++) {
+                    if (nodeWithRobot == clickedNode->getQNodeAtExit(i)) {
+                        if (uiDockSimulation->cbNodeMoveDirectly->isChecked()) {
+                            robot->move2(clickedNode);
+                        } else {
+                            robot->move2(clickedNode->getQEdgeAtExit(i));
+                        }
+                        return;
+                    }
+                }
+            }
+            else if (auto edgeWithRobot = dynamic_cast<QEdge*>(currentAt)) {
+                for (int i = 0; i < nums; i++) {
+                    if (edgeWithRobot == clickedNode->getQEdgeAtExit(i)) {
+                        robot->move2(clickedNode);
+                    }
+                }
+            } else {
+                cerr << "[TopoUI::onQGI_NodeRightClicked] ROBOT at nowhere!!!!" << endl;
+            }
         }
     }
 }
@@ -344,7 +372,7 @@ void TopoUI::buildModeAddNode2MapView() {
     auto pnode = new TopoNode(pIns);
     mapFromBuilding.addTopoNodeDirectly(pnode);
     mapFromBuilding.addInstanceDirectly(pIns);
-    auto QGI_node = new QGI_Node(pnode);
+    auto QGI_node = new QNode(pnode);
     QGI_node->setDrawDetail(true);
     QGI_node->setFlag(QGraphicsItem::ItemIsMovable);
     QGI_node->setAcceptDrops(true);
@@ -371,13 +399,13 @@ void TopoUI::setEdgeLen() {
         const auto & list = mapGView->scene()->selectedItems();
         if (!list.isEmpty()) {
             for (auto & item: list) {
-                if (auto edgeItem = dynamic_cast<QGI_Edge*> (item)) {
+                if (auto edgeItem = dynamic_cast<QEdge*> (item)) {
                     edgeItem->setLength(len);
                 }
             }
         } else {
             for (auto & item: mapGView->scene()->items()) {
-                if (auto edgeItem = dynamic_cast<QGI_Edge*> (item)) {
+                if (auto edgeItem = dynamic_cast<QEdge*> (item)) {
                     edgeItem->setLength(len);
                 }
             }
@@ -394,7 +422,7 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
 
     queue<TopoNode*> lookupQueue;
 
-    auto nodeQGI = new QGI_Node(beginNode);
+    auto nodeQGI = new QNode(beginNode);
     beginNode->setAssistPtr(nodeQGI);
     mapScene.addItem(nodeQGI);
     lookupQueue.push(beginNode);
@@ -402,7 +430,7 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
     while(!lookupQueue.empty()) {
         auto & curNode = lookupQueue.front();
         lookupQueue.pop();
-        QPointF curPos = static_cast<QGI_Node*>(curNode->getAssistPtr())->pos();
+        QPointF curPos = static_cast<QNode*>(curNode->getAssistPtr())->pos();
 
         //look into every edge
         for (gateId edgeNo = 0; edgeNo < curNode->getInsCorrespond()->sizeOfExits(); edgeNo++) {
@@ -424,9 +452,9 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
 
             //means the "anotherNode" has been drawn
             if (anotherNode->getAssistPtr() != nullptr) {
-                auto edge2Draw = new QGI_Edge(curEdge,
-                        static_cast<QGI_Node *>(curNode->getAssistPtr()),
-                        static_cast<QGI_Node *>(anotherNode->getAssistPtr()));
+                auto edge2Draw = new QEdge(curEdge,
+                        static_cast<QNode *>(curNode->getAssistPtr()),
+                        static_cast<QNode *>(anotherNode->getAssistPtr()));
                 mapScene.addItem(edge2Draw);
                 continue;
             }
@@ -441,7 +469,7 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
             const auto & exitOfThisNode =
                     curNode->getInsCorrespond()->getExits()[edgeNo];
             dist += {exitOfThisNode.getPosX(), -exitOfThisNode.getPosY()};
-            nodeQGI = new QGI_Node(anotherNode);
+            nodeQGI = new QNode(anotherNode);
             anotherNode->setAssistPtr(nodeQGI);
             nodeQGI->setPos(curPos + dist * METER_TO_PIXLE);
             mapScene.addItem(nodeQGI);
@@ -457,7 +485,7 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
             tempStr.append(QString::number(exit.getOutDir()) + ",");
         }
         tempStr.append(")");
-//        qDebug() << tempStr << ", " << static_cast<QGI_Node*>(node->getAssistPtr())->pos();
+//        qDebug() << tempStr << ", " << static_cast<QNode*>(node->getAssistPtr())->pos();
     }
 }
 

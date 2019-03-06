@@ -8,27 +8,29 @@
 #include <QGraphicsItem>
 #include "topo/Topo.h"
 
-class QGI_Node;
+class QNode;
 
-class QGI_Edge : public QGraphicsLineItem {
+class QEdge : public QGraphicsLineItem {
 
 public:
 
     /**
      * constructor for reading mode
      */
-    QGI_Edge(TopoEdge *edge, QGI_Node *QNodeA, QGI_Node *QNodeB);
+    QEdge(TopoEdge *edge, QNode *QNodeA, QNode *QNodeB);
 
     /**
      * constructor for building mode
      */
-    QGI_Edge(QGI_Node *QNode, uint8_t gate);
+    QEdge(QNode *QNode, uint8_t gate);
 
     void setRelatedEdgeTOPO(TopoEdge *relatedEdgeTOPO);
 
-    void setNodeA(QGI_Node *QNodeA, uint8_t gateA);
+    void setNodeA(QNode *QNodeA, uint8_t gateA);
 
-    void setNodeB(QGI_Node *QNodeB, uint8_t gateB);
+    void setNodeB(QNode *QNodeB, uint8_t gateB);
+
+    QNode * getAnotherNode(QNode *);
 
     QPainterPath shape() const override ;
 
@@ -49,11 +51,17 @@ private:
 
     QRectF boundingRect() const override;
 
+    void registerAtBothNodes();
+
     void showMsg();
 
+public:
+    virtual ~QEdge();
+
+private:
     TopoEdge *relatedEdgeTOPO = nullptr;
-    QGI_Node *QNodeA = nullptr;
-    QGI_Node *QNodeB = nullptr;
+    QNode *QNodeA = nullptr;
+    QNode *QNodeB = nullptr;
     uint8_t gateA;
     uint8_t gateB;
 

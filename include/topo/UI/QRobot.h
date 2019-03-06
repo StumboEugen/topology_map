@@ -8,10 +8,13 @@
 
 #include <QGraphicsItem>
 
-class QGI_Robot : public QGraphicsItem  {
+class QNode;
+class QEdge;
+
+class QRobot : public QGraphicsItem  {
 
 public:
-    explicit QGI_Robot();
+    explicit QRobot(QGraphicsItem * currentAt = nullptr);
 
     void
     paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -20,9 +23,13 @@ public:
 
     QPainterPath shape() const override;
 
-    ~QGI_Robot(){};
+    void move2(QGraphicsItem * target);
+
+    QGraphicsItem *getCurrentAt() const;
 
 private:
+
+    QGraphicsItem * currentAt;
 
 };
 

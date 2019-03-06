@@ -9,9 +9,9 @@
 #include <QWidget>
 
 #include "include/topo/Topo.h"
-#include "QGI_Node.h"
+#include "QNode.h"
 
-class QGI_Edge;
+class QEdge;
 
 class TopoMapGView : public QGraphicsView{
     Q_OBJECT
@@ -32,13 +32,14 @@ private:
     bool isDrawingEdge = false;
     uint8_t exitAofDrawingEdge;
     TopoNode * nodeAofDrawingEdge;
-    QGI_Edge * theDrawingEdge;
+    QEdge * theDrawingEdge;
 
     void setNodesMoveable(bool moveable);
 
 Q_SIGNALS:
-    void QGI_Node_clicked(QGI_Node *);
+    void QGI_Node_clicked(QNode *);
     void newEdgeConnected(TopoEdge *newEdge);
+    void rightClickOn_QGI_Node(QNode*);
 
 public Q_SLOTS:
     void switch2DrawEdgeMode(bool start);
