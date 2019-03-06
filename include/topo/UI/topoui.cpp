@@ -416,7 +416,7 @@ void TopoUI::setEdgeLen() {
 }
 
 void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
-    map2Draw.cleanAllNodeFlags();
+    map2Draw.cleanAllNodeFlagsAndPtr();
 
     auto beginNode = map2Draw.getOneTopoNode();
 
@@ -430,15 +430,16 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
     while(!lookupQueue.empty()) {
         auto & curNode = lookupQueue.front();
         lookupQueue.pop();
-        QPointF curPos = static_cast<QNode*>(curNode->getAssistPtr())->pos();
+        auto * curQNode = static_cast<QNode*>(curNode->getAssistPtr());
+        QPointF curPos = curQNode->pos();
 
         //look into every edge
         for (gateId edgeNo = 0; edgeNo < curNode->getInsCorrespond()->sizeOfExits(); edgeNo++) {
 
-//            //means this edge have been drawn
-//            if (curNode->chkFlag(edgeNo)) {
-//                continue;
-//            }
+            //means this edge have been drawn
+            if (curQNode->getQEdgeAtExit(edgeNo) != nullptr) {
+                continue;
+            }
 
             auto curEdge = curNode->getEdge(edgeNo);
             //means this edge has never been moved through
@@ -446,33 +447,33 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
                 continue;
             }
 
+
             TopoNode * anotherNode = curEdge->getAnotherNode(curNode);
             uint8_t anotherGate = curEdge->getAnotherGate(curNode);
-            anotherNode->setFlag(anotherGate);
 
-            //means the "anotherNode" has been drawn
-            if (anotherNode->getAssistPtr() != nullptr) {
-                auto edge2Draw = new QEdge(curEdge,
-                        static_cast<QNode *>(curNode->getAssistPtr()),
-                        static_cast<QNode *>(anotherNode->getAssistPtr()));
-                mapScene.addItem(edge2Draw);
-                continue;
+            //draw the other node
+            if (anotherNode->getAssistPtr() == nullptr) {
+                auto odomData = curEdge->getOdomData(curNode);
+                QPointF dist{odomData.first, -odomData.second};
+                //ENU is different with the UI coor
+                const auto & exitOfAnotherNode =
+                        anotherNode->getInsCorrespond()->getExits()[anotherGate];
+                QPointF disInAnotherNode{ exitOfAnotherNode.getPosX(),
+                                         -exitOfAnotherNode.getPosY()};
+                dist -= disInAnotherNode;
+                const auto & exitOfThisNode =
+                        curNode->getInsCorrespond()->getExits()[edgeNo];
+                dist += {exitOfThisNode.getPosX(), -exitOfThisNode.getPosY()};
+                auto anotherQNode = new QNode(anotherNode);
+                anotherNode->setAssistPtr(anotherQNode);
+                anotherQNode->setPos(curPos + dist * METER_TO_PIXLE);
+                mapScene.addItem(anotherQNode);
             }
 
-            //draw another node
-            auto odomData = curEdge->getOdomData(curNode);
-            QPointF dist{odomData.first, -odomData.second}; //ENU is different with the UI coor
-            const auto & exitOfAnotherNode =
-                    anotherNode->getInsCorrespond()->getExits()[anotherGate];
-            QPointF disInAnotherNode{exitOfAnotherNode.getPosX(), -exitOfAnotherNode.getPosY()};
-            dist -= disInAnotherNode;
-            const auto & exitOfThisNode =
-                    curNode->getInsCorrespond()->getExits()[edgeNo];
-            dist += {exitOfThisNode.getPosX(), -exitOfThisNode.getPosY()};
-            nodeQGI = new QNode(anotherNode);
-            anotherNode->setAssistPtr(nodeQGI);
-            nodeQGI->setPos(curPos + dist * METER_TO_PIXLE);
-            mapScene.addItem(nodeQGI);
+            //draw the edge between them
+            auto edge2Draw = new QEdge(curEdge, curQNode,
+                                       static_cast<QNode *>(anotherNode->getAssistPtr()));
+            mapScene.addItem(edge2Draw);
 
             lookupQueue.push(anotherNode);
         }

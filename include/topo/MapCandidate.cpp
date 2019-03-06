@@ -273,8 +273,9 @@ MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
     }
 }
 
-void MapCandidate::cleanAllNodeFlags() {
+void MapCandidate::cleanAllNodeFlagsAndPtr() {
     for (const auto & node : nodes) {
         node->cleanFlags();
+        node->setAssistPtr(nullptr);
     }
 }

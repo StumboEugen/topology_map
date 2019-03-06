@@ -59,7 +59,7 @@ public:
         return posInList;
     }
 
-    void cleanAllNodeFlags();
+    void cleanAllNodeFlagsAndPtr();
 
     TopoNode *const getOneTopoNode() {
         return nodes.begin().operator*();
