@@ -51,12 +51,18 @@ public:
 
     int getExitNums();
 
+    /// in degree, clock wise
+    void setRotation(double angle);
+
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
 private:
     TopoNode * relatedNodeTOPO;
     bool drawDetail = false;
+
+    /// in degree clock wise
+    double rotation = 0.0;
 
     static QRect outline() {
         return {-RECT_SIZE_HALF - 1, -RECT_SIZE_HALF - 1,

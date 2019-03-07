@@ -95,6 +95,7 @@ private Q_SLOTS:
     void buildModeAddNode2MapView();
     void newEdgeConnected(TopoEdge *);
     void setEdgeLen();
+    void setNodeRotation();
     void saveBuiltMap();
     void loadBuiltMap();
     void initROS();

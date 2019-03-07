@@ -24,12 +24,25 @@ QNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget 
         path.addEllipse(-20,-20,40,40);
         path.setFillRule(Qt::WindingFill);
         painter->setBrush(Qt::yellow);
+        QPen pen = painter->pen();
+        if (option->state & QStyle::State_Selected) {
+            pen.setWidth(2);
+        } else {
+            pen.setWidth(1);
+        }
+        painter->setPen(pen);
         painter->drawPath(path);
         const auto & ins = relatedNodeTOPO->getInsCorrespond();
-        for (const auto & exit: ins->getExits()) {
+        const auto & exits = ins->getExits();
+        for (int i = 0; i < exits.size(); i++) {
+            const auto & exit = exits[i];
             QPointF exitGatePoint{exit.getPosX() * METER_TO_PIXLE,
                                   -exit.getPosY() * METER_TO_PIXLE};
             painter->drawLine({0,0}, exitGatePoint);
+//            painter->rotate(-rotation);
+            painter->drawText(exitGatePoint, QString::number(i));
+//            painter->rotate(rotation);
+
             // stop drawing dir
 //            QPointF gateDir{sin(exit.getOutDir() * DEG2RAD), -cos(exit.getOutDir() * DEG2RAD)};
 //            gateDir *= METER_TO_PIXLE * 0.5;
@@ -39,10 +52,12 @@ QNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget 
 //            painter->restore();
         }
     } else {
-//        if (option->state & QStyle::State_Selected) {
+        if (option->state & QStyle::State_Selected) {
             painter->setPen(Qt::red);
-            painter->drawRect(rect.adjusted(-1, -1, 0, 0));
-//        }
+        } else {
+            painter->setPen(Qt::darkRed);
+        }
+        painter->drawRect(rect.adjusted(-1, -1, 0, 0));
 //        painter->fillRect(rect, Qt::gray);
     }
 }
@@ -91,12 +106,15 @@ int QNode::whichExitIsAtPos(const QPointF & pos) {
 
 QPointF QNode::posOfExitInItem(int i) {
     if (i < 0 || i >= relatedNodeTOPO->getEdgeConnected().size()) {
+        cerr << "[QNode::posOfExitInItem]" << endl;
         throw;
     }
     const auto & exits = relatedNodeTOPO->getInsCorrespond()->getExits();
     QPointF exitPos{exits[i].getPosX(), -exits[i].getPosY()};
     exitPos *= METER_TO_PIXLE;
-    return exitPos;
+    QLineF line{{0,0}, exitPos};
+//    line.setAngle(line.angle() + rotation);
+    return line.p2();
 }
 
 QPointF QNode::posOfExitInScene(int index) {
@@ -130,4 +148,9 @@ QNode *QNode::getQNodeAtExit(int index) {
     } else {
         return nullptr;
     }
+}
+
+void QNode::setRotation(double angle) {
+    QGraphicsItem::setRotation(angle);
+    rotation = angle;
 }

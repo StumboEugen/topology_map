@@ -113,6 +113,8 @@ TopoUI::TopoUI(QWidget *parent) :
     uiDockBuildMap->setupUi(dockBuildMap);
     QRegExp regx("[0-9\\.]+$");
     uiDockBuildMap->leEdgeLen->setValidator(new QRegExpValidator(regx, this));
+    regx.setPattern("[0-9]+$");
+    uiDockBuildMap->leRotation->setValidator(new QRegExpValidator(regx, this));
     addDockWidget(Qt::RightDockWidgetArea, dockBuildMap);
     dockBuildMap->setShown(false);
 
@@ -147,6 +149,9 @@ TopoUI::TopoUI(QWidget *parent) :
 
     connect(uiDockBuildMap->btnSetEdgeLen, SIGNAL(clicked())
             , this, SLOT(setEdgeLen()));
+
+    connect(uiDockBuildMap->btnSetRotation, SIGNAL(clicked())
+            , this, SLOT(setNodeRotation()));
 
     connect(uiDockBuildMap->btnSaveMap, SIGNAL(clicked())
             , this, SLOT(saveBuiltMap()));
@@ -225,8 +230,18 @@ void TopoUI::loadBuiltMap() {
                                "ARE YOU SURE? Now we just display the first map");
         }
         displayMapAtMapGV(*maps.front());
+        for (auto & item : mapGView->items()) {
+            if (auto edgeItem = dynamic_cast<QEdge*>(item)) {
+
+            }
+            else if (auto nodeItem = dynamic_cast<QNode*>(item)) {
+                nodeItem->setDrawDetail(true);
+                nodeItem->setFlag(QGraphicsItem::ItemIsMovable);
+            }
+        }
+
     } else {
-        bigBrother->setMsg("ERROR! CANT read the map:" + name);
+        setMsg("ERROR! CANT read the map:" + name);
     }
 }
 
@@ -375,7 +390,7 @@ void TopoUI::buildModeAddNode2MapView() {
     auto QGI_node = new QNode(pnode);
     QGI_node->setDrawDetail(true);
     QGI_node->setFlag(QGraphicsItem::ItemIsMovable);
-    QGI_node->setAcceptDrops(true);
+//    QGI_node->setAcceptDrops(true);
     mapGView->scene()->addItem(QGI_node);
 }
 
@@ -414,6 +429,32 @@ void TopoUI::setEdgeLen() {
         bigBrother->setMsg("Please enter a correct number");
     }
 }
+
+void TopoUI::setNodeRotation() {
+    bool pass = false;
+    double rotation = uiDockBuildMap->leRotation->text().toInt(&pass);
+
+    if (pass) {
+        const auto & list = mapGView->scene()->selectedItems();
+        if (!list.isEmpty()) {
+            for (auto & item: list) {
+                if (auto nodeItem = dynamic_cast<QNode*> (item)) {
+                    nodeItem->setRotation(-rotation);
+                }
+            }
+        }
+//        else {
+//            for (auto & item: mapGView->scene()->items()) {
+//                if (auto edgeItem = dynamic_cast<QEdge*> (item)) {
+//                    edgeItem->setLength(rotation);
+//                }
+//            }
+//        }
+    } else {
+        bigBrother->setMsg("Please enter a correct number");
+    }
+}
+
 
 void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
     map2Draw.cleanAllNodeFlagsAndPtr();
@@ -520,6 +561,5 @@ void TopoUI::initROS() {
 
     uiDockSimulation->btnConnectToROS->setEnabled(false);
 }
-
 
 

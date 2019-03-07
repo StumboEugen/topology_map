@@ -39,6 +39,9 @@
       </item>
       <item row="3" column="0">
        <widget class="QLineEdit" name="leEdgeLen">
+        <property name="text">
+         <string>5</string>
+        </property>
         <property name="maxLength">
          <number>10</number>
         </property>
@@ -58,6 +61,23 @@
        <widget class="QPushButton" name="btnAddNodeIntoMap">
         <property name="text">
          <string>Add into map</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLineEdit" name="leRotation">
+        <property name="text">
+         <string>90</string>
+        </property>
+        <property name="maxLength">
+         <number>3</number>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QPushButton" name="btnSetRotation">
+        <property name="text">
+         <string>set rotation</string>
         </property>
        </widget>
       </item>
@@ -93,7 +113,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="etFileName"/>
+       <widget class="QLineEdit" name="etFileName">
+        <property name="text">
+         <string>built</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="btnLoadMap">
