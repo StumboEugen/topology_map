@@ -19,6 +19,10 @@
 #include <vector>
 #include <iostream>
 
+#ifndef Q_MOC_RUN
+#include <ros/ros.h>
+#endif
+
 namespace Ui {
     class TopoUI;
     class DockReadMapUI;
@@ -47,9 +51,11 @@ private:
 
     QRobot * robot;
 
-    /**
-     * in different mode, it has differen't function
-     */
+    ros::Publisher pub_nodeInfo;
+    ros::Publisher pub_gateMove;
+
+    bool checkROS();
+
     MapArranger mapFromReading;
     MapArranger mapFromBuilding;
 
@@ -80,7 +86,7 @@ private:
 
     QDockWidget * initTheDock(const char *objectName);
 
-    void displayMapAtMapGV(MapCandidate &);
+    void displayMapAtMapGV(MapCandidate &, bool detailed = false, bool movable = false);
 
     bool loadMapGroupFromFile(const QString & fileName, MapArranger & dist);
 
@@ -94,11 +100,12 @@ private Q_SLOTS:
     void buildModeNewNode();
     void buildModeAddNode2MapView();
     void newEdgeConnected(TopoEdge *);
-    void setEdgeLen();
+    void setEdgeOdom();
     void setNodeRotation();
     void saveBuiltMap();
     void loadBuiltMap();
     void initROS();
+    void changeNodeMovable(bool);
 };
 
 #endif // TOPOUI_H

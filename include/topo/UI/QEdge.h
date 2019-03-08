@@ -38,6 +38,8 @@ public:
 
     void refreshOdom();
 
+    TopoEdge *getRelatedEdgeTOPO() const;
+
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
@@ -55,9 +57,6 @@ private:
 
     void showMsg();
 
-public:
-    virtual ~QEdge();
-
 private:
     TopoEdge *relatedEdgeTOPO = nullptr;
     QNode *QNodeA = nullptr;
@@ -65,8 +64,6 @@ private:
     uint8_t gateA;
     uint8_t gateB;
 
-    double odomX = 0.0;
-    double odomY = 0.0;
     double length = 0.0;
 
 };

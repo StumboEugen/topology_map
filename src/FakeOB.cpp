@@ -109,8 +109,8 @@ int main(int argc, char **argv)
 //    {
 //        ros::spinOnce();
 //
-//        gateMove_pub.publish(tempGate);
-//        nodeInfo_pub.publish(nodeMsg);
+//        pub_gateMove.publish(tempGate);
+//        pub_nodeInfo.publish(nodeMsg);
 //
 //        loop_rate.sleep();
 //        ++count;

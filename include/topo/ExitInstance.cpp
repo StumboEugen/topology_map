@@ -9,9 +9,14 @@
 ExitInstance::ExitInstance(double posx, double posy, double dir)
         :outDir(dir),
          midPosX(posx),
-         midPosY(posy),
-         midRad(atan2(posx, posy) - piHalf)
+         midPosY(posy)
+//         midRad(atan2(posx, posy) - piHalf)
+//         midRad(atan2(posx, posy)) //TODO shoule be like this
 {
+    midRad = atan2(posx, posy);
+    if (midRad < 0) {
+        midRad += piTwo;
+    }
 }
 
 bool ExitInstance::alike(const ExitInstance & rExit) const {

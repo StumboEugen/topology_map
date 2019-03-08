@@ -97,7 +97,8 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
      * TODO not robust
      */
     try {
-        std::vector<NodeInstance *> nodeInsesDict(JSnodeInses.size(), nullptr);
+//        std::vector<NodeInstance *> nodeInsesDict(JSnodeInses.size(), nullptr);
+        std::vector<NodeInstance *> nodeInsesDict;
         for (int i = 0; i < JSnodeInses.size(); i++) {
             auto ins = new NodeInstance(false);
             auto & JSIns = JSnodeInses[i];

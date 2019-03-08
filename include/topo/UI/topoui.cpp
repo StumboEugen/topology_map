@@ -28,6 +28,7 @@
 
 #include <map>
 #include <queue>
+#include <std_msgs/UInt8.h>
 
 using namespace std;
 
@@ -111,8 +112,8 @@ TopoUI::TopoUI(QWidget *parent) :
 
     dockBuildMap = initTheDock("DockBuildMap");
     uiDockBuildMap->setupUi(dockBuildMap);
-    QRegExp regx("[0-9\\.]+$");
-    uiDockBuildMap->leEdgeLen->setValidator(new QRegExpValidator(regx, this));
+    QRegExp regx("[0-9\\.-,]+$");
+    uiDockBuildMap->leEdgeOdom->setValidator(new QRegExpValidator(regx, this));
     regx.setPattern("[0-9]+$");
     uiDockBuildMap->leRotation->setValidator(new QRegExpValidator(regx, this));
     addDockWidget(Qt::RightDockWidgetArea, dockBuildMap);
@@ -141,14 +142,14 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockBuildMap->btnAddNodeIntoMap, SIGNAL(clicked())
             , this, SLOT(buildModeAddNode2MapView()));
 
-    connect(uiDockBuildMap->btnDrawEdge, SIGNAL(clicked(bool))
+    connect(uiDockBuildMap->btnDrawEdge, SIGNAL(toggled(bool))
             , mapGView, SLOT(switch2DrawEdgeMode(bool)));
 
     connect(mapGView, SIGNAL(newEdgeConnected(TopoEdge *))
             , this, SLOT(newEdgeConnected(TopoEdge *)));
 
-    connect(uiDockBuildMap->btnSetEdgeLen, SIGNAL(clicked())
-            , this, SLOT(setEdgeLen()));
+    connect(uiDockBuildMap->btnSetEdgeOdom, SIGNAL(clicked())
+            , this, SLOT(setEdgeOdom()));
 
     connect(uiDockBuildMap->btnSetRotation, SIGNAL(clicked())
             , this, SLOT(setNodeRotation()));
@@ -164,6 +165,9 @@ TopoUI::TopoUI(QWidget *parent) :
 
     connect(mapGView, SIGNAL(rightClickOn_QGI_Node(QNode *))
             , this, SLOT(onQGI_NodeRightClicked(QNode *)));
+
+    connect(uiDockBuildMap->cbNodesMovable, SIGNAL(toggled(bool))
+            , this, SLOT(changeNodeMovable(bool)));
 }
 
 TopoUI::~TopoUI()
@@ -203,7 +207,7 @@ void TopoUI::displayTheActivitedMap(int index) {
 
     MapCandidate & map2Draw = *comboBoxMaps[index];
 
-    displayMapAtMapGV(map2Draw);
+    displayMapAtMapGV(map2Draw, false, false);
 }
 
 void TopoUI::saveBuiltMap() {
@@ -229,16 +233,7 @@ void TopoUI::loadBuiltMap() {
             bigBrother->setMsg("get more than 1 map candidate from built map, "
                                "ARE YOU SURE? Now we just display the first map");
         }
-        displayMapAtMapGV(*maps.front());
-        for (auto & item : mapGView->items()) {
-            if (auto edgeItem = dynamic_cast<QEdge*>(item)) {
-
-            }
-            else if (auto nodeItem = dynamic_cast<QNode*>(item)) {
-                nodeItem->setDrawDetail(true);
-                nodeItem->setFlag(QGraphicsItem::ItemIsMovable);
-            }
-        }
+        displayMapAtMapGV(*maps.front(), true, uiDockBuildMap->cbNodesMovable->isChecked());
 
     } else {
         setMsg("ERROR! CANT read the map:" + name);
@@ -258,6 +253,10 @@ void TopoUI::onQGI_NodeLeftClicked(QNode *qgiNode) {
             uiDockSimulation->btnPlaceRobot->setChecked(false);
             robot = new QRobot(qgiNode);
             mapGView->scene()->addItem(robot);
+            if (checkROS()) {
+                pub_nodeInfo.publish(qgiNode->getRelatedNodeTOPO()->getInsCorrespond()
+                                             ->encode2ROSmsg(0,0,0,0));
+            }
         }
     }
 }
@@ -269,11 +268,33 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
             auto currentAt = robot->getCurrentAt();
             if (auto nodeWithRobot = dynamic_cast<QNode*>(currentAt)) {
                 for (int i = 0; i < nums; i++) {
+                    /// check if the robot is in the nearby node
                     if (nodeWithRobot == clickedNode->getQNodeAtExit(i)) {
+
+                        const auto QEdgeMoved = clickedNode->getQEdgeAtExit(i);
+
+                        /// send gate through msg
+                        if (checkROS()) {
+                            std_msgs::UInt8 tempGate;
+                            tempGate.data = QEdgeMoved->getRelatedEdgeTOPO()
+                                    ->getAnotherGate(clickedNode->getRelatedNodeTOPO());
+                            pub_gateMove.publish(tempGate);
+                        }
+
                         if (uiDockSimulation->cbNodeMoveDirectly->isChecked()) {
                             robot->move2(clickedNode);
+
+                            /// send node msg
+                            if (checkROS()) {
+                                const auto & odomInfo = QEdgeMoved->getRelatedEdgeTOPO()
+                                        ->getOdomData(clickedNode->getQNodeAtExit(i)
+                                                        ->getRelatedNodeTOPO());
+                                pub_nodeInfo.publish(clickedNode->getRelatedNodeTOPO()
+                                                             ->getInsCorrespond()
+                                                             ->encode2ROSmsg(i,odomInfo));
+                            }
                         } else {
-                            robot->move2(clickedNode->getQEdgeAtExit(i));
+                            robot->move2(QEdgeMoved);
                         }
                         return;
                     }
@@ -283,6 +304,14 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
                 for (int i = 0; i < nums; i++) {
                     if (edgeWithRobot == clickedNode->getQEdgeAtExit(i)) {
                         robot->move2(clickedNode);
+                        if (checkROS()) {
+                            const auto & odomInfo = edgeWithRobot->getRelatedEdgeTOPO()
+                                    ->getOdomData(clickedNode->getQNodeAtExit(i)
+                                                          ->getRelatedNodeTOPO());
+                            pub_nodeInfo.publish(clickedNode->getRelatedNodeTOPO()
+                                                         ->getInsCorrespond()
+                                                         ->encode2ROSmsg(i,odomInfo));
+                        }
                     }
                 }
             } else {
@@ -315,7 +344,8 @@ void TopoUI::changeMode(QAction * action) {
         uiDockBuildMap->btnMakeNewNode->setText("make a new node");
         cleanTableView();
     } else {
-
+        uiDockBuildMap->btnDrawEdge->setChecked(false);
+        uiDockBuildMap->cbNodesMovable->setChecked(false);
     }
 
     if (action == mode_SIMULATION) {
@@ -406,28 +436,43 @@ void TopoUI::appendMsg(const QString & msg) {
     infoView->append("\n" + msg);
 }
 
-void TopoUI::setEdgeLen() {
+void TopoUI::setEdgeOdom() {
     bool pass = false;
-    double len = uiDockBuildMap->leEdgeLen->text().toDouble(&pass);
+    const auto & str = uiDockBuildMap->leEdgeOdom->text();
+    auto strs = str.split(',');
+    if (strs.size() == 2) {
+        double odomX = strs[0].toDouble(&pass);
+        if (pass) {
+            double odomY = strs[1].toDouble(&pass);
+            if (pass) {
+                const auto & list = mapGView->scene()->selectedItems();
+                if (!list.isEmpty()) {
+                    uiDockBuildMap->cbNodesMovable->setChecked(false);
+                    for (auto & item: list) {
+                        if (auto edgeItem = dynamic_cast<QEdge*> (item)) {
+                            edgeItem->getRelatedEdgeTOPO()->
+                                    setOdomDataDirectly(odomX, odomY, 0);
+                        }
+                    }
+                    displayMapAtMapGV(*mapFromBuilding.getMapCollection().getMaps().front(),
+                                      true, uiDockBuildMap->cbNodesMovable->isChecked());
+                }
+//                else {
+//                    for (auto & item: mapGView->scene()->items()) {
+//                        if (auto edgeItem = dynamic_cast<QEdge*> (item)) {
+//                            edgeItem->getRelatedEdgeTOPO()->
+//                                    setOdomDataDirectly(odomX, odomY, 0);
+//                        }
+//                    }
+//                }
 
-    if (pass) {
-        const auto & list = mapGView->scene()->selectedItems();
-        if (!list.isEmpty()) {
-            for (auto & item: list) {
-                if (auto edgeItem = dynamic_cast<QEdge*> (item)) {
-                    edgeItem->setLength(len);
-                }
-            }
-        } else {
-            for (auto & item: mapGView->scene()->items()) {
-                if (auto edgeItem = dynamic_cast<QEdge*> (item)) {
-                    edgeItem->setLength(len);
-                }
+                return;
             }
         }
-    } else {
-        bigBrother->setMsg("Please enter a correct number");
     }
+
+    bigBrother->setMsg("Please enter a correct odom\n"
+                       "Example: -5.4,3");
 }
 
 void TopoUI::setNodeRotation() {
@@ -456,7 +501,8 @@ void TopoUI::setNodeRotation() {
 }
 
 
-void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
+void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw, bool detailed, bool movable) {
+    mapGView->scene()->clear();
     map2Draw.cleanAllNodeFlagsAndPtr();
 
     auto beginNode = map2Draw.getOneTopoNode();
@@ -466,6 +512,12 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
     auto nodeQGI = new QNode(beginNode);
     beginNode->setAssistPtr(nodeQGI);
     mapScene.addItem(nodeQGI);
+    if (detailed) {
+        nodeQGI->setDrawDetail(true);
+    }
+    if (movable) {
+        nodeQGI->setFlag(QGraphicsItem::ItemIsMovable);
+    }
     lookupQueue.push(beginNode);
 
     while(!lookupQueue.empty()) {
@@ -509,6 +561,12 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw) {
                 anotherNode->setAssistPtr(anotherQNode);
                 anotherQNode->setPos(curPos + dist * METER_TO_PIXLE);
                 mapScene.addItem(anotherQNode);
+                if (detailed) {
+                    anotherQNode->setDrawDetail(true);
+                }
+                if (movable) {
+                    anotherQNode->setFlag(QGraphicsItem::ItemIsMovable);
+                }
             }
 
             //draw the edge between them
@@ -551,7 +609,7 @@ void TopoUI::initROS() {
     int argc = 0;
     char ** argv = nullptr;
     ros::init(argc, argv, "TopoUINode");
-    if (!ros::master::check()) {
+    if (!checkROS()) {
         infoView->setText("CANT find the ROS master, plz run roscore and try again");
         return;
     }
@@ -559,7 +617,24 @@ void TopoUI::initROS() {
     ros::start();
     ros::NodeHandle n;
 
+    pub_nodeInfo = n.advertise<topology_map::NewNodeMsg>(
+            TOPO_STD_TOPIC_NAME_NODEINFO, 0);
+    pub_gateMove = n.advertise<std_msgs::UInt8>(
+            TOPO_STD_TOPIC_NAME_GATEMOVE, 0);
+
     uiDockSimulation->btnConnectToROS->setEnabled(false);
+}
+
+void TopoUI::changeNodeMovable(bool movable) {
+    for (auto & item : mapGView->scene()->items()) {
+        if (auto nodeItem = dynamic_cast<QNode*>(item)) {
+            nodeItem->setFlag(QGraphicsItem::ItemIsMovable, movable);
+        }
+    }
+}
+
+bool TopoUI::checkROS() {
+    return ros::master::check();
 }
 
 

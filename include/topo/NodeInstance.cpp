@@ -194,3 +194,8 @@ NodeInstance::NodeInstance(const NodeInstance & lIns, bool registerSerial)
     }
 }
 
+topology_map::NewNodeMsgPtr
+NodeInstance::encode2ROSmsg(unsigned char arriveAt, const array<double, 3> & odomMsg) {
+    return encode2ROSmsg(arriveAt, (float) odomMsg[0], (float) odomMsg[1], (float) odomMsg[2]);
+}
+

@@ -69,6 +69,9 @@ public:
 
     topology_map::NewNodeMsgPtr
     encode2ROSmsg(unsigned char arriveAt, float odomX, float odomY, float yaw);
+
+    topology_map::NewNodeMsgPtr
+    encode2ROSmsg(unsigned char arriveAt, const array<double, 3> & odomMsg);
     // TODO split this(ROS related) out of the lib
 
     const uint8_t sizeOfExits() const {

@@ -86,7 +86,9 @@ QEdge::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget 
         const QPointF & pointOfExitA = QNodeA->posOfExitInScene(gateA);
         const QPointF & pointOfExitB = QNodeB->posOfExitInScene(gateB);
         setLine({pointOfExitA, pointOfExitB});
-        refreshOdom();
+        if (QNodeA->flags() & QGraphicsItem::ItemIsMovable) {
+            refreshOdom();
+        }
     }
     if (option->state & QStyle::State_Selected) {
         this->setPen(QPen(Qt::black, 7));
@@ -148,9 +150,9 @@ void QEdge::registerAtBothNodes() {
     QNodeB->setQEdge(gateB, this);
 }
 
-QEdge::~QEdge() {
-    //TODO may need to unregister
-}
+//QEdge::~QEdge() {
+//    //TODO may need to unregister
+//}
 
 QNode *QEdge::getAnotherNode(QNode * node) {
     if (node == QNodeA) {
@@ -161,5 +163,9 @@ QNode *QEdge::getAnotherNode(QNode * node) {
     } else {
         return nullptr;
     }
+}
+
+TopoEdge *QEdge::getRelatedEdgeTOPO() const {
+    return relatedEdgeTOPO;
 }
 
