@@ -66,7 +66,7 @@ void MapROSNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
     nodeInstance->completeAdding();
     mapGroup.arriveInstance(nodeInstance, static_cast<gateId>(msgP.arriveAt), msgP.odomX,
                             msgP.odomY, msgP.odomYaw);
-    cout << "rec new node" << endl;
+    cout << "rec new node complete, current candidates: " << mapGroup.getMapNumbers() << endl;
 }
 
 void MapROSNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
@@ -74,7 +74,7 @@ void MapROSNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
     if (mapGroup.experienceNum() == 6) {
         cout << mapGroup.getMapNumbers() << endl;
     }
-    cout << "rec new edge" << endl;
+    cout << "rec new edge complete" << endl;
 }
 
 bool MapROSNode::srvSaveMap(topology_map::SaveMap::Request &req,
