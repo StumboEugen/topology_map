@@ -5,7 +5,7 @@
 #ifndef TOPOLOGY_MAP_MAPCOLLECTION_H
 #define TOPOLOGY_MAP_MAPCOLLECTION_H
 
-#include <list>
+#include <set>
 #include <iostream>
 
 #include "TopoTools.h"
@@ -18,16 +18,19 @@ class MapCollection {
 public:
     void arriveNodeInstance(NodeInstance *, uint8_t arriveAt, double dis_x, double dis_y,
                                 double yaw);
-    std::list<MapCandidate *>::iterator addNewMap
-            (std::list<MapCandidate *>::iterator pos2Insert, MapCandidate *);
+    void addNewMap(MapCandidate *);
     void everyMapThroughGate(gateId exit);
 
-    size_t mapNumbers() {
+    size_t mapNumbers() const {
         return maps.size();
     }
 
-    const std::list<MapCandidate *> & getMaps() const {
+    const std::set<MapCandidate *> & getMaps() const {
         return maps;
+    }
+
+    MapCandidate * getTheFirstMap() const {
+        return maps.begin().operator*();
     }
 
     void addNodeDirectly(TopoNode *);
@@ -38,12 +41,11 @@ public:
 
     void clear();
 
-    mapPosInList addMapAtListBack(MapCandidate *);
 private:
     /**
      * using list to store the map candidate to sort them quickly
      */
-    std::list<MapCandidate*> maps;
+    std::set<MapCandidate*> maps;
 };
 
 

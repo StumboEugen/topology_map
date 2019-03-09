@@ -23,13 +23,10 @@ using namespace std;
  * @param dis_y
  * @return the new maps caused by moving to similiar nodes
  */
-vector<pair<std::list<MapCandidate *>::iterator, MapCandidate *>>
-NodeCollection::addInstanceAndCompare
+vector<MapCandidate *> NodeCollection::addInstanceAndCompare
         (NodeInstance *instance, uint8_t arriveAt, double dis_x, double dis_y) {
-    /** @first father's posInList
-     *  @second the child map
-     */
-    vector<pair<mapPosInList, MapCandidate *>> newMaps;
+
+    vector<MapCandidate *> newMaps;
     /**find data group we need to check*/
     auto & nodeSet = nodeSets[instance->sizeOfExits()];
     auto iter = nodeSet.begin();
@@ -45,7 +42,7 @@ NodeCollection::addInstanceAndCompare
                     if (!relatedMap->isJustMovedOnKnownEdge()) {
                         auto newMap = relatedMap->arriveAtSimiliar(useage.second, arriveAt);
                         if (newMap != nullptr) {
-                            newMaps.emplace_back(relatedMap->getPosInList(), newMap);
+                            newMaps.push_back(newMap);
                         }
                     }
                 }

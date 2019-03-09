@@ -52,14 +52,6 @@ public:
         return lastEdgeIsOldEdge;
     }
 
-    void setPosInList(mapPosInList listPos) {
-        posInList = listPos;
-    }
-
-    mapPosInList getPosInList() {
-        return posInList;
-    }
-
     void cleanAllNodeFlagsAndPtr();
 
     TopoNode *const getOneTopoNode() {
@@ -116,8 +108,8 @@ private:
     //the sum of all nodes' edges, to determine the close situation
     size_t fullEdgeNumber;
 
-    //to record the place in the mapCollection std::list<>
-    mapPosInList posInList;
+//    //to record the place in the mapCollection std::list<>
+//    mapPosInList posInList;
 };
 
 

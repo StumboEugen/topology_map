@@ -24,8 +24,8 @@ void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
     auto newMaps = nodeCollection.addInstanceAndCompare(instance, arriveAt, odomX, odomY);
 
     for (const auto & newMap: newMaps) {
-        auto newPos = mapCollection.addNewMap(newMap.first, newMap.second);
-        newMap.second->setPosInList(newPos);
+        mapCollection.addNewMap(newMap);
+//        newMap.second->setPosInList(newPos);
     }
     experiences ++;
 }
@@ -123,8 +123,8 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
          */
         for (int i = 0; i < JSmaps.size(); i++) {
             auto newMap = new MapCandidate(nodeInsesDict, JSmaps[i]);
-            auto pos = mapCollection.addMapAtListBack(newMap);
-            newMap->setPosInList(pos);
+            mapCollection.addNewMap(newMap);
+//            newMap->setPosInList(pos);
         }
 
         /**

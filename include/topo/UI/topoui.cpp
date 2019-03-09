@@ -228,12 +228,13 @@ void TopoUI::loadBuiltMap() {
     }
     mapFromBuilding.selfClean();
     if (loadMapGroupFromFile(name, mapFromBuilding)) {
-        const auto & maps = mapFromBuilding.getMapCollection().getMaps();
-        if (maps.size() > 1) {
+        const auto & mapCollection = mapFromBuilding.getMapCollection();
+        if (mapCollection.mapNumbers() > 1) {
             bigBrother->setMsg("get more than 1 map candidate from built map, "
                                "ARE YOU SURE? Now we just display the first map");
         }
-        displayMapAtMapGV(*maps.front(), true, uiDockBuildMap->cbNodesMovable->isChecked());
+        displayMapAtMapGV(*mapCollection.getTheFirstMap(), true,
+                          uiDockBuildMap->cbNodesMovable->isChecked());
 
     } else {
         setMsg("ERROR! CANT read the map:" + name);
@@ -425,7 +426,7 @@ void TopoUI::buildModeAddNode2MapView() {
 }
 
 void TopoUI::newEdgeConnected(TopoEdge * newEdge) {
-    mapFromBuilding.getMapCollection().getMaps().front()->addEdgeDirectly(newEdge);
+    mapFromBuilding.getMapCollection().getTheFirstMap()->addEdgeDirectly(newEdge);
 }
 
 void TopoUI::setMsg(const QString & msg) {
@@ -454,7 +455,7 @@ void TopoUI::setEdgeOdom() {
                                     setOdomDataDirectly(odomX, odomY, 0);
                         }
                     }
-                    displayMapAtMapGV(*mapFromBuilding.getMapCollection().getMaps().front(),
+                    displayMapAtMapGV(*mapFromBuilding.getMapCollection().getTheFirstMap(),
                                       true, uiDockBuildMap->cbNodesMovable->isChecked());
                 }
 //                else {

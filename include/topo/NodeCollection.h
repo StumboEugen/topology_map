@@ -19,8 +19,7 @@ using namespace std;
  */
 class NodeCollection {
 public:
-    vector<pair<mapPosInList, MapCandidate *>>
-    addInstanceAndCompare(NodeInstance *instance, uint8_t arriveAt,
+    vector<MapCandidate *> addInstanceAndCompare(NodeInstance *instance, uint8_t arriveAt,
                           double dis_x, double dis_y);
 
     const map<int, set<NodeInstance *>> &getNodeSets() const {

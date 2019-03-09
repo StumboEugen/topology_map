@@ -15,8 +15,8 @@ void MapCollection::arriveNodeInstance(NodeInstance *instance, uint8_t arriveAt,
                                        double dis_x, double dis_y, double yaw) {
     if (maps.empty()) {
         auto firstMap = new MapCandidate(instance);
-        maps.emplace_back(firstMap);
-        firstMap->setPosInList(maps.begin());
+        maps.insert(firstMap);
+//        firstMap->setPosInList(maps.begin());
     } else {
         auto iter = maps.begin();
         while (iter != maps.end()) {
@@ -32,9 +32,8 @@ void MapCollection::arriveNodeInstance(NodeInstance *instance, uint8_t arriveAt,
     }
 }
 
-list<MapCandidate *>::iterator
-MapCollection::addNewMap(list<MapCandidate *>::iterator pos2Insert, MapCandidate *newMap) {
-    return maps.insert(pos2Insert, newMap);
+void MapCollection::addNewMap(MapCandidate *newMap) {
+    maps.insert(newMap);
 }
 
 void MapCollection::everyMapThroughGate(gateId exit) {
@@ -58,17 +57,6 @@ void MapCollection::clear() {
     maps.clear();
 }
 
-/**
- * add the mapCandidate to the list back, which means the maps should be added as a sequence
- * @param newMap
- */
-mapPosInList MapCollection::addMapAtListBack(MapCandidate *newMap) {
-    maps.push_back(newMap);
-    auto temp = maps.end();
-    temp--;
-    return temp;
-}
-
 void MapCollection::addNodeDirectly(TopoNode * node)  {
     if (maps.size() > 1) {
         std::cerr << "[MapCollection::addNodeDirectly]"
@@ -77,10 +65,10 @@ void MapCollection::addNodeDirectly(TopoNode * node)  {
     }
 
     if (maps.empty()) {
-        maps.push_back(new MapCandidate(node->getInsCorrespond()));
+        maps.insert(new MapCandidate(node->getInsCorrespond()));
     }
 
-    maps.front()->addNodeDirectly(node);
+    (*maps.begin())->addNodeDirectly(node);
 }
 
 void MapCollection::addEdgeDirectly(TopoEdge * edge) {
@@ -91,8 +79,8 @@ void MapCollection::addEdgeDirectly(TopoEdge * edge) {
     }
 
     if (maps.empty()) {
-        maps.push_back(new MapCandidate(edge->getNodeA()->getInsCorrespond()));
+        maps.insert(new MapCandidate(edge->getNodeA()->getInsCorrespond()));
     }
 
-    maps.front()->addEdgeDirectly(edge);
+    (*maps.begin())->addEdgeDirectly(edge);
 }
