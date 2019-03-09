@@ -124,15 +124,20 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId 
     if (!arriveNode->isExitEmpty(arriveGate)) {
         /**because it is called for a new candidate, so we don't let @this suicide()*/
         return nullptr;
-    } else {
-        auto newMap = new MapCandidate(*this);
-        /**@attention change is applied on the new map, not "this" */
-        newMap->currentEdge->changeExitTo(newMap->currentNode, arriveNode->clonedTo, arriveGate);
-        //the old new node is replaced by the similiar node
-        newMap->removeNode(newMap->currentNode);
-        newMap->currentNode = arriveNode->clonedTo;
-        return newMap;
     }
+
+    if (arriveNode == currentEdge->getAnotherNode(currentNode)) {
+        /// we don't consider the case where the node can conncet to itself
+        return nullptr;
+    }
+
+    auto newMap = new MapCandidate(*this);
+    /**@attention change is applied on the new map, not "this" */
+    newMap->currentEdge->changeExitTo(newMap->currentNode, arriveNode->clonedTo, arriveGate);
+    //the old new node is replaced by the similiar node
+    newMap->removeNode(newMap->currentNode);
+    newMap->currentNode = arriveNode->clonedTo;
+    return newMap;
 }
 
 //TODO we may need a fuction to move according to pos & dir, not the id
