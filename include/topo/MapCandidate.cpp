@@ -53,6 +53,16 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
         this->edges.insert(clonedEdge);
         /**add the relationships in nodes;*/
         clonedEdge->registerAtNodes();
+
+//        if (nodes.find(clonedEdge->getNodeA()) == nodes.end() ||
+//            nodes.find(clonedEdge->getNodeB()) == nodes.end()) {
+//            throw;
+//        }
+//
+//        if (clonedEdge->getNodeA() == nullptr || clonedEdge->getNodeB() == nullptr) {
+//            throw;
+//        }
+
 //        clonedEdge->getNodeA()->addEdge(clonedEdge->getGateA(), clonedEdge);
 //        clonedEdge->getNodeB()->addEdge(clonedEdge->getGateB(), clonedEdge);
     }
@@ -137,6 +147,16 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId 
     //the old new node is replaced by the similiar node
     newMap->removeNode(newMap->currentNode);
     newMap->currentNode = arriveNode->clonedTo;
+
+//    auto & nodes = newMap->getNodes();
+//    auto & edges = newMap->getEdges();
+//    for (auto & edge : edges) {
+//        if (nodes.find(edge->getNodeA()) == nodes.end() ||
+//            nodes.find(edge->getNodeA()) == nodes.end()) {
+//            throw;
+//        }
+//    }
+
     return newMap;
 }
 

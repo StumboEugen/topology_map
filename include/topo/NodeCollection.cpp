@@ -27,6 +27,7 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
         (NodeInstance *instance, uint8_t arriveAt, double dis_x, double dis_y) {
 
     vector<MapCandidate *> newMaps;
+    vector<pair<MapCandidate *, TopoNode*>> loopDetected;
     /**find data group we need to check*/
     auto & nodeSet = nodeSets[instance->sizeOfExits()];
     auto iter = nodeSet.begin();
@@ -40,14 +41,18 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
                 for (auto & useage : nodeInstance->getNodeUseages()) {
                     MapCandidate * relatedMap = useage.first;
                     if (!relatedMap->isJustMovedOnKnownEdge()) {
-                        auto newMap = relatedMap->arriveAtSimiliar(useage.second, arriveAt);
-                        if (newMap != nullptr) {
-                            newMaps.push_back(newMap);
-                        }
+                        loopDetected.emplace_back(relatedMap, useage.second);
                     }
                 }
             }
             iter++;
+        }
+    }
+
+    for (auto & loopCondition: loopDetected) {
+        auto newMap = loopCondition.first->arriveAtSimiliar(loopCondition.second, arriveAt);
+        if (newMap != nullptr) {
+            newMaps.push_back(newMap);
         }
     }
 
