@@ -78,6 +78,8 @@ public:
 
     void removeUseages();
 
+    void xConfidence(double coe);
+
 private:
     void arriveNewNode(NodeInstance *instance, gateId arriveAt);
     set<TopoNode *> nodes;

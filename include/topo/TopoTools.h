@@ -22,9 +22,11 @@ class ExitInstance;
 
 typedef Json::Value JSobj;
 
-static const double convEdgePerMeter = 0.1;
+static const double convEdgePerMeter = 0.01;
 /// in RAD
-static const double convNodePerGate = 0.2;
+static const double convNodePerGate = 0.04;
+
+static const double convDistPerMeter = 0.01;
 
 static const double piHalf = 3.1415926 / 2.0;
 static const double pi = 3.1415926;
@@ -39,6 +41,7 @@ static const double piTwo = 3.1415926 * 2.0;
 namespace topo {
     const std::string getCurrentTimeString();
     bool checkJSMember(const std::vector<std::string> &strs, const JSobj &js);
+    double calDis(double x, double y);
 }
 
 #endif //TOPOLOGY_MAP_TOPOTOOL_H

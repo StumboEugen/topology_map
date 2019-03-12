@@ -5,6 +5,7 @@
 #include <string>
 #include <ctime>
 #include "TopoTools.h"
+#include <cmath>
 
 using namespace std;
 
@@ -27,4 +28,8 @@ bool topo::checkJSMember(const vector<std::string> &strs, const JSobj &js) {
         }
     }
     return true;
+}
+
+double topo::calDis(double x, double y) {
+    return sqrt(x * x + y * y);
 }

@@ -199,3 +199,9 @@ NodeInstance::encode2ROSmsg(unsigned char arriveAt, const array<double, 3> & odo
     return encode2ROSmsg(arriveAt, (float) odomMsg[0], (float) odomMsg[1], (float) odomMsg[2]);
 }
 
+void NodeInstance::setGlobalPos(double x, double y, double movedDis) {
+    globalX = x;
+    globalY = y;
+    travelDis = movedDis;
+}
+

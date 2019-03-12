@@ -107,6 +107,23 @@ public:
 
     JSobj toJS() const;
 
+    /**
+     * set the pos in global,(from the origin) and the distance moved
+     */
+    void setGlobalPos(double x, double y, double movedDis);
+
+    double getGlobalX() const {
+        return globalX;
+    }
+
+    double getGlobalY() const {
+        return globalY;
+    }
+
+    double getTravelDis() const {
+        return travelDis;
+    }
+
 private:
     /**
      * check & adjust the dir to 0-360°
@@ -147,6 +164,9 @@ private:
     //serial number record the input sequence & pointer like number
     size_t serialNumber;    //TODO 0 start or 1 start?
 
+    double globalX;
+    double globalY;
+    double travelDis;
 
 };
 

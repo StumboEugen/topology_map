@@ -19,7 +19,7 @@ using namespace std;
  */
 class NodeCollection {
 public:
-    vector<MapCandidate *> addInstanceAndCompare(NodeInstance *instance, uint8_t arriveAt,
+    vector<MapCandidate *> addInstanceAndCompare(NodeInstance *newIns, uint8_t arriveAt,
                           double dis_x, double dis_y);
 
     const map<int, set<NodeInstance *>> &getNodeSets() const {
@@ -38,6 +38,8 @@ public:
 
 private:
     map<int, set<NodeInstance*>> nodeSets;
+
+    std::vector<NodeInstance*> experiences;
 };
 //TODO 更多的分类标准
 

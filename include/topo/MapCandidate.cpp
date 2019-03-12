@@ -30,13 +30,15 @@ MapCandidate::MapCandidate( NodeInstance *const firstInstance):
 MapCandidate::MapCandidate(const MapCandidate & copyFrom)
         :leaveFrom(copyFrom.leaveFrom),
          lastEdgeIsOldEdge(copyFrom.lastEdgeIsOldEdge),
-         fullEdgeNumber(copyFrom.fullEdgeNumber)
+         fullEdgeNumber(copyFrom.fullEdgeNumber),
+         confidence(copyFrom.confidence)
 {
     /**
      * firstly copy all the TopoNode instances
      */
     for (auto oriNode: copyFrom.nodes) {
-        TopoNode *clonedNodePtr = * this->nodes.emplace(new TopoNode(oriNode->getInsCorrespond())).first;
+        TopoNode *clonedNodePtr = * this->nodes.emplace
+                (new TopoNode(oriNode->getInsCorrespond())).first;
         /**the useage should be added oustide of the constructor
          * because there is no map info in constructor
          */
@@ -129,7 +131,7 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
  * @return if it is a similar return the new similar ptr, otherwise a nullptr
  */
 MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId arriveGate) {
-    //TODO 其他判定条件
+    //TODO move this outwards
     /**you may match a node on a map, but just moved on a known edge, in this case, return*/
     if (!arriveNode->isExitEmpty(arriveGate)) {
         /**because it is called for a new candidate, so we don't let @this suicide()*/
@@ -306,3 +308,8 @@ void MapCandidate::cleanAllNodeFlagsAndPtr() {
         node->setAssistPtr(nullptr);
     }
 }
+
+void MapCandidate::xConfidence(double coe) {
+    confidence *= coe;
+}
+
