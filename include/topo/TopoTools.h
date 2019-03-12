@@ -22,6 +22,10 @@ class ExitInstance;
 
 typedef Json::Value JSobj;
 
+static const double convEdgePerMeter = 0.1;
+/// in RAD
+static const double convNodePerGate = 0.2;
+
 static const double piHalf = 3.1415926 / 2.0;
 static const double pi = 3.1415926;
 static const double piTwo = 3.1415926 * 2.0;

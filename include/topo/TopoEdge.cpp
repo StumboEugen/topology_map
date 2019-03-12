@@ -64,9 +64,9 @@ bool TopoEdge::haveLeftFromNode(TopoNode *leftnode) {
 
 /**
  * add odom data to this edge
- * @return the experience on this node
+ * @return the confience fix coe
  */
-uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, double yaw, TopoNode *leftNode) {
+double TopoEdge::addOdomData(double dis_x, double dis_y, double yaw, TopoNode *leftNode) {
     using std::abs;
     if (leftNode == exitB) {
         dis_x *= -1.0;
@@ -76,13 +76,26 @@ uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, double yaw, TopoNode 
         cerr << "addOdomData no matching Exit FAILURE" << endl;
         throw;
     }
+
+    double fixCoe = 1.0;
+
     if (odomCount != 0) {
-        double odomDis = sqrt(odomX * odomX + odomY * odomY);
-        if (abs(dis_x - odomX) + abs(dis_y - odomY) > odomDis / 10.0) {
-            cout << "[TopoEdge::addOdomData]edge not match well\n"
-                    "recorded: " << odomX << " " << odomY
-                 << "current :" << dis_x << " " << dis_y << endl;
+        double odomRecorded = sqrt(odomX * odomX + odomY * odomY);
+        double distGot = sqrt(dis_x * dis_x + dis_y * dis_y);
+        fixCoe = odomRecorded - distGot;
+        fixCoe *= fixCoe;
+        double conv = convEdgePerMeter * odomRecorded * (odomCount + 1.0) / odomCount;
+        fixCoe /= conv;
+        if (fixCoe > 16) {
+//            return 0.0; TODO
         }
+        fixCoe = exp (-0.5 * fixCoe);
+
+//        if (abs(dis_x - odomX) + abs(dis_y - odomY) > odomRecorded / 10.0) {
+//            cout << "[TopoEdge::addOdomData]edge not match well\n"
+//                    "recorded: " << odomX << " " << odomY
+//                 << "current :" << dis_x << " " << dis_y << endl;
+//        }
     }
     double x = (odomX * odomCount) + dis_x;
     double y = (odomY * odomCount) + dis_y;
@@ -91,7 +104,7 @@ uint16_t TopoEdge::addOdomData(double dis_x, double dis_y, double yaw, TopoNode 
     odomX = x / odomCount;
     odomY = y / odomCount;
     yawOdom = turn / odomCount;
-    return odomCount;
+    return fixCoe;
 }
 
 /**

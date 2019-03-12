@@ -40,7 +40,7 @@ public:
     }
 
     NodeInstance *const getInsCorrespond() const {
-        return corresponding;
+        return relatedIns[0];
     }
 
     void disconnectEdge(gateId number) {
@@ -51,20 +51,10 @@ public:
         return edgeConnected;
     }
 
-    size_t getInstanceSerialNO();
-
     //tool member help cloning maps
     TopoNode * clonedTo;
 
     JSobj toJS() const;
-
-private:
-    //the corresponded instance
-    NodeInstance *const corresponding;
-
-    //edges connected at this TopoNode
-    std::vector<TopoEdge*> edgeConnected;
-
 
 public:
     void cleanFlags() {
@@ -96,7 +86,16 @@ public:
     }
 
 private:
-    //to help iterate the map
+
+    std::vector<NodeInstance *> relatedIns;
+
+//    ///the corresponded instance
+//    NodeInstance *const corresponding;
+
+    ///edges connected at this TopoNode
+    std::vector<TopoEdge*> edgeConnected;
+
+    ///to help iterate the map
     uint32_t tempFlags = 0;
 
     void * assistPtr = nullptr;

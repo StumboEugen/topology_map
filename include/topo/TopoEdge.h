@@ -73,7 +73,7 @@ public:
      * @param leftNode
      * @return
      */
-    uint16_t addOdomData(double dis_x, double dis_y, double yaw, TopoNode *leftNode);
+    double addOdomData(double dis_x, double dis_y, double yaw, TopoNode *leftNode);
 
     void setOdomDataDirectly(double x, double y, double yaw);
 

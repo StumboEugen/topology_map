@@ -111,7 +111,7 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
         if (instance->alike(*shouldToNode->getInsCorrespond())
             && arriveAt == currentEdge->getAnotherGate(currentNode)) {
             currentEdge->leaveFromNode(currentNode);
-            currentEdge->addOdomData(dis_x, dis_y, yaw, currentNode);
+            confidence *= currentEdge->addOdomData(dis_x, dis_y, yaw, currentNode);
             currentNode = shouldToNode;
             lastEdgeIsOldEdge = true;
         } else {

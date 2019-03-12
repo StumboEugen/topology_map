@@ -6,7 +6,7 @@
 
 
 TopoNode::TopoNode(NodeInstance *const nodeInstance):
-        corresponding(nodeInstance),
+        relatedIns(1, nodeInstance),
         edgeConnected(nodeInstance->sizeOfExits(), nullptr),
         tempFlags(0),
         clonedTo(nullptr)
@@ -20,6 +20,3 @@ JSobj TopoNode::toJS() const {
     return JSobj();
 }
 
-size_t TopoNode::getInstanceSerialNO() {
-    return corresponding->getSerialNumber();
-}

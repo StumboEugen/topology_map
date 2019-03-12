@@ -83,6 +83,8 @@ private:
     set<TopoNode *> nodes;
     set<TopoEdge *> edges;
 
+    double confidence = 1.0;
+
     /**
      * on edge -> the node just leave
      *
