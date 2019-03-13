@@ -29,6 +29,8 @@
 #include <map>
 #include <queue>
 #include <std_msgs/UInt8.h>
+#include <random>
+#include <ctime>
 
 using namespace std;
 
@@ -121,6 +123,9 @@ TopoUI::TopoUI(QWidget *parent) :
 
     dockSimulation = initTheDock("DockSimulation");
     uiDockSimulation->setupUi(dockSimulation);
+    regx.setPattern("[0-9\\.]+$");
+    uiDockSimulation->leEdgeNoise->setValidator(new QRegExpValidator(regx, this));
+    uiDockSimulation->leNodeNoise->setValidator(new QRegExpValidator(regx, this));
     addDockWidget(Qt::LeftDockWidgetArea, dockSimulation);
     dockSimulation->setShown(false);
 
@@ -287,12 +292,7 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
 
                             /// send node msg
                             if (checkROS()) {
-                                const auto & odomInfo = QEdgeMoved->getRelatedEdgeTOPO()
-                                        ->getOdomData(clickedNode->getQNodeAtExit(i)
-                                                        ->getRelatedNodeTOPO());
-                                pub_nodeInfo.publish(clickedNode->getRelatedNodeTOPO()
-                                                             ->getInsCorrespond()
-                                                             ->encode2ROSmsg(i,odomInfo));
+                                sendNodeROSmsg(clickedNode, QEdgeMoved, i);
                             }
                         } else {
                             robot->move2(QEdgeMoved);
@@ -306,12 +306,7 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
                     if (edgeWithRobot == clickedNode->getQEdgeAtExit(i)) {
                         robot->move2(clickedNode);
                         if (checkROS()) {
-                            const auto & odomInfo = edgeWithRobot->getRelatedEdgeTOPO()
-                                    ->getOdomData(clickedNode->getQNodeAtExit(i)
-                                                          ->getRelatedNodeTOPO());
-                            pub_nodeInfo.publish(clickedNode->getRelatedNodeTOPO()
-                                                         ->getInsCorrespond()
-                                                         ->encode2ROSmsg(i,odomInfo));
+                            sendNodeROSmsg(clickedNode, edgeWithRobot, i);
                         }
                     }
                 }
@@ -320,6 +315,27 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
             }
         }
     }
+}
+
+void TopoUI::sendNodeROSmsg(QNode *clickedNode, const QEdge *edgeWithRobot, int exit) {
+    auto odomInfo = edgeWithRobot->getRelatedEdgeTOPO()
+            ->getOdomData(clickedNode->getQNodeAtExit(exit)->getRelatedNodeTOPO());
+    if (uiDockSimulation->cbEdgeNoise->isChecked()) {
+        bool pass;
+        double stdErr = uiDockSimulation->
+                leEdgeNoise->text().toDouble(&pass);
+        if (pass) {
+            default_random_engine e(time(nullptr));
+            normal_distribution<> n{0, stdErr};
+            double dist = topo::calDis(odomInfo[0], odomInfo[1]);
+            odomInfo[0] += n(e) * dist;
+            odomInfo[1] += n(e) * dist;
+        } else {
+            setMsg("Please enter a right number");
+        }
+    }
+    pub_nodeInfo.publish(clickedNode->getRelatedNodeTOPO()
+                                 ->getInsCorrespond()->encode2ROSmsg(exit, odomInfo));
 }
 
 void TopoUI::changeMode(QAction * action) {

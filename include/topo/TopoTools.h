@@ -22,7 +22,10 @@ class ExitInstance;
 
 typedef Json::Value JSobj;
 
-static const double convEdgePerMeter = 0.01;
+static const double convEdgePerMeter = 0.02;
+static const double stdDevEdgePerMeter = 0.0141421356237;
+static const double stdDevEdgePerMeterOneAx = 0.1;
+static const double convEdgePerMeterOneAx = 0.01;
 /// in RAD
 static const double convNodePerGate = 0.04;
 

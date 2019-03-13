@@ -90,6 +90,8 @@ private:
 
     bool loadMapGroupFromFile(const QString & fileName, MapArranger & dist);
 
+    void sendNodeROSmsg(QNode *clickedNode, const QEdge *edgeWithRobot, int exit);
+
 private Q_SLOTS:
     void loadReadingMap();
     void displayTheActivitedMap(int);
