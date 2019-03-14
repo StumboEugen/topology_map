@@ -13,12 +13,15 @@
 
 using namespace std;
 
+class MapArranger;
 /**
  * collection of the NodeInstances
  * a member in MapArranger
  */
 class NodeCollection {
 public:
+    explicit NodeCollection(MapArranger * parent);
+
     vector<MapCandidate *> addInstanceAndCompare(NodeInstance *newIns, uint8_t arriveAt,
                           double dis_x, double dis_y);
 
@@ -26,8 +29,8 @@ public:
         return nodeSets;
     }
 
-    size_t size() const {
-        return nodeSets.size();
+    size_t experienceSize() const {
+        return experiences.size();
     }
 
     JSobj toJS() const;
@@ -37,7 +40,9 @@ public:
     void addInstanceDirectly(NodeInstance * newNode);
 
 private:
-    map<int, set<NodeInstance*>> nodeSets;
+    MapArranger * const parent;
+
+    std::map<int, std::set<NodeInstance*>> nodeSets;
 
     std::vector<NodeInstance*> experiences;
 };

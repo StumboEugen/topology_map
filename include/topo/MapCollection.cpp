@@ -42,6 +42,16 @@ void MapCollection::everyMapThroughGate(gateId exit) {
     }
 }
 
+JSobj MapCollection::toJSWithSortedMaps() {
+    JSobj obj;
+    sortByConfidence();
+    for (const auto & mapIns: orderedMaps) {
+        obj.append(mapIns->toJS());
+    }
+    return std::move(obj);
+}
+
+
 JSobj MapCollection::toJS() const {
     JSobj obj;
     for (const auto & mapIns: maps) {
@@ -83,4 +93,45 @@ void MapCollection::addEdgeDirectly(TopoEdge * edge) {
     }
 
     (*maps.begin())->addEdgeDirectly(edge);
+}
+
+void MapCollection::sortByConfidence() {
+    sortByConfidence(maps.size());
+}
+
+void MapCollection::sortByConfidence(size_t topCount) {
+    size_t experience = parent->getNodeCollection().experienceSize();
+    auto comp = [experience](MapCandidate * a, MapCandidate * b){
+        return a->getConfidence(experience) > b->getConfidence(experience) ;
+    };
+    orderedMaps.clear();
+    orderedMaps.reserve(maps.size());
+    orderedMaps.assign(maps.size(), nullptr);
+    copy(maps.begin(), maps.end(), orderedMaps.begin());
+    topCount = min(maps.size(), topCount);
+    partial_sort(orderedMaps.begin(), orderedMaps.begin() + topCount, orderedMaps.end(), comp);
+}
+
+
+void MapCollection::purgeBadMaps(int survival) {
+    if (survival > maps.size()) {
+        survival = static_cast<int>(maps.size());
+    }
+
+    sortByConfidence(static_cast<size_t>(survival));
+
+    for (int i = survival; i < orderedMaps.size(); i++) {
+        auto map2delete = orderedMaps[i];
+        maps.erase(map2delete);
+        map2delete->detachAllInstances();
+        delete map2delete;
+    }
+
+    orderedMaps.erase(orderedMaps.begin() + survival, orderedMaps.end()); //TODO
+}
+
+MapCollection::MapCollection(MapArranger *parent)
+        :parent(parent)
+{
+
 }

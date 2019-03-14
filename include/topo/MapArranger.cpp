@@ -39,13 +39,15 @@ size_t MapArranger::getMapNumbers() {
 }
 
 MapArranger::MapArranger()
-        : mapName(topo::getCurrentTimeString())
+        : mapName(topo::getCurrentTimeString()),
+          mapCollection(this),
+          nodeCollection(this)
 {}
 
-JSobj MapArranger::toJS() const {
+JSobj MapArranger::toJS() {
     JSobj obj;
     obj["nodeInstance"] = nodeCollection.toJS();
-    obj["mapInstance"] = mapCollection.toJS();
+    obj["mapInstance"] = mapCollection.toJSWithSortedMaps();
     obj["Name"] = mapName;
     return std::move(obj);
 }
@@ -170,4 +172,8 @@ bool MapArranger::reloadFromFile(const std::string & fileName) {
 void MapArranger::selfClean() {
     mapCollection.clear();
     nodeCollection.clear();
+}
+
+void MapArranger::sortByConfidence() {
+    mapCollection.sortByConfidence();
 }

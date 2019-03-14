@@ -52,7 +52,7 @@ public:
      * @param mapGroup the maps to record
      * @return 0 if success, -1 if fail
      */
-    int outputMap(const MapArranger &mapGroup);
+    int outputMap(MapArranger & mapGroup);
 
     int inputMap(MapArranger &mapGroup);
 

@@ -80,6 +80,13 @@ public:
 
     void xConfidence(double coe);
 
+    double getConfidence(double experienceCountK) const;
+
+    /// get the confidence with out N logk
+    double getConfidencePURE() const;
+
+    void detachAllInstances();
+
 private:
     void arriveNewNode(NodeInstance *instance, gateId arriveAt);
     set<TopoNode *> nodes;

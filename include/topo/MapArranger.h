@@ -52,9 +52,11 @@ public:
         mapCollection.addEdgeDirectly(edge);
     }
 
+    void sortByConfidence();
+
     bool readFromJSON(const JSobj & obj);
 
-    JSobj toJS() const;
+    JSobj toJS();
 
     bool reloadFromFile(const std::string & fileName);
 

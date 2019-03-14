@@ -243,6 +243,7 @@ JSobj MapCandidate::toJS() const {
     obj["curNode"] = currentNode->getInsCorrespond()->getSerialNumber();
     obj["lEiOe"] = lastEdgeIsOldEdge; //TODO is this needed?
     obj["edgeFullNum"] = fullEdgeNumber;
+    obj["confidence"] = confidence;
     return std::move(obj);
 }
 
@@ -293,7 +294,8 @@ MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
         }
     }
 
-    this->currentNode = nodeDict[JSinfo["curNode"].asUInt() ];
+    this->confidence = JSinfo["confidence"].asDouble();
+    this->currentNode = nodeDict[JSinfo["curNode"].asUInt()];
     this->lastEdgeIsOldEdge = JSinfo["lEiOe"].asBool();
 
     // using this as a way of checking
@@ -311,5 +313,20 @@ void MapCandidate::cleanAllNodeFlagsAndPtr() {
 
 void MapCandidate::xConfidence(double coe) {
     confidence *= coe;
+}
+
+double MapCandidate::getConfidence(double experienceCountK) const {
+    double N = nodes.size();
+    return confidence * exp(-N * log(experienceCountK));
+}
+
+void MapCandidate::detachAllInstances() {
+    for (auto & node : nodes) {
+        node->getInsCorrespond()->removeUseage(this);
+    }
+}
+
+double MapCandidate::getConfidencePURE() const {
+    return confidence;
 }
 

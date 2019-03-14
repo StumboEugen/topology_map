@@ -107,7 +107,7 @@ int TopoFile::open(std::_Ios_Openmode mode) {
     }
 }
 
-int TopoFile::outputMap(const MapArranger &mapGroup) {
+int TopoFile::outputMap(MapArranger & mapGroup) {
     if (!fs.is_open()) {
         cout << "[TopoFile::outputMap] you didn't open at first! "
                 "Try to open now ..." << endl;

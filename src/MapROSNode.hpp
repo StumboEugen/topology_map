@@ -67,6 +67,9 @@ void MapROSNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
     mapGroup.arriveInstance(nodeInstance, static_cast<gateId>(msgP.arriveAt), msgP.odomX,
                             msgP.odomY, msgP.odomYaw);
     cout << "rec new node complete, current candidates: " << mapGroup.getMapNumbers() << endl;
+    for (auto & map : mapGroup.getMapCollection().getMaps()) {
+        cout << map->getConfidencePURE() << endl;
+    }
 }
 
 void MapROSNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
@@ -81,6 +84,7 @@ bool MapROSNode::srvSaveMap(topology_map::SaveMap::Request &req,
                          topology_map::SaveMap::Response &res) {
     TopoFile topoFile(mapGroup.getMapName());
     topoFile.open();
+    mapGroup.sortByConfidence();
     topoFile.outputMap(mapGroup);
     res.fileName = mapGroup.getMapName();
     return true;

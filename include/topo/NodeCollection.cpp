@@ -73,7 +73,7 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
         for (auto & loopCondition : alikeInsPair.second) {
             auto newMap = loopCondition.first->arriveAtSimiliar(loopCondition.second, arriveAt);
             if (newMap != nullptr) {
-                newMap->xConfidence(fixCoe);
+//                newMap->xConfidence(fixCoe); //TODO
                 newMaps.push_back(newMap);
             }
         }
@@ -105,4 +105,11 @@ void NodeCollection::clear() {
 
 void NodeCollection::addInstanceDirectly(NodeInstance *newNode) {
     nodeSets[newNode->sizeOfExits()].insert(newNode);
+    experiences.push_back(newNode);
+}
+
+NodeCollection::NodeCollection(MapArranger *parent):
+        parent(parent)
+{
+
 }

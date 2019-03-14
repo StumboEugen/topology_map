@@ -194,8 +194,10 @@ void TopoUI::loadReadingMap() {
         int mapCounts = 0;
 
         for (const auto & mapCand: mapFromReading.getMapCollection().getMaps()) {
-            QString comboInfo = QString("#%1 fullEdge:%2")
-                    .arg(mapCounts).arg(mapCand->getFullEdgeNumber());
+            QString comboInfo = QString("#%1 Confidence:%2")
+                    .arg(mapCounts)
+                    .arg(mapCand->getConfidence(
+                            mapFromReading.getNodeCollection().experienceSize()));
             comboBoxMaps.push_back(mapCand);
             uiDockReadMap->cmboMapCandidate->addItem(comboInfo); // TODO use variant
             mapCounts++;
