@@ -115,7 +115,12 @@ int TopoFile::outputMap(MapArranger & mapGroup) {
             return -1;
         }
     }
-    fs << mapGroup.toJS() << endl;
+    Json::StreamWriterBuilder builder;
+    builder["precision"] = 4;
+    builder["indentation"] = "";
+    auto writer(builder.newStreamWriter());
+    writer->write(mapGroup.toJS(), &fs);
+    fs << endl;
     return 0;
 }
 
