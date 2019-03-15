@@ -95,6 +95,7 @@ private:
 private Q_SLOTS:
     void loadReadingMap();
     void displayTheActivitedMap(int);
+    void jump2ReadingMapIndex();
     void onQGI_NodeLeftClicked(QNode *);
     void onQGI_NodeRightClicked(QNode *);
     void changeMode(QAction *);

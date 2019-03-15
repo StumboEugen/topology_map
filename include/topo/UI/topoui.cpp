@@ -110,11 +110,13 @@ TopoUI::TopoUI(QWidget *parent) :
     setDockNestingEnabled(true);
     dockReadMap = initTheDock("DockReadMap");
     uiDockReadMap->setupUi(dockReadMap);
+    QRegExp regx("[0-9]+$");
+    uiDockReadMap->leMapID->setValidator(new QRegExpValidator(regx, this));
     addDockWidget(Qt::RightDockWidgetArea, dockReadMap);
 
     dockBuildMap = initTheDock("DockBuildMap");
     uiDockBuildMap->setupUi(dockBuildMap);
-    QRegExp regx("[0-9\\.-,]+$");
+    regx.setPattern("[0-9\\.-,]+$");
     uiDockBuildMap->leEdgeOdom->setValidator(new QRegExpValidator(regx, this));
     regx.setPattern("[0-9]+$");
     uiDockBuildMap->leRotation->setValidator(new QRegExpValidator(regx, this));
@@ -132,8 +134,11 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockReadMap->btnInputMap, SIGNAL(clicked())
             , this, SLOT(loadReadingMap()));
 
-    connect(uiDockReadMap->cmboMapCandidate, SIGNAL(activated(int))
+    connect(uiDockReadMap->cmboMapCandidate, SIGNAL(currentIndexChanged(int))
             , this, SLOT(displayTheActivitedMap(int)));
+
+    connect(uiDockReadMap->btnJump2Map, SIGNAL(clicked())
+            , this, SLOT(jump2ReadingMapIndex()));
 
     connect(mapGView, SIGNAL(QGI_Node_clicked(QNode *))
             , this, SLOT(onQGI_NodeLeftClicked(QNode * )));
@@ -173,6 +178,9 @@ TopoUI::TopoUI(QWidget *parent) :
 
     connect(uiDockBuildMap->cbNodesMovable, SIGNAL(toggled(bool))
             , this, SLOT(changeNodeMovable(bool)));
+
+    connect(uiDockReadMap->cbMoveNode, SIGNAL(toggled(bool))
+            , this, SLOT(changeNodeMovable(bool)));
 }
 
 TopoUI::~TopoUI()
@@ -190,6 +198,8 @@ void TopoUI::loadReadingMap() {
 
     if (loadMapGroupFromFile(name, mapFromReading)) {
         cout << "UI load map successful" << endl;
+
+        setMsg("Total maps: " + QString::number(mapFromReading.getMapNumbers()) );
 
         int mapCounts = 0;
 
@@ -214,7 +224,7 @@ void TopoUI::displayTheActivitedMap(int index) {
 
     MapCandidate & map2Draw = *comboBoxMaps[index];
 
-    displayMapAtMapGV(map2Draw, false, false);
+    displayMapAtMapGV(map2Draw, true, false);
 }
 
 void TopoUI::saveBuiltMap() {
@@ -645,6 +655,9 @@ void TopoUI::initROS() {
 }
 
 void TopoUI::changeNodeMovable(bool movable) {
+    if (CURRENT_MODE == READ_MODE) {
+        displayTheActivitedMap(uiDockReadMap->cmboMapCandidate->currentIndex());
+    }
     for (auto & item : mapGView->scene()->items()) {
         if (auto nodeItem = dynamic_cast<QNode*>(item)) {
             nodeItem->setFlag(QGraphicsItem::ItemIsMovable, movable);
@@ -654,6 +667,17 @@ void TopoUI::changeNodeMovable(bool movable) {
 
 bool TopoUI::checkROS() {
     return ros::master::check();
+}
+
+void TopoUI::jump2ReadingMapIndex() {
+    int index = uiDockReadMap->leMapID->text().toUInt();
+    int maxNum = uiDockReadMap->cmboMapCandidate->count();
+    if (index >= maxNum) {
+        setMsg("please enter a correct number\n"
+               "There are " + QString::number(maxNum) + " maps\n(Start from 0)");
+        return;
+    }
+    uiDockReadMap->cmboMapCandidate->setCurrentIndex(index);
 }
 
 

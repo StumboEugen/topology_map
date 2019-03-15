@@ -14,6 +14,7 @@
 #include "topoui.h"
 
 extern TopoUI * bigBrother;
+extern UIMode CURRENT_MODE;
 
 QEdge::QEdge(TopoEdge *edge, QNode *QNodeA, QNode *QNodeB)
 {
@@ -86,7 +87,7 @@ QEdge::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget 
         const QPointF & pointOfExitA = QNodeA->posOfExitInScene(gateA);
         const QPointF & pointOfExitB = QNodeB->posOfExitInScene(gateB);
         setLine({pointOfExitA, pointOfExitB});
-        if (QNodeA->flags() & QGraphicsItem::ItemIsMovable) {
+        if (QNodeA->flags() & QGraphicsItem::ItemIsMovable and CURRENT_MODE == BUILD_MODE) {
             refreshOdom();
         }
     }

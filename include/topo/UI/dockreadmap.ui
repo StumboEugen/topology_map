@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>169</width>
-    <height>300</height>
+    <width>206</width>
+    <height>311</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>206</width>
+    <height>311</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>read map dock</string>
@@ -17,82 +23,71 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QGroupBox" name="groupBox">
-      <property name="minimumSize">
-       <size>
-        <width>151</width>
-        <height>91</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>151</width>
-        <height>91</height>
-       </size>
-      </property>
       <property name="title">
        <string>Input map</string>
       </property>
-      <widget class="QLineEdit" name="etInputMap">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>121</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="whatsThis">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;the map name&lt;/p&gt;&lt;p&gt;default floder: ~/topoMaps/&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="layoutDirection">
-        <enum>Qt::LeftToRight</enum>
-       </property>
-       <property name="text">
-        <string>map</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btnInputMap">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>60</y>
-         <width>121</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Input Map</string>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLineEdit" name="etInputMap">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;the map name&lt;/p&gt;&lt;p&gt;default floder: ~/topoMaps/&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>map</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnInputMap">
+         <property name="text">
+          <string>Input Map</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </item>
     <item>
      <widget class="QGroupBox" name="groupBox_2">
-      <property name="minimumSize">
-       <size>
-        <width>151</width>
-        <height>71</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>151</width>
-        <height>71</height>
-       </size>
-      </property>
       <property name="title">
        <string>Map Candidate</string>
       </property>
-      <widget class="QComboBox" name="cmboMapCandidate">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>131</width>
-         <height>25</height>
-        </rect>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QComboBox" name="cmboMapCandidate"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLineEdit" name="leMapID">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="maxLength">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnJump2Map">
+           <property name="text">
+            <string>jump to</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item alignment="Qt::AlignHCenter">
+     <widget class="QCheckBox" name="cbMoveNode">
+      <property name="text">
+       <string>enable node moving</string>
+      </property>
      </widget>
     </item>
     <item>
