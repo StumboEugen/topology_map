@@ -40,6 +40,7 @@ static const double piTwo = 3.1415926 * 2.0;
 #define TOPO_STD_TOPIC_NAME_NODEINFO "topo/NewTravel"
 #define TOPO_STD_TOPIC_NAME_GATEMOVE "topo/MoveThroughGate"
 #define TOPO_STD_SERVICE_NAME_SAVEMAP "topoSrv/SaveMap"
+#define TOPO_STD_SERVICE_NAME_GETMAPS "topoSrv/GetMaps"
 
 namespace topo {
     const std::string getCurrentTimeString();

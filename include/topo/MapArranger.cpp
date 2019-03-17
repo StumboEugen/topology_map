@@ -174,6 +174,20 @@ void MapArranger::selfClean() {
     nodeCollection.clear();
 }
 
-void MapArranger::sortByConfidence() {
-    mapCollection.sortByConfidence();
+void MapArranger::sortByConfidence(size_t topCount) {
+    if (topCount == 0) {
+        mapCollection.sortByConfidence();
+    } else {
+        mapCollection.sortByConfidence(topCount);
+    }
+}
+
+string MapArranger::toString() {
+    stringstream ss;
+    Json::StreamWriterBuilder builder;
+    builder["precision"] = 4;
+    builder["indentation"] = "";
+    auto writer(builder.newStreamWriter());
+    writer->write(toJS(), &ss);
+    return std::move(ss.str());
 }

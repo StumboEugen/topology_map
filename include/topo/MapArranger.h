@@ -52,11 +52,17 @@ public:
         mapCollection.addEdgeDirectly(edge);
     }
 
-    void sortByConfidence();
+    /**
+     * sort the map, if the count asked is 0, sort every map
+     * @param topCount
+     */
+    void sortByConfidence(size_t topCount = 0);
 
     bool readFromJSON(const JSobj & obj);
 
     JSobj toJS();
+
+    string toString();
 
     bool reloadFromFile(const std::string & fileName);
 
