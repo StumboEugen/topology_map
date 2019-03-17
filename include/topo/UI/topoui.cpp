@@ -196,7 +196,35 @@ void TopoUI::loadReadingMap() {
         name = "map";
     }
 
-    if (loadMapGroupFromFile(name, mapFromReading)) {
+    bool loadComplete;
+
+    if (name.contains("real")) {
+        /// we load the map from ROS
+        initROS();
+        if (!checkROS()) {
+            setMsg("file name start with \"real\" means ask the realtime map, the following "
+                   "number means the number of maps you would like to get, for example\n"
+                   "real2 means you want the 2 real time map (with highest confidence");
+        }
+        name.remove(0, 3);
+        auto mapNeeded = name.toUInt();
+        topology_map::GetMapsRequest request;
+        topology_map::GetMapsResponse response;
+        request.requiredMaps = static_cast<unsigned short>(mapNeeded);
+        if (srvC_askMaps.call(request, response)) {
+            appendMsg("map loaded success");
+            loadComplete = mapFromReading.readFromStr(response.mapJS);
+        } else {
+            loadComplete = false;
+            appendMsg("service call fail");
+        }
+    } else {
+        /// load the map from file
+        loadComplete = loadMapGroupFromFile(name, mapFromReading);
+    }
+
+
+    if (loadComplete) {
         cout << "UI load map successful" << endl;
 
         setMsg("Total maps: " + QString::number(mapFromReading.getMapNumbers()) );
@@ -212,8 +240,8 @@ void TopoUI::loadReadingMap() {
             uiDockReadMap->cmboMapCandidate->addItem(comboInfo); // TODO use variant
             mapCounts++;
         }
-
     } else {
+        appendMsg("UI load map FAIL");
         cerr << "UI load map FAIL" << endl;
     }
 }
@@ -635,6 +663,10 @@ bool TopoUI::loadMapGroupFromFile(const QString & fileName, MapArranger & dist) 
 }
 
 void TopoUI::initROS() {
+    if (checkROS()) {
+        infoView->setText("you have connected to ROS");
+        return;
+    }
     int argc = 0;
     char ** argv = nullptr;
     ros::init(argc, argv, "TopoUINode");
@@ -643,6 +675,10 @@ void TopoUI::initROS() {
         return;
     }
     infoView->setText("ROS connect success!");
+
+    uiDockSimulation->btnConnectToROS->setChecked(true);
+    uiDockSimulation->btnConnectToROS->setEnabled(false);
+
     ros::start();
     ros::NodeHandle n;
 
@@ -650,8 +686,7 @@ void TopoUI::initROS() {
             TOPO_STD_TOPIC_NAME_NODEINFO, 0);
     pub_gateMove = n.advertise<std_msgs::UInt8>(
             TOPO_STD_TOPIC_NAME_GATEMOVE, 0);
-
-    uiDockSimulation->btnConnectToROS->setEnabled(false);
+    srvC_askMaps = n.serviceClient<topology_map::GetMaps>(TOPO_STD_SERVICE_NAME_GETMAPS);
 }
 
 void TopoUI::changeNodeMovable(bool movable) {

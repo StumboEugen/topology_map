@@ -60,6 +60,8 @@ public:
 
     bool readFromJSON(const JSobj & obj);
 
+    bool readFromStr(const std::string & str);
+
     JSobj toJS();
 
     string toString();

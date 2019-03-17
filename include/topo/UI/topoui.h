@@ -23,6 +23,8 @@
 #include <ros/ros.h>
 #endif
 
+#include <topology_map/GetMaps.h>
+
 namespace Ui {
     class TopoUI;
     class DockReadMapUI;
@@ -53,6 +55,7 @@ private:
 
     ros::Publisher pub_nodeInfo;
     ros::Publisher pub_gateMove;
+    ros::ServiceClient srvC_askMaps;
 
     bool checkROS();
 

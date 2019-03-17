@@ -187,7 +187,23 @@ string MapArranger::toString() {
     Json::StreamWriterBuilder builder;
     builder["precision"] = 4;
     builder["indentation"] = "";
-    auto writer(builder.newStreamWriter());
+    std::unique_ptr<Json::StreamWriter> const writer(builder.newStreamWriter());
     writer->write(toJS(), &ss);
     return std::move(ss.str());
+}
+
+bool MapArranger::readFromStr(const std::string & str) {
+    selfClean();
+    Json::CharReaderBuilder b;
+    char const* begin = str.data();
+    char const* end = begin + str.size();
+    std::unique_ptr<Json::CharReader> const reader(b.newCharReader());
+    JSobj js;
+    string err;
+    bool ok = reader->parse(begin, end, &js, &err);
+    if (ok) {
+        return readFromJSON(js);
+    } else {
+        return false;
+    }
 }

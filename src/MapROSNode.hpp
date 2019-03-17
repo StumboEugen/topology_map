@@ -112,8 +112,11 @@ MapROSNode::srvGetMap(topology_map::GetMaps::Request & req,
                       topology_map::GetMaps::Response & res) {
     auto askMaps = req.requiredMaps;
     mapGroup.sortByConfidence(askMaps);
+    const auto & str = mapGroup.toString();
+
     res.mapJS = std::move(mapGroup.toString());
-    ROS_INFO_STREAM("[srvGetMap] requset of map count" << askMaps <<" is sent");
+    ROS_INFO_STREAM("[srvGetMap] requset of map count" << askMaps <<" is sent\n"
+                                                                    "size:" << str.size());
     return true;
 }
 
