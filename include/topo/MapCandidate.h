@@ -87,6 +87,10 @@ public:
 
     void detachAllInstances();
 
+    TopoNode *getCurrentNode() const {
+        return currentNode;
+    }
+
 private:
     void arriveNewNode(NodeInstance *instance, gateId arriveAt);
     set<TopoNode *> nodes;

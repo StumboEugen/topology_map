@@ -51,6 +51,8 @@ private:
     QAction * mode_BUILD;
     QAction * mode_SIMULATION;
 
+    QAction * qactConnectToROS;
+
     QRobot * robot;
 
     ros::Publisher pub_nodeInfo;
@@ -89,7 +91,8 @@ private:
 
     QDockWidget * initTheDock(const char *objectName);
 
-    void displayMapAtMapGV(MapCandidate &, bool detailed = false, bool movable = false);
+    void displayMapAtMapGV(MapCandidate &, bool drawRobot = false, bool detailed = true, bool
+            movable = false);
 
     bool loadMapGroupFromFile(const QString & fileName, MapArranger & dist);
 

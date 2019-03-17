@@ -68,6 +68,10 @@ TopoUI::TopoUI(QWidget *parent) :
     uiMain->mainToolBar->addSeparator();
     connect(dragMode, SIGNAL(toggled(bool)), this, SLOT(setMapGViewDragMode(bool)));
 
+    qactConnectToROS = new QAction("Connect to ROS", uiMain->mainToolBar);
+    qactConnectToROS->setCheckable(true);
+    uiMain->mainToolBar->addAction(qactConnectToROS);
+
     centerLayout = new QHBoxLayout(uiMain->centralWidget);
     centerLayout->setSpacing(6);
     centerLayout->setContentsMargins(11, 11, 11, 11);
@@ -170,7 +174,7 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockBuildMap->btnLoadMap, SIGNAL(clicked())
             , this, SLOT(loadBuiltMap()));
 
-    connect(uiDockSimulation->btnConnectToROS, SIGNAL(clicked())
+    connect(qactConnectToROS, SIGNAL(changed())
             , this, SLOT(initROS()));
 
     connect(mapGView, SIGNAL(rightClickOn_QGI_Node(QNode *))
@@ -248,11 +252,15 @@ void TopoUI::loadReadingMap() {
 
 void TopoUI::displayTheActivitedMap(int index) {
 
+    if (index < 0 || index >= comboBoxMaps.size()) {
+        return;
+    }
+
     cleanTableView();
 
     MapCandidate & map2Draw = *comboBoxMaps[index];
 
-    displayMapAtMapGV(map2Draw, true, false);
+    displayMapAtMapGV(map2Draw, true, true, false);
 }
 
 void TopoUI::saveBuiltMap() {
@@ -278,7 +286,7 @@ void TopoUI::loadBuiltMap() {
             bigBrother->setMsg("get more than 1 map candidate from built map, "
                                "ARE YOU SURE? Now we just display the first map");
         }
-        displayMapAtMapGV(*mapCollection.getTheFirstMap(), true,
+        displayMapAtMapGV(*mapCollection.getTheFirstMap(), false, true,
                           uiDockBuildMap->cbNodesMovable->isChecked());
 
     } else {
@@ -379,6 +387,13 @@ void TopoUI::sendNodeROSmsg(QNode *clickedNode, const QEdge *edgeWithRobot, int 
 }
 
 void TopoUI::changeMode(QAction * action) {
+    static QAction * lastAction = mode_READ;
+
+    if (action == lastAction) {
+        return;
+    }
+    lastAction = action;
+
     dockBuildMap->setShown(false);
     dockReadMap->setShown(false);
     dockSimulation->setShown(false);
@@ -467,6 +482,9 @@ void TopoUI::buildModeNewNode() {
 }
 
 void TopoUI::buildModeAddNode2MapView() {
+
+    uiDockBuildMap->cbNodesMovable->setChecked(true);
+
     auto pBox = uiDockBuildMap->cmboMadeNodes;
     NodeInstance * sampleIns =
             static_cast<NodeInstance *>(pBox->itemData(pBox->currentIndex()).value<void*>());
@@ -512,7 +530,7 @@ void TopoUI::setEdgeOdom() {
                         }
                     }
                     displayMapAtMapGV(*mapFromBuilding.getMapCollection().getTheFirstMap(),
-                                      true, uiDockBuildMap->cbNodesMovable->isChecked());
+                                      false, true, uiDockBuildMap->cbNodesMovable->isChecked());
                 }
 //                else {
 //                    for (auto & item: mapGView->scene()->items()) {
@@ -558,9 +576,12 @@ void TopoUI::setNodeRotation() {
 }
 
 
-void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw, bool detailed, bool movable) {
+void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw,
+                               bool drawRobot, bool detailed, bool movable) {
     mapGView->scene()->clear();
     map2Draw.cleanAllNodeFlagsAndPtr();
+
+    const auto & robotPlace = map2Draw.getCurrentNode();
 
     auto beginNode = map2Draw.getOneTopoNode();
 
@@ -577,11 +598,17 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw, bool detailed, bool mova
     }
     lookupQueue.push(beginNode);
 
+    /// BFS
     while(!lookupQueue.empty()) {
         auto & curNode = lookupQueue.front();
         lookupQueue.pop();
         auto * curQNode = static_cast<QNode*>(curNode->getAssistPtr());
         QPointF curPos = curQNode->pos();
+
+        if (curNode == robotPlace and drawRobot) {
+            auto Qrobot = new QRobot(curQNode);
+            mapScene.addItem(Qrobot);
+        }
 
         //look into every edge
         for (gateId edgeNo = 0; edgeNo < curNode->getInsCorrespond()->sizeOfExits(); edgeNo++) {
@@ -664,7 +691,7 @@ bool TopoUI::loadMapGroupFromFile(const QString & fileName, MapArranger & dist) 
 
 void TopoUI::initROS() {
     if (checkROS()) {
-        infoView->setText("you have connected to ROS");
+        infoView->setText("connect to ROS successfully");
         return;
     }
     int argc = 0;
@@ -676,8 +703,8 @@ void TopoUI::initROS() {
     }
     infoView->setText("ROS connect success!");
 
-    uiDockSimulation->btnConnectToROS->setChecked(true);
-    uiDockSimulation->btnConnectToROS->setEnabled(false);
+    qactConnectToROS->setChecked(true);
+    qactConnectToROS->setEnabled(false);
 
     ros::start();
     ros::NodeHandle n;
