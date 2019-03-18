@@ -44,10 +44,10 @@ MapArranger::MapArranger()
           nodeCollection(this)
 {}
 
-JSobj MapArranger::toJS() {
+JSobj MapArranger::toJS(size_t mapCount) {
     JSobj obj;
     obj["nodeInstance"] = nodeCollection.toJS();
-    obj["mapInstance"] = mapCollection.toJSWithSortedMaps();
+    obj["mapInstance"] = mapCollection.toJSWithSortedMaps(mapCount);
     obj["Name"] = mapName;
     return std::move(obj);
 }
@@ -175,20 +175,16 @@ void MapArranger::selfClean() {
 }
 
 void MapArranger::sortByConfidence(size_t topCount) {
-    if (topCount == 0) {
-        mapCollection.sortByConfidence();
-    } else {
         mapCollection.sortByConfidence(topCount);
-    }
 }
 
-string MapArranger::toString() {
+string MapArranger::toString(size_t mapCount) {
     stringstream ss;
     Json::StreamWriterBuilder builder;
     builder["precision"] = 4;
     builder["indentation"] = "";
     std::unique_ptr<Json::StreamWriter> const writer(builder.newStreamWriter());
-    writer->write(toJS(), &ss);
+    writer->write(toJS(mapCount), &ss);
     return std::move(ss.str());
 }
 

@@ -10,6 +10,7 @@
 
 void
 QRobot::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    move2(currentAt);
     painter->setBrush(Qt::red);
     painter->drawEllipse(-10, -10, 20, 20);
 }

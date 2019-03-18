@@ -62,9 +62,20 @@ public:
 
     bool readFromStr(const std::string & str);
 
-    JSobj toJS();
 
-    string toString();
+    /**
+     * turn the map into a JSON obj
+     * @param mapCount the number of mapCandidate you would like to save (0 == whole)
+     * @return the js obj
+     */
+    JSobj toJS(size_t mapCount = 0);
+
+    /**
+     * turn the whold map into a str in JSON format
+     * @param mapCount the number of mapCandidate you would like to save (0 == whole)
+     * @return the str
+     */
+    string toString(size_t mapCount = 0);
 
     bool reloadFromFile(const std::string & fileName);
 

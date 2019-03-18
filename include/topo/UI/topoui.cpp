@@ -210,7 +210,8 @@ void TopoUI::loadReadingMap() {
                    "number means the number of maps you would like to get, for example\n"
                    "real2 means you want the 2 real time map (with highest confidence");
         }
-        name.remove(0, 3);
+        name.remove(0, 4);
+        cout << name.toStdString() << endl;
         auto mapNeeded = name.toUInt();
         topology_map::GetMapsRequest request;
         topology_map::GetMapsResponse response;
@@ -310,6 +311,8 @@ void TopoUI::onQGI_NodeLeftClicked(QNode *qgiNode) {
             if (checkROS()) {
                 pub_nodeInfo.publish(qgiNode->getRelatedNodeTOPO()->getInsCorrespond()
                                              ->encode2ROSmsg(0,0,0,0));
+            } else {
+                setMsg("Please connect to ROS first!");
             }
         }
     }

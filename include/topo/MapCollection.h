@@ -38,8 +38,10 @@ public:
 
     void purgeBadMaps(int survival);
 
-    void sortByConfidence();
-
+    /**
+     * sort the map according to confidence, the sorted map will be stored in orderedMaps
+     * @param topCount only topCount of maps are stored
+     */
     void sortByConfidence(size_t topCount);
 
     void addNodeDirectly(TopoNode *);
@@ -48,7 +50,12 @@ public:
 
     JSobj toJS() const;
 
-    JSobj toJSWithSortedMaps();
+    /**
+     * turn the map collection into a JSON obj
+     * @param mapCount the count of map you would like to save (0 == whole)
+     * @return the JS obj
+     */
+    JSobj toJSWithSortedMaps(size_t mapCount = 0);
 
     void clear();
 

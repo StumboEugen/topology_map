@@ -42,11 +42,14 @@ void MapCollection::everyMapThroughGate(gateId exit) {
     }
 }
 
-JSobj MapCollection::toJSWithSortedMaps() {
+JSobj MapCollection::toJSWithSortedMaps(size_t mapCount) {
     JSobj obj;
-    sortByConfidence();
-    for (const auto & mapIns: orderedMaps) {
-        obj.append(mapIns->toJS());
+    if (mapCount == 0 || mapCount > maps.size()) {
+        mapCount = maps.size();
+    }
+    sortByConfidence(mapCount);
+    for (int i = 0; i < mapCount; i++) {
+        obj.append(orderedMaps[i]->toJS());
     }
     return std::move(obj);
 }
@@ -95,10 +98,6 @@ void MapCollection::addEdgeDirectly(TopoEdge * edge) {
     (*maps.begin())->addEdgeDirectly(edge);
 }
 
-void MapCollection::sortByConfidence() {
-    sortByConfidence(maps.size());
-}
-
 void MapCollection::sortByConfidence(size_t topCount) {
     size_t experience = parent->getNodeCollection().experienceSize();
     auto comp = [experience](MapCandidate * a, MapCandidate * b){
@@ -108,7 +107,9 @@ void MapCollection::sortByConfidence(size_t topCount) {
     orderedMaps.reserve(maps.size());
     orderedMaps.assign(maps.size(), nullptr);
     copy(maps.begin(), maps.end(), orderedMaps.begin());
-    topCount = min(maps.size(), topCount);
+    if (topCount == 0 || topCount > maps.size()) {
+        topCount = maps.size();
+    }
     partial_sort(orderedMaps.begin(), orderedMaps.begin() + topCount, orderedMaps.end(), comp);
 }
 
@@ -127,7 +128,7 @@ void MapCollection::purgeBadMaps(int survival) {
         delete map2delete;
     }
 
-    orderedMaps.erase(orderedMaps.begin() + survival, orderedMaps.end()); //TODO
+    orderedMaps.erase(orderedMaps.begin() + survival, orderedMaps.end());
 }
 
 MapCollection::MapCollection(MapArranger *parent)
