@@ -15,6 +15,7 @@
 #include "ui_dockreadmap.h"
 #include "ui_dockbuildmap.h"
 #include "ui_docksimulation.h"
+#include "ui_dockrealtime.h"
 #include "topo/Topo.h"
 
 #include "TopoMapGView.h"
@@ -42,7 +43,8 @@ TopoUI::TopoUI(QWidget *parent) :
     uiMain(new Ui::TopoUI),
     uiDockReadMap(new Ui::DockReadMapUI),
     uiDockBuildMap(new Ui::DockBuildMapUI),
-    uiDockSimulation(new Ui::DockSimulationUI)
+    uiDockSimulation(new Ui::DockSimulationUI),
+    uiDockRealTime(new Ui::DockRealTimeUI)
 {
     bigBrother = this;
 
@@ -50,16 +52,23 @@ TopoUI::TopoUI(QWidget *parent) :
     setWindowTitle("TOPO Simulator");
 
     modeGroup = new QActionGroup(this);
+
     mode_READ = modeGroup->addAction("read file mode");
     mode_BUILD = modeGroup->addAction("build map mode");
     mode_SIMULATION = modeGroup->addAction("simulation mode");
+    mode_REALTIME = modeGroup->addAction("realtime mode");
+
     mode_READ->setCheckable(true);
     mode_BUILD->setCheckable(true);
     mode_SIMULATION->setCheckable(true);
+    mode_REALTIME->setCheckable(true);
+
     mode_READ->setChecked(true);
+
     uiMain->mainToolBar->addAction(mode_READ);
     uiMain->mainToolBar->addAction(mode_BUILD);
     uiMain->mainToolBar->addAction(mode_SIMULATION);
+    uiMain->mainToolBar->addAction(mode_REALTIME);
     uiMain->mainToolBar->addSeparator();
 
     QAction * dragMode = new QAction("Drag Mode", uiMain->mainToolBar);
@@ -111,7 +120,9 @@ TopoUI::TopoUI(QWidget *parent) :
 
     centerLayout->addLayout(smallWindowLayout);
 
+
     setDockNestingEnabled(true);
+
     dockReadMap = initTheDock("DockReadMap");
     uiDockReadMap->setupUi(dockReadMap);
     QRegExp regx("[0-9]+$");
@@ -135,11 +146,16 @@ TopoUI::TopoUI(QWidget *parent) :
     addDockWidget(Qt::LeftDockWidgetArea, dockSimulation);
     dockSimulation->setShown(false);
 
+    dockRealTime = initTheDock("DockRealTime");
+    uiDockRealTime->setupUi(dockRealTime);
+    addDockWidget(Qt::LeftDockWidgetArea, dockRealTime);
+    dockRealTime->setShown(false);
+
     connect(uiDockReadMap->btnInputMap, SIGNAL(clicked())
             , this, SLOT(loadReadingMap()));
 
     connect(uiDockReadMap->cmboMapCandidate, SIGNAL(currentIndexChanged(int))
-            , this, SLOT(displayTheActivitedMap(int)));
+            , this, SLOT(displayCandidateFromReading(int)));
 
     connect(uiDockReadMap->btnJump2Map, SIGNAL(clicked())
             , this, SLOT(jump2ReadingMapIndex()));
@@ -185,6 +201,12 @@ TopoUI::TopoUI(QWidget *parent) :
 
     connect(uiDockReadMap->cbMoveNode, SIGNAL(toggled(bool))
             , this, SLOT(changeNodeMovable(bool)));
+
+    connect(uiDockRealTime->btnGetRealTimeMap, SIGNAL(clicked())
+            , this, SLOT(askForRealTimeMap()));
+
+    connect(uiDockRealTime->cbCandidates, SIGNAL(currentIndexChanged(int))
+            , this, SLOT(displayCandidateFromRealTime(int)));
 }
 
 TopoUI::~TopoUI()
@@ -251,7 +273,7 @@ void TopoUI::loadReadingMap() {
     }
 }
 
-void TopoUI::displayTheActivitedMap(int index) {
+void TopoUI::displayCandidateFromReading(int index) {
 
     if (index < 0 || index >= comboBoxMaps.size()) {
         return;
@@ -400,6 +422,7 @@ void TopoUI::changeMode(QAction * action) {
     dockBuildMap->setShown(false);
     dockReadMap->setShown(false);
     dockSimulation->setShown(false);
+    dockRealTime->setShown(false);
 
     infoView->clear();
 
@@ -427,6 +450,16 @@ void TopoUI::changeMode(QAction * action) {
         cout << "switch to simulation mode" << endl;
         CURRENT_MODE = SIMULATION_MODE;
         dockSimulation->setShown(true);
+        if (lastAction != mode_BUILD) {
+            cleanTableView();
+        }
+    }
+
+    if (action == mode_REALTIME) {
+        cout << "switch to simulation mode" << endl;
+        CURRENT_MODE = SIMULATION_MODE;
+        dockRealTime->setShown(true);
+        cleanTableView();
     }
 }
 
@@ -721,7 +754,7 @@ void TopoUI::initROS() {
 
 void TopoUI::changeNodeMovable(bool movable) {
     if (CURRENT_MODE == READ_MODE) {
-        displayTheActivitedMap(uiDockReadMap->cmboMapCandidate->currentIndex());
+        displayCandidateFromReading(uiDockReadMap->cmboMapCandidate->currentIndex());
     }
     for (auto & item : mapGView->scene()->items()) {
         if (auto nodeItem = dynamic_cast<QNode*>(item)) {
@@ -743,6 +776,50 @@ void TopoUI::jump2ReadingMapIndex() {
         return;
     }
     uiDockReadMap->cmboMapCandidate->setCurrentIndex(index);
+}
+
+void TopoUI::askForRealTimeMap() {
+    if (!checkROS()) {
+        setMsg("Please connect to ROS first");
+    }
+
+    auto mapNeeded = uiDockRealTime->sbMapNeeded->text().toUInt();
+    topology_map::GetMapsRequest request;
+    topology_map::GetMapsResponse response;
+    request.requiredMaps = static_cast<unsigned short>(mapNeeded);
+    if (srvC_askMaps.call(request, response)) {
+        appendMsg("real time map loaded success");
+
+        uiDockRealTime->cbCandidates->clear();
+
+        mapFromRealTime.readFromStr(response.mapJS);
+
+        int mapCounts = 0;
+        for (auto mapCand : mapFromRealTime.getMapCollection().getOrderedMaps()) {
+            double confidence = mapCand->getConfidence(
+                                        mapFromRealTime.getNodeCollection().experienceSize());
+            QString comboInfo = QString("#%1 Confidence:%2")
+                    .arg(mapCounts++)
+                    .arg(confidence);
+            uiDockRealTime->cbCandidates->addItem(comboInfo);
+        }
+    } else {
+        appendMsg("service call fail");
+    }
+}
+
+void TopoUI::displayCandidateFromRealTime(int index) {
+    if (index < 0) {
+        return;
+    }
+
+    cleanTableView();
+    const auto & maps = mapFromRealTime.getMapCollection().getOrderedMaps();
+    if (index >= maps.size()) {
+        return;
+    }
+
+    displayMapAtMapGV(*maps[index], true, true, false);
 }
 
 

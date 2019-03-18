@@ -100,6 +100,7 @@ void NodeCollection::clear() {
             delete node;
         }
     }
+    experiences.clear();
     nodeSets.clear();
 }
 

@@ -32,6 +32,11 @@ public:
         return maps;
     }
 
+    const std::vector<MapCandidate *> & getOrderedMaps() {
+        sortByConfidence(0);
+        return orderedMaps;
+    }
+
     MapCandidate * getTheFirstMap() const {
         return maps.begin().operator*();
     }

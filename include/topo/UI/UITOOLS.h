@@ -17,6 +17,7 @@ enum UIMode {
     READ_MODE,
     BUILD_MODE,
     SIMULATION_MODE,
+    REALTIME_MODE,
 };
 
 #endif //TOPOLOGY_MAP_UITOOLS_H

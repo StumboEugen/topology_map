@@ -30,6 +30,7 @@ namespace Ui {
     class DockReadMapUI;
     class DockBuildMapUI;
     class DockSimulationUI;
+    class DockRealTimeUI;
 }
 
 class TopoUI : public QMainWindow
@@ -50,6 +51,7 @@ private:
     QAction * mode_READ;
     QAction * mode_BUILD;
     QAction * mode_SIMULATION;
+    QAction * mode_REALTIME;
 
     QAction * qactConnectToROS;
 
@@ -63,6 +65,7 @@ private:
 
     MapArranger mapFromReading;
     MapArranger mapFromBuilding;
+    MapArranger mapFromRealTime;
 
     QHBoxLayout * centerLayout;
 
@@ -86,6 +89,9 @@ private:
     Ui::DockSimulationUI * uiDockSimulation;
     QDockWidget * dockSimulation;
 
+    Ui::DockRealTimeUI * uiDockRealTime;
+    QDockWidget * dockRealTime;
+
     void cleanTableView();
     void cleanReadDock();
 
@@ -100,7 +106,7 @@ private:
 
 private Q_SLOTS:
     void loadReadingMap();
-    void displayTheActivitedMap(int);
+    void displayCandidateFromReading(int);
     void jump2ReadingMapIndex();
     void onQGI_NodeLeftClicked(QNode *);
     void onQGI_NodeRightClicked(QNode *);
@@ -115,6 +121,8 @@ private Q_SLOTS:
     void loadBuiltMap();
     void initROS();
     void changeNodeMovable(bool);
+    void askForRealTimeMap();
+    void displayCandidateFromRealTime(int);
 };
 
 #endif // TOPOUI_H

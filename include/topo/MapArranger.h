@@ -36,7 +36,7 @@ public:
         return nodeCollection;
     }
 
-    const MapCollection &getMapCollection() const {
+    MapCollection & getMapCollection() {
         return mapCollection;
     }
 
