@@ -61,9 +61,9 @@ public:
     /**
      * compare two nodes if it IS ALIKE
      * @param rnode
-     * @return is it alike
+     * @return -1: unlike  other: the serial ID difference, 1: the serial of this need to +1
      */
-    bool alike (const NodeInstance&) const;
+    int alike(const NodeInstance &) const;
 
     // TODO slove the problem of switch between gateID and ExitPos
 

@@ -110,8 +110,12 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
         TopoNode * shouldToNode = currentEdge->getAnotherNode(currentNode);
         /**if we used to move on this edge, the arrival situation should remain the same
          * otherwise it is a confilct, this candidate is wrong*/
-        if (instance->alike(*shouldToNode->getInsCorrespond())
-            && arriveAt == currentEdge->getAnotherGate(currentNode)) {
+
+        /// sth like 1, 359 may happen
+        int diff = instance->alike(*shouldToNode->getInsCorrespond());
+        arriveAt += diff;
+        arriveAt %= instance->sizeOfExits();
+        if (diff != -1 && arriveAt == currentEdge->getAnotherGate(currentNode)) {
             currentEdge->leaveFromNode(currentNode);
             confidence *= currentEdge->addOdomData(dis_x, dis_y, yaw, currentNode);
             currentNode = shouldToNode;

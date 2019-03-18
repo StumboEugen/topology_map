@@ -7,6 +7,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include <tuple>
 
 #include "NodeCollection.h"
 #include "NodeInstance.h"
@@ -39,7 +40,9 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
     experiences.push_back(newIns);
 
     vector<MapCandidate *> newMaps;
-    map< NodeInstance*, vector<pair<MapCandidate *, TopoNode*>>> loopDetected;
+
+    /// alike xxx instance, with useage of xxx map at xxx node with xxx diff
+    map< NodeInstance*, vector<tuple<MapCandidate *, TopoNode*, int>>> loopDetected;
     /**find data group we need to check*/
     auto & nodeSet = nodeSets[newIns->sizeOfExits()];
     auto iter = nodeSet.begin();
@@ -49,11 +52,13 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
         } else {
             auto & nodeInstance = *iter;
             /**they are alike! check the useage in map, if it is propriate*/
-            if (nodeInstance->alike(*newIns)) {
+            int diff = newIns->alike(*nodeInstance);
+            if (diff >= 0) {
                 for (auto & useage : nodeInstance->getNodeUseages()) {
                     MapCandidate * relatedMap = useage.first;
                     if (!relatedMap->isJustMovedOnKnownEdge()) {
-                        loopDetected[nodeInstance].emplace_back(relatedMap, useage.second);
+                        loopDetected[nodeInstance].emplace_back(
+                                relatedMap, useage.second, diff);
                     }
                 }
             }
@@ -64,14 +69,19 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
     /// do the arrive at similiar task at here, because earlier the ins useages will be polluted
     for (auto & alikeInsPair: loopDetected) {
         auto & alikeIns = alikeInsPair.first;
-        double travelDis = newIns->getTravelDis() - alikeIns->getTravelDis();
-        double error = topo::calDis(
-                alikeIns->getGlobalX() - newIns->getGlobalX(),
-                alikeIns->getGlobalY() - newIns->getGlobalY());
-        double stdError = error / travelDis;
-        double fixCoe = exp(-0.5 * stdError * stdError / convDistPerMeter);
-        for (auto & loopCondition : alikeInsPair.second) {
-            auto newMap = loopCondition.first->arriveAtSimiliar(loopCondition.second, arriveAt);
+
+//        double travelDis = newIns->getTravelDis() - alikeIns->getTravelDis();
+//        double error = topo::calDis(
+//                alikeIns->getGlobalX() - newIns->getGlobalX(),
+//                alikeIns->getGlobalY() - newIns->getGlobalY());
+//        double stdError = error / travelDis;
+//        double fixCoe = exp(-0.5 * stdError * stdError / convDistPerMeter);
+
+        for (auto & loopTuple : alikeInsPair.second) {
+            auto modifiedExitNum = static_cast<uint8_t>(arriveAt + get<2>(loopTuple));
+            modifiedExitNum %= newIns->sizeOfExits();
+            auto newMap = get<0>(loopTuple)
+                    ->arriveAtSimiliar(get<1>(loopTuple), modifiedExitNum);
             if (newMap != nullptr) {
 //                newMap->xConfidence(fixCoe); //TODO
                 newMaps.push_back(newMap);

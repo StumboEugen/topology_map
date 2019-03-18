@@ -21,22 +21,22 @@ public:
 
     explicit ExitInstance(double posx, double posy, double dir);
 
-    // the exit outward direction(NOTHING to do with the instance) ENU
+    /// the exit outward direction(NOTHING to do with the instance) ENU
     const double & getOutDir() const {
         return outDir;
     }
 
-    // relative coor to the mid of the instance, ENU
+    /// relative coor to the mid of the instance, ENU
     const double & getPosX() const {
         return midPosX;
     }
 
-    // relative coor to the mid of the instance, ENU
+    /// relative coor to the mid of the instance, ENU
     const double & getPosY() const {
         return midPosY;
     }
 
-    // the dir of the vector(mid to exit) ENU (NORTH = 0/360)
+    /// the dir of the vector(mid to exit) ENU (NORTH = 0/360)
     const double & getMidRad() const {
         return midRad;
     }
