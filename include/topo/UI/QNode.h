@@ -16,7 +16,8 @@
 
 class QEdge;
 
-class QNode : public QGraphicsItem {
+class QNode : public QGraphicsItem  {
+
 public:
     explicit QNode(TopoNode * node);
 
@@ -39,6 +40,11 @@ public:
         QNode::drawDetail = drawDetail;
     }
 
+    void setRealTimeMode(bool realTimeMode) {
+        QNode::realTimeMode = realTimeMode;
+        setAcceptHoverEvents(realTimeMode);
+    }
+
     int type() const override;
 
     void setQEdge(int index, QEdge * edge);
@@ -57,9 +63,18 @@ public:
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+
 private:
     TopoNode * relatedNodeTOPO;
     bool drawDetail = false;
+
+    bool realTimeMode = false;
+    int currentExitHoverOn = -1;
 
     /// in degree clock wise
     double rotation = 0.0;

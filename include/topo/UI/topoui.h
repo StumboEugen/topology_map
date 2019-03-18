@@ -44,6 +44,8 @@ public:
     void appendMsg(const QString & msg);
     void setMsg(const QString & msg);
 
+    void realTimeMode_sendMoveCmd(int);
+
 private:
 
     Ui::TopoUI *uiMain;

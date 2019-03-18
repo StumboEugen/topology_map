@@ -457,7 +457,7 @@ void TopoUI::changeMode(QAction * action) {
 
     if (action == mode_REALTIME) {
         cout << "switch to simulation mode" << endl;
-        CURRENT_MODE = SIMULATION_MODE;
+        CURRENT_MODE = REALTIME_MODE;
         dockRealTime->setShown(true);
         cleanTableView();
     }
@@ -644,6 +644,13 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw,
         if (curNode == robotPlace and drawRobot) {
             auto Qrobot = new QRobot(curQNode);
             mapScene.addItem(Qrobot);
+            if (CURRENT_MODE == REALTIME_MODE) {
+                nodeScene.clear();
+                auto nodeForCmd = new QNode(curNode);
+                nodeForCmd->setRealTimeMode(true);
+                nodeForCmd->setDrawDetail(true);
+                nodeScene.addItem(nodeForCmd);
+            }
         }
 
         //look into every edge
@@ -820,6 +827,10 @@ void TopoUI::displayCandidateFromRealTime(int index) {
     }
 
     displayMapAtMapGV(*maps[index], true, true, false);
+}
+
+void TopoUI::realTimeMode_sendMoveCmd(int) {
+    cout << "Send cmd!" << endl;
 }
 
 

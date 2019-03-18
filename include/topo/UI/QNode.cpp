@@ -8,6 +8,7 @@
 #include <QColor>
 #include <QDebug>
 #include <QStyleOptionGraphicsItem>
+#include <QGraphicsSceneHoverEvent>
 
 #include "UITOOLS.h"
 #include "topoui.h"
@@ -39,6 +40,13 @@ QNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget 
             QPointF exitGatePoint{exit.getPosX() * METER_TO_PIXLE,
                                   -exit.getPosY() * METER_TO_PIXLE};
             painter->drawLine({0,0}, exitGatePoint);
+
+            if (realTimeMode && currentExitHoverOn == i) {
+                painter->save();
+                painter->setBrush(Qt::gray);
+                painter->drawEllipse(posOfExitInItem(i), 5, 5);
+                painter->restore();
+            }
 //            painter->rotate(-rotation);
             painter->drawText(exitGatePoint, QString::number(i));
 //            painter->rotate(rotation);
@@ -153,4 +161,29 @@ QNode *QNode::getQNodeAtExit(int index) {
 void QNode::setRotation(double angle) {
     QGraphicsItem::setRotation(angle);
     rotation = angle;
+}
+
+void QNode::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+    QGraphicsItem::hoverMoveEvent(event);
+    auto thisTime = whichExitIsAtPos(event->pos());
+    if (thisTime != currentExitHoverOn) {
+        currentExitHoverOn = thisTime;
+        update();
+    }
+}
+
+void QNode::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
+    QGraphicsItem::hoverLeaveEvent(event);
+    currentExitHoverOn = -1;
+    update();
+}
+
+void QNode::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+    QGraphicsItem::mousePressEvent(event);
+    if (event->button() == Qt::MouseButton::RightButton) {
+        const auto exit = whichExitIsAtPos(event->pos());
+        if (exit != -1) {
+            bigBrother->realTimeMode_sendMoveCmd(exit);
+        }
+    }
 }
