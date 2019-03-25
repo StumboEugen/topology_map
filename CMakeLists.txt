@@ -177,6 +177,9 @@ add_library(jsonCpp ${JsonFILES})
 add_executable(main src/main.cpp src/MapROSNode.hpp)
 add_executable(TopoUI src/UI_main.cpp)
 add_executable(FakeOB src/FakeOB.cpp)
+add_executable(localController
+    src/grounding/localController.cpp
+    src/grounding/localController.h)
 
 target_link_libraries(topoLayer jsonCpp)
 target_link_libraries(topoLayer_UI topoLayer)
@@ -198,6 +201,7 @@ target_link_libraries(FakeOB topoLayer)
 target_link_libraries(main ${catkin_LIBRARIES})
 target_link_libraries(TopoUI ${catkin_LIBRARIES} ${QT_LIBRARIES})
 target_link_libraries(FakeOB ${catkin_LIBRARIES})
+target_link_libraries(localController ${catkin_LIBRARIES})
 
 add_dependencies(topoLayer jsonCpp)
 add_dependencies(topoLayer_UI topoLayer)
@@ -206,6 +210,7 @@ add_dependencies(TopoUI topoLayer_UI)
 add_dependencies(topoLayer ${PROJECT_NAME}_gencpp)
 add_dependencies(main ${PROJECT_NAME}_gencpp)
 add_dependencies(FakeOB ${PROJECT_NAME}_gencpp)
+add_dependencies(localController ${PROJECT_NAME}_gencpp)
 
 #############
 ## Install ##

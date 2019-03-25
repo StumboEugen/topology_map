@@ -261,11 +261,12 @@ if __name__ == "__main__":
                 x0 = int(ans[0, 0] * r1 + ans[0, 1] * r2)
                 y0 = int(ans[1, 0] * r1 + ans[1, 1] * r2)
 
+                imageExtract.nodePosX = x0
+                imageExtract.nodePosY = y0
+
                 if abs(x0 - sizex / 2) <= sizex / 4 and abs(y0 - sizey / 2) <= sizey / 4:
                     rings = exractTopoStructor(img2v, x0, y0)
 
-                    imageExtract.nodePosX = x0
-                    imageExtract.nodePosY = y0
                     imageExtract.exitDirs = rings
 
                     if isShowingResult:
@@ -284,6 +285,7 @@ if __name__ == "__main__":
 
                 pub_imageInfo.publish(imageExtract)
 
+            # strange situation
             else:
                 print(linesExracted)
 
