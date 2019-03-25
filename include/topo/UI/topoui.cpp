@@ -417,7 +417,6 @@ void TopoUI::changeMode(QAction * action) {
     if (action == lastAction) {
         return;
     }
-    lastAction = action;
 
     dockBuildMap->setShown(false);
     dockReadMap->setShown(false);
@@ -461,6 +460,8 @@ void TopoUI::changeMode(QAction * action) {
         dockRealTime->setShown(true);
         cleanTableView();
     }
+
+    lastAction = action;
 }
 
 void TopoUI::setMapGViewDragMode(bool isDrag) {
