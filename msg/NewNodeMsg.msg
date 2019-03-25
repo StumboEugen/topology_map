@@ -4,6 +4,7 @@ uint16 arriveAt
 float32 odomX
 float32 odomY
 float32 odomYaw
+float32 odomDist
 float32[] midPosXs
 float32[] midPosYs
 float32[] outDirs

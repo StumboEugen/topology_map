@@ -3,8 +3,10 @@
 #include "topo/Topo.h"
 
 #include <topology_map/NewNodeMsg.h>
+#include <topology_map/LeaveNode.h>
 #include <std_msgs/UInt8.h>
 #include <std_msgs/String.h>
+#include <devel/include/topology_map/LeaveNode.h>
 
 void wait4Key(const string &info) {
     cout << "wait for key:" << info << "..." << endl;
@@ -21,7 +23,7 @@ int main(int argc, char **argv)
 
     ros::Publisher nodeInfo_pub = n.advertise<topology_map::NewNodeMsg>(
             TOPO_STD_TOPIC_NAME_NODEINFO, 0);
-    ros::Publisher gateMove_pub = n.advertise<std_msgs::UInt8>(
+    ros::Publisher gateMove_pub = n.advertise<topology_map::LeaveNode>(
             TOPO_STD_TOPIC_NAME_GATEMOVE, 0);
 
     sleep(1); // this line is necessary, without it, the publish might be lost
@@ -35,8 +37,8 @@ int main(int argc, char **argv)
     instance0->addExit(0, 1, 0);
     instance0->completeAdding();
     auto nodeMsg = instance0->encode2ROSmsg(0, 0, 0, 0);
-    std_msgs::UInt8 tempGate;
-    tempGate.data = 0;
+    topology_map::LeaveNode tempGate;
+    tempGate.leaveGate = 0;
     wait4Key("1n");
     nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
@@ -48,7 +50,7 @@ int main(int argc, char **argv)
     instance1->addExit(0, -1, 180);
     instance1->completeAdding();
     nodeMsg = instance1->encode2ROSmsg(1, 0, 10, 0);
-    tempGate.data = 0;
+    tempGate.leaveGate = 0;
     wait4Key("2n");
     nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
@@ -60,7 +62,7 @@ int main(int argc, char **argv)
     instance2->addExit(0, -1, 180);
     instance2->completeAdding();
     nodeMsg = instance2->encode2ROSmsg(0, 10, 0, 0);
-    tempGate.data = 1;
+    tempGate.leaveGate = 1;
     wait4Key("3n");
     nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
@@ -72,7 +74,7 @@ int main(int argc, char **argv)
     instance3->addExit(0, 1, 0);
     instance3->completeAdding();
     nodeMsg = instance3->encode2ROSmsg(1, 0, -10, 0);
-    tempGate.data = 0;
+    tempGate.leaveGate = 0;
     wait4Key("4n");
     nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
@@ -84,7 +86,7 @@ int main(int argc, char **argv)
     instance4->addExit(0, 1, 0);
     instance4->completeAdding();
     nodeMsg = instance4->encode2ROSmsg(1, -10, 0, 0);
-    tempGate.data = 0;
+    tempGate.leaveGate = 0;
     wait4Key("5n");
     nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();
@@ -96,7 +98,7 @@ int main(int argc, char **argv)
     instance5->addExit(0, -1, 180);
     instance5->completeAdding();
     nodeMsg = instance5->encode2ROSmsg(1, 0, 10, 0);
-    tempGate.data = 0;
+    tempGate.leaveGate = 0;
     wait4Key("6n");
     nodeInfo_pub.publish(nodeMsg);
     loop_rate.sleep();

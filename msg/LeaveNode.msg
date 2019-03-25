@@ -1,0 +1,2 @@
+float32 leaveDir
+uint16 leaveGate

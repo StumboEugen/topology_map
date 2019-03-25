@@ -12,6 +12,7 @@
 #include "ros/ros.h"
 
 #include <topology_map/NewNodeMsg.h>
+#include <topology_map/LeaveNode.h>
 #include <topology_map/SaveMap.h>
 #include <topology_map/GetMaps.h>
 #include <std_msgs/UInt8.h>
@@ -44,7 +45,7 @@ private:
     void rosNodeInit();
 
     void cbNewNode(const topology_map::NewNodeMsg &);
-    void cbThroughGate(std_msgs::UInt8);
+    void cbThroughGate(const topology_map::LeaveNode &);
     bool srvSaveMap(topology_map::SaveMap::Request &, topology_map::SaveMap::Response &);
     bool srvGetMap(topology_map::GetMaps::Request &, topology_map::GetMaps::Response &);
 };
@@ -76,8 +77,8 @@ void MapROSNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
 //    }
 }
 
-void MapROSNode::cbThroughGate(std_msgs::UInt8 leaveGate) {
-    mapGroup.moveThroughGate(leaveGate.data);
+void MapROSNode::cbThroughGate(const topology_map::LeaveNode & leaveGate) {
+    mapGroup.moveThroughGate(static_cast<gateId>(leaveGate.leaveGate));
     if (mapGroup.experienceNum() == 6) {
         cout << mapGroup.getMapNumbers() << endl;
     }

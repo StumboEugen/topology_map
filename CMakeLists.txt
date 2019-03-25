@@ -60,6 +60,7 @@ find_package(Boost
 add_message_files(
     FILES
     NewNodeMsg.msg
+    LeaveNode.msg
 )
 # add_message_files(
 #   FILES

@@ -32,6 +32,7 @@
 #include <std_msgs/UInt8.h>
 #include <random>
 #include <ctime>
+#include <devel/include/topology_map/LeaveNode.h>
 
 using namespace std;
 
@@ -354,10 +355,13 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
 
                         /// send gate through msg
                         if (checkROS()) {
-                            std_msgs::UInt8 tempGate;
-                            tempGate.data = QEdgeMoved->getRelatedEdgeTOPO()
+                            topology_map::LeaveNode nodeLeavingMsg;
+                            nodeLeavingMsg.leaveGate = QEdgeMoved->getRelatedEdgeTOPO()
                                     ->getAnotherGate(clickedNode->getRelatedNodeTOPO());
-                            pub_gateMove.publish(tempGate);
+                            nodeLeavingMsg.leaveDir = (float)nodeWithRobot->getRelatedNodeTOPO()
+                                            ->getInsCorrespond()->getExits()
+                                            .at(nodeLeavingMsg.leaveGate).getMidRad();
+                            pub_gateMove.publish(nodeLeavingMsg);
                         }
 
                         if (uiDockSimulation->cbNodeMoveDirectly->isChecked()) {
@@ -755,7 +759,7 @@ void TopoUI::initROS() {
 
     pub_nodeInfo = n.advertise<topology_map::NewNodeMsg>(
             TOPO_STD_TOPIC_NAME_NODEINFO, 0);
-    pub_gateMove = n.advertise<std_msgs::UInt8>(
+    pub_gateMove = n.advertise<topology_map::LeaveNode>(
             TOPO_STD_TOPIC_NAME_GATEMOVE, 0);
     srvC_askMaps = n.serviceClient<topology_map::GetMaps>(TOPO_STD_SERVICE_NAME_GETMAPS);
 }
