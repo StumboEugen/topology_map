@@ -61,6 +61,7 @@ add_message_files(
     FILES
     NewNodeMsg.msg
     LeaveNode.msg
+    ImageExract.msg
 )
 # add_message_files(
 #   FILES

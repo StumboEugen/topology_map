@@ -39,6 +39,7 @@ static const double piTwo = 3.1415926 * 2.0;
 
 #define TOPO_STD_TOPIC_NAME_NODEINFO "topo/ArriveAtNewNode"
 #define TOPO_STD_TOPIC_NAME_GATEMOVE "topo/LeaveFromNode"
+#define TOPO_STD_TOPIC_NAME_CVINFO "topo/cvInfo"
 #define TOPO_STD_SERVICE_NAME_SAVEMAP "topoSrv/SaveMap"
 #define TOPO_STD_SERVICE_NAME_GETMAPS "topoSrv/GetMaps"
 

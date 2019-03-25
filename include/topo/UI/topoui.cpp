@@ -32,7 +32,7 @@
 #include <std_msgs/UInt8.h>
 #include <random>
 #include <ctime>
-#include <devel/include/topology_map/LeaveNode.h>
+#include <topology_map/LeaveNode.h>
 
 using namespace std;
 

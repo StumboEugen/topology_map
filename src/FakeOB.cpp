@@ -6,7 +6,6 @@
 #include <topology_map/LeaveNode.h>
 #include <std_msgs/UInt8.h>
 #include <std_msgs/String.h>
-#include <devel/include/topology_map/LeaveNode.h>
 
 void wait4Key(const string &info) {
     cout << "wait for key:" << info << "..." << endl;
