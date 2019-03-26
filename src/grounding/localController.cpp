@@ -12,6 +12,8 @@
 
 using namespace std;
 
+bool testMode = true;
+
 int main(int argc, char **argv) {
 
     ros::init(argc, argv, "localController");
@@ -27,26 +29,28 @@ int main(int argc, char **argv) {
     pub_newNode = n.advertise<topology_map::NewNodeMsg>(TOPO_STD_TOPIC_NAME_NODEINFO, 1);
 
     /// take off
-    while (automony_status != 1) {
-        ROSSLEEP(1);
-        ROS_INFO_THROTTLE(2, "[TAKE OFF] waitting for OFFBOARD");
-        ros::spinOnce();
+    if (!testMode) {
+        while (automony_status != 1) {
+            ROSSLEEP(1);
+            ROS_INFO_THROTTLE(2, "[TAKE OFF] waitting for OFFBOARD");
+            ros::spinOnce();
+        }
+
+        px4_autonomy::Takeoff cmd_tf;
+        cmd_tf.take_off = 1;
+        cmd_tf.header.stamp = ros::Time::now();
+        pub_takeOff.publish(cmd_tf);
+
+        while (automony_status != 5) {
+            ROSSLEEP(0.2);
+            ROS_INFO_THROTTLE(2, "[TAKE OFF] taking off...");
+            ros::spinOnce();
+        }
+
+        posCmd.yaw = curPose.yaw;
+
+        move2Z(curiseHeight);
     }
-
-    px4_autonomy::Takeoff cmd_tf;
-    cmd_tf.take_off = 1;
-    cmd_tf.header.stamp = ros::Time::now();
-    pub_takeOff.publish(cmd_tf);
-
-    while (automony_status != 5) {
-        ROSSLEEP(0.2);
-        ROS_INFO_THROTTLE(2, "[TAKE OFF] taking off...");
-        ros::spinOnce();
-    }
-
-    posCmd.yaw = curPose.yaw;
-
-    move2Z(curiseHeight);
 
     ros::Rate rate(RFRATE);
 
@@ -59,7 +63,12 @@ int main(int argc, char **argv) {
             case MODE_ON_EDGE:
 
                 if (imageInfo.nodePosX != -1) {
-                    // TODO CHECK IF THE CROSS IS AT THE MOVING DIR
+                    float thOfNode = atan2f(
+                            imageInfo.nodePosY - (-imageInfo.imageSizeY / 2.0f),
+                            imageInfo.nodePosX - imageInfo.imageSizeX / 2.0f);
+                    if (fabsf(thOfNode - curMovingDIR) > piHalf) {
+                        mode = MODE_ARRIVING_NODE;
+                    }
                 }
 
                 findTheLineAndGiveSP();
@@ -79,13 +88,13 @@ int main(int argc, char **argv) {
 
                     cerr << "NO CROSS NODE DETECTED AT AIMMING MODE!" << endl;
 
-//                    static int errorCount = 0;
-//                    errorCount++;
-//                    if (errorCount >= 3) {
-//                        cerr << "NO CROSS NODE DETECTED AT AIMMING MODE! throw!" << endl;
+                    static int errorCount = 0;
+                    errorCount++;
+                    if (errorCount >= 3) {
+                        cerr << "NO CROSS NODE DETECTED AT AIMMING MODE! throw!" << endl;
 //                        stayAtSP();
 //                        exit(0);
-//                    }
+                    }
                 }
 
                 float aimErrx = imageInfo.nodePosX - midInImgx;

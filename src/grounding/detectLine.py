@@ -219,7 +219,8 @@ if __name__ == "__main__":
                     else:
                         beginType = 0
 
-                    x = xb, y = yb
+                    x = xb
+                    y = yb
                     for i in range(lineDevideC / 4, lineDevideC * 3 / 4):
                         x, y = getiDevided(float(i) / lineDevideC, edgePoints)
                         if img2v[y][x] != beginType:
