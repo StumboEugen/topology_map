@@ -50,8 +50,12 @@ int main(int argc, char **argv) {
         posCmd.yaw = curPose.yaw;
 
         move2Z(curiseHeight);
+    } else {
+        m2px = m2pxPerMeterInZ * 0.5;
+        midInImgx = 320;
+        midInImgy = -240;
     }
-
+        
     ros::Rate rate(RFRATE);
 
     while (ros::ok()) {
@@ -62,11 +66,15 @@ int main(int argc, char **argv) {
 
             case MODE_ON_EDGE:
 
+                cout << "\nat mode: MODE_ON_EDGE" << endl;
+
                 if (imageInfo.nodePosX != -1) {
                     float thOfNode = atan2f(
-                            imageInfo.nodePosY - (-imageInfo.imageSizeY / 2.0f),
-                            imageInfo.nodePosX - imageInfo.imageSizeX / 2.0f);
-                    if (fabsf(thOfNode - curMovingDIR) > piHalf) {
+                            imageInfo.nodePosY - midInImgy,
+                            imageInfo.nodePosX - midInImgx);
+                    cout << "the node dir is " << thOfNode << endl;
+                    if (fabsf(thOfNode - curMovingDIR) < piHalf) { //TODO
+                        cerr << "find a node in the front! we are landing!!" << endl;
                         mode = MODE_ARRIVING_NODE;
                     }
                 }
@@ -76,6 +84,8 @@ int main(int argc, char **argv) {
                 break;
             case MODE_ARRIVING_NODE:
 
+                cout << "\nat mode: MODE_ARRIVING_NODE" << endl;
+
                 findTheLineAndGiveSP();
 
                 if (!imageInfo.exitDirs.empty()) {
@@ -84,6 +94,9 @@ int main(int argc, char **argv) {
 
                 break;
             case MODE_AIMMING_AT_NODE: {
+
+                cout << "\nat mode: MODE_AIMMING_AT_NODE" << endl;
+
                 if (imageInfo.exitDirs.empty()) {
 
                     cerr << "NO CROSS NODE DETECTED AT AIMMING MODE!" << endl;
@@ -95,18 +108,32 @@ int main(int argc, char **argv) {
 //                        stayAtSP();
 //                        exit(0);
                     }
+
+                    break;
                 }
 
                 float aimErrx = imageInfo.nodePosX - midInImgx;
                 float aimErry = imageInfo.nodePosY - midInImgy;
-                float aimErrinMeter = sqrtf(aimErrx * aimErrx + aimErry * aimErry) / m2px;
+                float aimErrinPx = sqrtf(aimErrx * aimErrx + aimErry * aimErry);
+
+                float aimErrinMeter = aimErrinPx / m2px;
+
                 float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw;
 
                 if (aimErrinMeter < XY_TOLLERANCE) {
+                    if (testMode) {
+                        cout << "aimming good!" << endl;
+                    }
                     static int aimC = 0;
                     aimC ++;
                     if (aimC > 5) {
                         cout << "aimming good more than 5 times!" << endl;
+                        if (testMode) {
+                            cout << "[testMode] change to leaving mode" << endl;
+                            mode = MODE_LEAVING_NODE;
+                        }
+                    } else {
+                        aimC = 0;
                     }
                 }
 
@@ -126,16 +153,23 @@ int main(int argc, char **argv) {
 
             case MODE_LEAVING_NODE:
 
+                cout << "\nat mode: MODE_LEAVING_NODE" << endl;
+
                 findTheLineAndGiveSP();
 
-                if (imageInfo.nodePosX != -1) {
+                if (imageInfo.exitDirs.empty()) {
+                    cout << "we can't see the node info, we have left" << endl;
                     mode = MODE_ON_EDGE;
                 }
 
                 break;
         }
 
-        rate.sleep();
+        if (testMode) {
+            ROSSLEEP(1);
+        } else {
+            rate.sleep();
+        }
     }
 }
 
@@ -222,7 +256,7 @@ void findTheLineAndGiveSP() {
         th += pi;
     }
 
-    float errorInMeterInThDIR = (rh - cosf(th) * midInImgx + sinf(th) * midInImgy) / m2px;
+    float errorInMeterInThDIR = (rh - cosf(th) * midInImgx - sinf(th) * midInImgy) / m2px;
     float corErr = errorInMeterInThDIR * 0.5f;
     corErr = min(corErr, XY_INC_MIN);
     corErr = max(corErr, -XY_INC_MIN);
