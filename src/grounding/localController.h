@@ -31,6 +31,8 @@ const static float RFRATE = 10; // hz
 
 const static float curiseHeight = 0.6;
 
+const static float m2pxPerMeterInZ = 666;
+
 const static float Z_INC_MAX = 0.3;
 const static float Z_INC_MIN = 0.1;
 const static float Z_TOLLERANCE = 0.1;
@@ -48,17 +50,28 @@ ros::Publisher pub_newNode;
 TopoLocalControllerMode mode = MODE_AIMMING_AT_NODE;
 
 int automony_status = 0;
+
+/// ENU N is 0, -pi ~ pi clockwise
 px4_autonomy::Position curPose;
+
+/// ENU N is 0, -pi ~ pi clockwise
 vec3f_t curSP;
+px4_autonomy::Position posCmd;
+
+/// image coor, right x, down y, rh th is in ENU
 topology_map::ImageExract imageInfo;
 
-///in RAD, NED
 float curMovingDIR;
+float midInImgx;
+float midInImgy;
+float m2px;
 
 void cb_px4Pose(const px4_autonomy::Position &);
 void cb_status(const std_msgs::UInt8 &);
 void cb_image(const topology_map::ImageExract &);
 void cb_gateMove(const topology_map::LeaveNode &);
+
+void findTheLineAndGiveSP();
 
 void move2Z(float targetZ) {
 
@@ -71,38 +84,30 @@ void move2Z(float targetZ) {
         curSP.z = curPose.z + slopeCal(curiseHeight - curPose.z,
                                        Z_TOLLERANCE, Z_SAFEDIS,
                                        Z_INC_MIN, Z_INC_MAX);
-        pub_spPose.publish(curSP.toPosCmd());
+        curSP.loadXYZ2POS(posCmd);
+        pub_spPose.publish(posCmd);
         rate.sleep();
         ros::spinOnce();
     }
     curSP.z = targetZ;
-    pub_spPose.publish(curSP.toPosCmd());
+    curSP.loadXYZ2POS(posCmd);
+    pub_spPose.publish(posCmd);
 }
 
 void stayAtSP(double ms = 0.0) {
-    pub_spPose.publish(curSP.toPosCmd());
+    curSP.loadXYZ2POS(posCmd);
+    pub_spPose.publish(posCmd);
     ROSSLEEP(ms);
     ros::spinOnce();
 }
 
-float fixRadFromImg(float radFromImage) {
-    radFromImage += piHalf;
-    if (radFromImage > piTwo) {
-        radFromImage -= piTwo;
+void fixRad2nppi(float & target) {
+    if (target > pi) {
+        target -= piTwo;
     }
-    if (radFromImage < 0) {
-        radFromImage += piTwo;
+    else if (target < -pi) {
+        target += piTwo;
     }
-    return radFromImage;
-}
-
-float fixRadFromImg(const vec3f_t & vecInImg) {
-
-}
-
-vec3f_t coorChangeFromImg(vec3f_t vec3f) {
-    vec3f.y *= -1;
-    return vec3f;
 }
 
 #endif //TOPOLOGY_MAP_LOCALCONTROLLER_H

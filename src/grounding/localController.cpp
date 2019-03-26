@@ -44,11 +44,15 @@ int main(int argc, char **argv) {
         ros::spinOnce();
     }
 
+    posCmd.yaw = curPose.yaw;
+
     move2Z(curiseHeight);
 
     ros::Rate rate(RFRATE);
 
     while (ros::ok()) {
+
+        ros::spinOnce();
 
         switch (mode) {
 
@@ -58,36 +62,62 @@ int main(int argc, char **argv) {
                     // TODO CHECK IF THE CROSS IS AT THE MOVING DIR
                 }
 
-                //TODO give the sp to follow line
+                findTheLineAndGiveSP();
 
                 break;
             case MODE_ARRIVING_NODE:
 
-                //TODO give the sp to follow line
+                findTheLineAndGiveSP();
 
                 if (!imageInfo.exitDirs.empty()) {
                     mode = MODE_AIMMING_AT_NODE;
                 }
 
                 break;
-            case MODE_AIMMING_AT_NODE:
+            case MODE_AIMMING_AT_NODE: {
                 if (imageInfo.exitDirs.empty()) {
-                    static int errorCount = 0;
-                    errorCount++;
-                    if (errorCount >= 3) {
-                        cerr << "NO CROSS NODE DETECTED AT AIMMING MODE! throw!" << endl;
-                        exit(0);
+
+                    cerr << "NO CROSS NODE DETECTED AT AIMMING MODE!" << endl;
+
+//                    static int errorCount = 0;
+//                    errorCount++;
+//                    if (errorCount >= 3) {
+//                        cerr << "NO CROSS NODE DETECTED AT AIMMING MODE! throw!" << endl;
+//                        stayAtSP();
+//                        exit(0);
+//                    }
+                }
+
+                float aimErrx = imageInfo.nodePosX - midInImgx;
+                float aimErry = imageInfo.nodePosY - midInImgy;
+                float aimErrinMeter = sqrtf(aimErrx * aimErrx + aimErry * aimErry) / m2px;
+                float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw;
+
+                if (aimErrinMeter < XY_TOLLERANCE) {
+                    static int aimC = 0;
+                    aimC ++;
+                    if (aimC > 5) {
+                        cout << "aimming good more than 5 times!" << endl;
                     }
                 }
 
-                //TODO AIMMING WORK
+                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0, XY_INC_MIN);
 
-                //TODO if aimming good, send the topo structor
+                float aimCorrx = aimCorr * cosf(aimErrTh);
+                float aimCorry = aimCorr * sinf(aimErrTh);
+
+                posCmd.x = curPose.x + aimCorrx;
+                posCmd.y = curPose.y + aimCorry;
+                posCmd.z = curiseHeight;
+
+                pub_spPose.publish(posCmd);
 
                 break;
+            }
+
             case MODE_LEAVING_NODE:
 
-                //TODO give the sp to follow line
+                findTheLineAndGiveSP();
 
                 if (imageInfo.nodePosX != -1) {
                     mode = MODE_ON_EDGE;
@@ -106,15 +136,102 @@ void cb_status(const std_msgs::UInt8 & msg) {
 
 void cb_px4Pose(const px4_autonomy::Position & msg) {
     curPose = msg;
+    m2px = curPose.z * m2pxPerMeterInZ;
+    float correctionX = tan(curPose.roll) * m2px;
+    float correctionY = -tan(curPose.pitch) * m2px;
+    midInImgx = imageInfo.imageSizeX / 2.0f + correctionX;
+    midInImgy = -imageInfo.imageSizeY / 2.0f + correctionY;
 }
 
 void cb_image(const topology_map::ImageExract & msg) {
     imageInfo = msg;
+    imageInfo.nodePosY *= -1;
+    for (int i = 0; i < imageInfo.ths.size(); i++) {
+        imageInfo.ths[i] *= -1;
+        fixRad2nppi(imageInfo.ths[i]);
+    }
 }
 
 void cb_gateMove(const topology_map::LeaveNode &msg) {
     if (mode == MODE_AIMMING_AT_NODE) {
         mode = MODE_LEAVING_NODE;
-        curMovingDIR = msg.leaveDir;
+        curMovingDIR = static_cast<float>(piHalf - msg.leaveDir);
+        fixRad2nppi(curMovingDIR);
     }
+}
+
+void findTheLineAndGiveSP() {
+
+    cerr << "[findTheLineAndGiveSP] into find line and give SP" << endl;
+
+    /// pick the line most close to the dir
+    float th = imageInfo.ths.front();
+    float rh = imageInfo.rhs.front();
+    float thux = cosf(th);
+    float thuy = sinf(th);
+    float dirInLocal = curMovingDIR - curPose.yaw;
+    float dirux = cosf(dirInLocal);
+    float diruy = sinf(dirInLocal);
+    float dot = fabsf(thux * dirux + thuy * diruy);
+    for (int i = 1; i < imageInfo.ths.size(); i++) {
+        float ath = imageInfo.ths[i];
+        float athux = cosf(ath);
+        float athuy = sinf(ath);
+        float adot = fabsf(dirux * athux + diruy * athuy);
+        if (adot < dot) {
+            dot = adot;
+            th = ath;
+            rh = imageInfo.rhs[i];
+        }
+    }
+    cerr << "[findTheLineAndGiveSP] following line is: th = " << th << "; rh = " << rh << endl;
+
+    /// find the dir cloest to the desire dir
+    float ldir = th;
+    ldir += piHalf;
+    float ldirux = cosf(ldir);
+    float ldiruy = sinf(ldir);
+    float dotld = ldirux * dirux + ldiruy * diruy;
+    if (dotld < 0) {
+        ldir += pi;
+    }
+    fixRad2nppi(ldir);
+    cerr << "[findTheLineAndGiveSP] I think the dir is: " << ldir << endl;
+
+    ldir += curPose.yaw;
+
+    float mainIncx = XY_INC_MAX * cosf(ldir);
+    float mainIncy = XY_INC_MAX * sinf(ldir);
+    cerr << "[findTheLineAndGiveSP] main inc: " << mainIncx << ":" << mainIncy << endl;
+
+    /// cal the correction to follow the line
+
+    cerr << "[findTheLineAndGiveSP] mid point: " << midInImgx << " : " << midInImgy << endl;
+
+    if (rh < 0) {
+        rh = -rh;
+        th += pi;
+    }
+
+    float errorInMeterInThDIR = (rh - cosf(th) * midInImgx + sinf(th) * midInImgy) / m2px;
+    float corErr = errorInMeterInThDIR * 0.5f;
+    corErr = min(corErr, XY_INC_MIN);
+    corErr = max(corErr, -XY_INC_MIN);
+
+    th += curPose.yaw;
+
+    float corErrx = cosf(th) * corErr;
+    float corErry = sinf(th) * corErr;
+
+    cerr << "[findTheLineAndGiveSP] cor err: " << corErrx << " : " << corErry << endl;
+
+    posCmd.x = curPose.x + corErrx + mainIncx;
+    posCmd.y = curPose.y + corErry + mainIncy;
+    posCmd.z = curiseHeight;
+    posCmd.yaw = 0;
+
+    cerr << "[findTheLineAndGiveSP] cur pose: " << curPose.x << " : " << curPose.y << endl;
+    cerr << "[findTheLineAndGiveSP] cur sp: " << posCmd.x << " : " << posCmd.y << endl;
+
+    pub_spPose.publish(posCmd);
 }

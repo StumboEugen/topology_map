@@ -59,13 +59,21 @@ typedef struct vec3f_s {
     }
 
     px4_autonomy::Position toPosCmd() const {
+        static uint32_t seq = 0;
         px4_autonomy::Position posCmd;
         posCmd.x = this->x;
         posCmd.y = this->y;
         posCmd.z = this->z;
-        posCmd.yaw =3.1415926 / 2.0;
+        posCmd.yaw = 3.1415926f / 2.0f;
         posCmd.header.stamp = ros::Time::now();
+        posCmd.header.seq = seq++;
         return posCmd;
+    }
+
+    void loadXYZ2POS(px4_autonomy::Position & pos) {
+        pos.x = x;
+        pos.y = y;
+        pos.z = z;
     }
 
     px4_autonomy::Velocity toVelCmd() const {
