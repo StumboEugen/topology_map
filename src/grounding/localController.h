@@ -29,9 +29,10 @@ enum TopoLocalControllerMode{
 
 const static float RFRATE = 10; // hz
 
-const static float curiseHeight = 0.6;
+const static float curiseHeight = 0.5;
 
-const static float m2pxPerMeterInZ = 666;
+/// 60 degree cam
+const static float m2pxWithUnitZ = 600;
 
 const static float Z_INC_MAX = 0.3;
 const static float Z_INC_MIN = 0.1;
@@ -63,6 +64,7 @@ topology_map::ImageExract imageInfo;
 
 float lastNodeX = 0.0f;
 float lastNodeY = 0.0f;
+bool aimComplete = false;
 
 float curMovingDIR;
 float midInImgx;

@@ -29,6 +29,12 @@ path = 'pics/'
 
 
 def getiDevided(i, twoP):
+    """
+    fuck you
+    :param i: asdf
+    :param twoP: asdf
+    :return:
+    """
     x = twoP[0][0] * i + twoP[1][0] * (1 - i)
     y = twoP[0][1] * i + twoP[1][1] * (1 - i)
     return [int(x), int(y)]
@@ -132,6 +138,7 @@ if __name__ == "__main__":
         lines = cv2.HoughLines(imgLine, 1, np.pi / 180, 50)
 
         if lines is not None:
+            # { theta : [[thetas], [rhs]] }
             lineInfos = {}
             lines1 = lines[:, 0, :]
             for pair in lines1[:]:
@@ -142,6 +149,7 @@ if __name__ == "__main__":
                 dirHasRecorded = False
                 for angle in lineInfos.keys():
 
+                    # if the th is negative with the angle, put it back and negative the rh
                     if abs(abs(angle - theta) - np.pi) < 0.3:
                         theta = angle
                         rho = -rho
@@ -149,7 +157,7 @@ if __name__ == "__main__":
                     if abs(angle - theta) < 0.3:
                         lineInfos[angle][0].append(theta)
                         lineInfos[angle][1].append(rho)
-                        dirHasRecorded = True
+                        dirHasRecorded = True  # it's not a new dir
                         break
 
                 if dirHasRecorded:
@@ -159,13 +167,10 @@ if __name__ == "__main__":
 
             linesExracted = []
             for lineSet in lineInfos.values():
+                # we just average it, which looks good
                 th = np.average(lineSet[0])
                 rh = np.average(lineSet[1])
                 linesExracted.append([th, rh])
-
-            if isD:
-                cv2.imshow('im', img2v)
-                cv2.waitKey()
 
             # one line situation
             if len(linesExracted) == 1:
@@ -257,6 +262,7 @@ if __name__ == "__main__":
                 imageExtract.rhs.append(r2)
                 imageExtract.ths.append(a2)
 
+                # xcos() + ysin() = r
                 ans = np.matrix([[np.cos(a1), np.sin(a1)], [np.cos(a2), np.sin(a2)]]).I
                 # x0 y0 is the cross point of two lines
                 x0 = int(ans[0, 0] * r1 + ans[0, 1] * r2)
@@ -265,6 +271,7 @@ if __name__ == "__main__":
                 imageExtract.nodePosX = x0
                 imageExtract.nodePosY = y0
 
+                # if the node is in the detect area 25% ~ 75%
                 if abs(x0 - sizex / 2) <= sizex / 4 and abs(y0 - sizey / 2) <= sizey / 4:
                     rings = exractTopoStructor(img2v, x0, y0)
 

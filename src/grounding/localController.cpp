@@ -12,6 +12,10 @@
 
 using namespace std;
 
+/// in test mode:
+/// HZ is 1,
+/// do not take off
+/// direct pass the aimming mode
 bool testMode = true;
 
 int main(int argc, char **argv) {
@@ -51,7 +55,7 @@ int main(int argc, char **argv) {
 
         move2Z(curiseHeight);
     } else {
-        m2px = m2pxPerMeterInZ * 0.5f;
+        m2px = m2pxWithUnitZ / 0.5f;
         midInImgx = 320;
         midInImgy = -240;
     }
@@ -105,8 +109,9 @@ int main(int argc, char **argv) {
                     static int errorCount = 0;
                     errorCount++;
                     if (errorCount >= 3) {
-                        cerr << "NO CROSS NODE DETECTED AT AIMMING MODE! throw!" << endl;
-//                        stayAtSP();
+                        ROS_FATAL_STREAM("NO CROSS NODE DETECTED AT AIMMING MODE FOR 3 times! "
+                                         "throw!");
+                        stayAtSP();
 //                        exit(0);
                     }
 
@@ -121,37 +126,8 @@ int main(int argc, char **argv) {
 
                 float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw;
 
-                if (aimErrinMeter < XY_TOLLERANCE) {
-                    if (testMode) {
-                        cout << "aimming good!" << endl;
-                    }
-                    static int aimC = 0;
-                    aimC ++;
-                    if (aimC > 5) {
-                        cout << "aimming good more than 5 times!" << endl;
-                        if (testMode) {
-                            cout << "[testMode] change to leaving mode" << endl;
-                            mode = MODE_LEAVING_NODE;
-                        }
-
-                        NodeInstance nodeInstance(false);
-                        for (const auto & th: imageInfo.exitDirs) {
-                            nodeInstance.addExit(cos(th), sin(th), th * RAD2DEG);
-                        }
-                        nodeInstance.completeAdding();
-                        auto theArrivedGate = nodeInstance.getMidDirClosestExit(-curMovingDIR);
-                        auto msg = nodeInstance.encode2ROSmsg(theArrivedGate,
-                                curPose.x - lastNodeX, curPose.y - lastNodeY, 0.0);
-                        pub_newNode.publish(msg);
-                        lastNodeY = curPose.y;
-                        lastNodeX = curPose.x;
-
-                    } else {
-                        aimC = 0;
-                    }
-                }
-
-                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0, XY_INC_MIN);
+                /// TODO  check if the coor is good in meter
+                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.25, XY_INC_MIN);
 
                 float aimCorrx = aimCorr * cosf(aimErrTh);
                 float aimCorry = aimCorr * sinf(aimErrTh);
@@ -162,10 +138,45 @@ int main(int argc, char **argv) {
 
                 pub_spPose.publish(posCmd);
 
+                /// if still aimming, check if the aim is good
+                if (aimErrinMeter < XY_TOLLERANCE && !aimComplete) {
+                    static int aimC = 0;
+                    if (testMode) {
+                        cout << "aimming good! times:" << aimC << endl;
+                    }
+                    aimC ++;
+                    if (aimC > 5) {
+                        cout << "aimming good more than 5 times!" << endl;
+                        if (testMode) {
+                            cout << "[testMode] change to leaving mode" << endl;
+                            mode = MODE_LEAVING_NODE;
+                        }
+
+                        NodeInstance nodeInstance(false);
+                        for (const auto & th: imageInfo.exitDirs) {
+                            nodeInstance.addExit(cosf(th), sinf(th), th * RAD2DEG);
+                        }
+                        nodeInstance.completeAdding();
+                        auto arrivedGateId = nodeInstance.getMidDirClosestExit(-curMovingDIR);
+                        auto newNodeMsg = nodeInstance.encode2ROSmsg(arrivedGateId,
+                                curPose.x - lastNodeX, curPose.y - lastNodeY, 0.0);
+                        pub_newNode.publish(newNodeMsg);
+                        lastNodeY = curPose.y;
+                        lastNodeX = curPose.x;
+
+                        aimComplete = true;
+
+                    } else {
+                        aimC = 0;
+                    }
+                }
+
                 break;
             }
 
             case MODE_LEAVING_NODE:
+
+                aimComplete = false;
 
                 cout << "\nat mode: MODE_LEAVING_NODE" << endl;
 
@@ -193,7 +204,7 @@ void cb_status(const std_msgs::UInt8 & msg) {
 
 void cb_px4Pose(const px4_autonomy::Position & msg) {
     curPose = msg;
-    m2px = curPose.z * m2pxPerMeterInZ;
+    m2px = m2pxWithUnitZ / curPose.z;
     float correctionX = tan(curPose.roll) * m2px;
     float correctionY = -tan(curPose.pitch) * m2px;
     midInImgx = imageInfo.imageSizeX / 2.0f + correctionX;
@@ -202,6 +213,8 @@ void cb_px4Pose(const px4_autonomy::Position & msg) {
 
 void cb_image(const topology_map::ImageExract & msg) {
     imageInfo = msg;
+
+    /// turn the coor to ENU
     imageInfo.nodePosY *= -1;
     for (int i = 0; i < imageInfo.ths.size(); i++) {
         imageInfo.ths[i] *= -1;
@@ -214,10 +227,12 @@ void cb_image(const topology_map::ImageExract & msg) {
 }
 
 void cb_gateMove(const topology_map::LeaveNode &msg) {
-    if (mode == MODE_AIMMING_AT_NODE) {
+    if (aimComplete) {
         mode = MODE_LEAVING_NODE;
         curMovingDIR = msg.leaveDir;
         fixRad2nppi(curMovingDIR);
+    } else {
+        ROS_FATAL_STREAM("\nAIMMING NOT COMPLETE\nBUT GATE MOVE ORDER SENT");
     }
 }
 
@@ -230,9 +245,11 @@ void findTheLineAndGiveSP() {
     float rh = imageInfo.rhs.front();
     float thux = cosf(th);
     float thuy = sinf(th);
-    float dirInLocal = curMovingDIR - curPose.yaw;
+    float dirInLocal = curMovingDIR - curPose.yaw; // TODO check if it's ok
     float dirux = cosf(dirInLocal);
     float diruy = sinf(dirInLocal);
+
+    /// they are vert, so dot should be as small as possible
     float dot = fabsf(thux * dirux + thuy * diruy);
     for (int i = 1; i < imageInfo.ths.size(); i++) {
         float ath = imageInfo.ths[i];
@@ -249,10 +266,12 @@ void findTheLineAndGiveSP() {
 
     /// find the dir cloest to the desire dir
     float ldir = th;
+    /// after adding pi/2, is hor not vert
     ldir += piHalf;
     float ldirux = cosf(ldir);
     float ldiruy = sinf(ldir);
     float dotld = ldirux * dirux + ldiruy * diruy;
+    /// which means that we guess wrong direction
     if (dotld < 0) {
         ldir += pi;
     }
@@ -275,21 +294,21 @@ void findTheLineAndGiveSP() {
     }
 
     float errorInMeterInThDIR = (rh - cosf(th) * midInImgx - sinf(th) * midInImgy) / m2px;
-    float corErr = errorInMeterInThDIR * 0.5f;
-    corErr = min(corErr, XY_INC_MIN);
-    corErr = max(corErr, -XY_INC_MIN);
+    /// this is PID with only P = 0.5
+    float corErrInc = errorInMeterInThDIR * 0.5f;
+    corErrInc = min(corErrInc, XY_INC_MIN);
+    corErrInc = max(corErrInc, -XY_INC_MIN);
 
     th += curPose.yaw;
 
-    float corErrx = cosf(th) * corErr;
-    float corErry = sinf(th) * corErr;
+    float corErrx = cosf(th) * corErrInc;
+    float corErry = sinf(th) * corErrInc;
 
     cerr << "[findTheLineAndGiveSP] cor err: " << corErrx << " : " << corErry << endl;
 
     posCmd.x = curPose.x + corErrx + mainIncx;
     posCmd.y = curPose.y + corErry + mainIncy;
     posCmd.z = curiseHeight;
-    posCmd.yaw = 0;
 
     cerr << "[findTheLineAndGiveSP] cur pose: " << curPose.x << " : " << curPose.y << endl;
     cerr << "[findTheLineAndGiveSP] cur sp: " << posCmd.x << " : " << posCmd.y << endl;
