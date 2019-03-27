@@ -3,7 +3,7 @@
 //
 
 /**
- * COOR: NWU
+ * COOR: ENU
  */
 
 #ifndef TOPOLOGY_MAP_TOPO_H

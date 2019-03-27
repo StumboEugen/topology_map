@@ -184,6 +184,7 @@ add_executable(localController
 target_link_libraries(topoLayer jsonCpp)
 target_link_libraries(topoLayer_UI topoLayer)
 target_link_libraries(main topoLayer)
+target_link_libraries(localController topoLayer)
 target_link_libraries(TopoUI topoLayer_UI)
 target_link_libraries(FakeOB topoLayer)
 

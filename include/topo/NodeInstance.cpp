@@ -210,6 +210,17 @@ void NodeInstance::setGlobalPos(double x, double y, double movedDis) {
 }
 
 gateId NodeInstance::getMidDirClosestExit(double midDir) {
-    return 0;
+    midDir = topo::fixRad2nppi(midDir);
+    double curDif = piTwo;
+    double curI = 0;
+    for (int i = 0; i < exits.size(); ++i) {
+        double dirDif = abs(midDir - exits[i].getMidRad());
+        dirDif = min(dirDif, piTwo - dirDif);
+        if (dirDif < curDif) {
+            curDif = dirDif;
+            curI = i;
+        }
+    }
+    return static_cast<gateId>(curI);
 }
 

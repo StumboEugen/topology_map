@@ -87,7 +87,7 @@ public:
      * @param midDir in rad
      * @return the closest exit id
      */
-    gateId getMidDirClosestExit(double midDir); //TODO
+    gateId getMidDirClosestExit(double midDir);
 
     inline const map<MapCandidate *, TopoNode *> &getNodeUseages() const {
         return nodeUseages;

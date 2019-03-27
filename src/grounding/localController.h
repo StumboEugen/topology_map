@@ -61,6 +61,9 @@ px4_autonomy::Position posCmd;
 /// image coor, right x, down y, rh th is in ENU
 topology_map::ImageExract imageInfo;
 
+float lastNodeX = 0.0f;
+float lastNodeY = 0.0f;
+
 float curMovingDIR;
 float midInImgx;
 float midInImgy;

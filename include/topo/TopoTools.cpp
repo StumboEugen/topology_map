@@ -33,3 +33,13 @@ bool topo::checkJSMember(const vector<std::string> &strs, const JSobj &js) {
 double topo::calDis(double x, double y) {
     return sqrt(x * x + y * y);
 }
+
+double topo::fixRad2nppi(double target) {
+    if (target > pi) {
+        target -= piTwo;
+    }
+    else if (target < -pi) {
+        target += piTwo;
+    }
+    return target;
+}

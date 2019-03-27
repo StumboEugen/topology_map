@@ -4,7 +4,7 @@
 
 #include "ros/ros.h"
 
-#include "topo/TopoTools.h"
+#include "topo/Topo.h"
 
 #include "localController.h"
 
@@ -133,6 +133,19 @@ int main(int argc, char **argv) {
                             cout << "[testMode] change to leaving mode" << endl;
                             mode = MODE_LEAVING_NODE;
                         }
+
+                        NodeInstance nodeInstance(false);
+                        for (const auto & th: imageInfo.exitDirs) {
+                            nodeInstance.addExit(cos(th), sin(th), th * RAD2DEG);
+                        }
+                        nodeInstance.completeAdding();
+                        auto theArrivedGate = nodeInstance.getMidDirClosestExit(-curMovingDIR);
+                        auto msg = nodeInstance.encode2ROSmsg(theArrivedGate,
+                                curPose.x - lastNodeX, curPose.y - lastNodeY, 0.0);
+                        pub_newNode.publish(msg);
+                        lastNodeY = curPose.y;
+                        lastNodeX = curPose.x;
+
                     } else {
                         aimC = 0;
                     }
@@ -193,6 +206,10 @@ void cb_image(const topology_map::ImageExract & msg) {
     for (int i = 0; i < imageInfo.ths.size(); i++) {
         imageInfo.ths[i] *= -1;
         fixRad2nppi(imageInfo.ths[i]);
+    }
+    for (auto & th: imageInfo.exitDirs) {
+        th *= -1;
+        fixRad2nppi(th);
     }
 }
 

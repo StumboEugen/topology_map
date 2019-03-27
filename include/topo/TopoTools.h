@@ -9,6 +9,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "json/json.h"
 
@@ -23,7 +24,7 @@ class ExitInstance;
 typedef Json::Value JSobj;
 
 static const double convEdgePerMeter = 0.02;
-static const double stdDevEdgePerMeter = 0.0141421356237;
+static const double stdDevEdgePerMeter = 0.1 * M_SQRT2;
 static const double stdDevEdgePerMeterOneAx = 0.1;
 static const double convEdgePerMeterOneAx = 0.01;
 /// in RAD
@@ -34,6 +35,9 @@ static const double convDistPerMeter = 0.01;
 static const double piHalf = 3.1415926 / 2.0;
 static const double pi = 3.1415926;
 static const double piTwo = 3.1415926 * 2.0;
+
+static const double DEG2RAD = pi / 180;
+static const double RAD2DEG = 180 / pi;
 
 #define TOPO_STD_FILE_SAVE_FLODER_NAME "topoMaps/"
 
@@ -47,6 +51,7 @@ namespace topo {
     const std::string getCurrentTimeString();
     bool checkJSMember(const std::vector<std::string> &strs, const JSobj &js);
     double calDis(double x, double y);
+    double fixRad2nppi(double target);
 }
 
 #endif //TOPOLOGY_MAP_TOPOTOOL_H
