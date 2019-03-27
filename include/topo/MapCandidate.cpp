@@ -149,10 +149,27 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId 
 
     auto newMap = new MapCandidate(*this);
     /**@attention change is applied on the new map, not "this" */
-    newMap->currentEdge->changeExitTo(newMap->currentNode, arriveNode->clonedTo, arriveGate);
-    //the old new node is replaced by the similiar node
+
+    /// the node that happens loop close
+    auto loopClosureNode = arriveNode->clonedTo;
+
+    /// in the new map, the edge should connect form the last node to the loop-closed node
+    newMap->currentEdge->changeExitTo(newMap->currentNode, loopClosureNode, arriveGate);
+
+    /// record the newset ins, because we are going to kill and unregister the old cur node
+    auto theLatestIns = newMap->currentNode->getTheLastRelatedIns();
+
+    /// remove the node and unregister
     newMap->removeNode(newMap->currentNode);
-    newMap->currentNode = arriveNode->clonedTo;
+
+    /// remove the last useage in the loop-closed node related ins
+    loopClosureNode->getTheLastRelatedIns()->removeUseage(this);
+
+    /// add the useage in the latest ins
+    theLatestIns->addUseage(this, loopClosureNode);
+    loopClosureNode->addNewRelatedIns(theLatestIns);
+
+    newMap->currentNode = loopClosureNode;
 
 //    auto & nodes = newMap->getNodes();
 //    auto & edges = newMap->getEdges();

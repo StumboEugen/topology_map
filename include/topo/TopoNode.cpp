@@ -6,7 +6,7 @@
 
 
 TopoNode::TopoNode(NodeInstance *const nodeInstance):
-        relatedIns(1, nodeInstance),
+        relatedInses(1, nodeInstance),
         edgeConnected(nodeInstance->sizeOfExits(), nullptr),
         tempFlags(0),
         clonedTo(nullptr)

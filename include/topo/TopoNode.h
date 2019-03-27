@@ -39,8 +39,21 @@ public:
         return edgeConnected[number];
     }
 
+    // TODO make this return an "average" ins
     NodeInstance *const getInsCorrespond() const {
-        return relatedIns[0];
+        return relatedInses[0];
+    }
+
+    NodeInstance *const getTheLastRelatedIns() const {
+        return relatedInses.back();
+    }
+
+    void addNewRelatedIns(NodeInstance * ins) {
+        relatedInses.push_back(ins);
+    }
+
+    const vector<NodeInstance *> & getRelatedInses() const {
+        return relatedInses;
     }
 
     void disconnectEdge(gateId number) {
@@ -56,7 +69,6 @@ public:
 
     JSobj toJS() const;
 
-public:
     void cleanFlags() {
         tempFlags = 0;
         assistPtr = nullptr;
@@ -87,7 +99,7 @@ public:
 
 private:
 
-    std::vector<NodeInstance *> relatedIns;
+    std::vector<NodeInstance *> relatedInses;
 
 //    ///the corresponded instance
 //    NodeInstance *const corresponding;
