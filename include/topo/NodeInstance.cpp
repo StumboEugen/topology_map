@@ -209,3 +209,7 @@ void NodeInstance::setGlobalPos(double x, double y, double movedDis) {
     travelDis = movedDis;
 }
 
+gateId NodeInstance::getMidDirClosestExit(double midDir) {
+    return 0;
+}
+

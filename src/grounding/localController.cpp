@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 
         move2Z(curiseHeight);
     } else {
-        m2px = m2pxPerMeterInZ * 0.5;
+        m2px = m2pxPerMeterInZ * 0.5f;
         midInImgx = 320;
         midInImgy = -240;
     }
@@ -73,7 +73,8 @@ int main(int argc, char **argv) {
                             imageInfo.nodePosY - midInImgy,
                             imageInfo.nodePosX - midInImgx);
                     cout << "the node dir is " << thOfNode << endl;
-                    if (fabsf(thOfNode - curMovingDIR) < piHalf) { //TODO
+                    const auto diffABS = fabsf(thOfNode - curMovingDIR);
+                    if (diffABS < piHalf || diffABS - piTwo < piHalf) {
                         cerr << "find a node in the front! we are landing!!" << endl;
                         mode = MODE_ARRIVING_NODE;
                     }
@@ -198,7 +199,7 @@ void cb_image(const topology_map::ImageExract & msg) {
 void cb_gateMove(const topology_map::LeaveNode &msg) {
     if (mode == MODE_AIMMING_AT_NODE) {
         mode = MODE_LEAVING_NODE;
-        curMovingDIR = static_cast<float>(piHalf - msg.leaveDir);
+        curMovingDIR = msg.leaveDir;
         fixRad2nppi(curMovingDIR);
     }
 }

@@ -82,6 +82,13 @@ public:
         return addComplete;
     }
 
+    /**
+     * get the cloest exit of the dir
+     * @param midDir in rad
+     * @return the closest exit id
+     */
+    gateId getMidDirClosestExit(double midDir); //TODO
+
     inline const map<MapCandidate *, TopoNode *> &getNodeUseages() const {
         return nodeUseages;
     }
@@ -133,7 +140,7 @@ private:
     const double & checkDir(double & d);
 
     static double exitRadTollerance() {
-        return 0.3;
+        return 0.5;
     }
 
     void setExtraMsg(const string &msg) {

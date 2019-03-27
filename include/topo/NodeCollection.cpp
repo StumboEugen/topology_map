@@ -70,12 +70,12 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
     for (auto & alikeInsPair: loopDetected) {
         auto & alikeIns = alikeInsPair.first;
 
-//        double travelDis = newIns->getTravelDis() - alikeIns->getTravelDis();
-//        double error = topo::calDis(
-//                alikeIns->getGlobalX() - newIns->getGlobalX(),
-//                alikeIns->getGlobalY() - newIns->getGlobalY());
-//        double stdError = error / travelDis;
-//        double fixCoe = exp(-0.5 * stdError * stdError / convDistPerMeter);
+        double travelDis = newIns->getTravelDis() - alikeIns->getTravelDis();
+        double error = topo::calDis(
+                alikeIns->getGlobalX() - newIns->getGlobalX(),
+                alikeIns->getGlobalY() - newIns->getGlobalY());
+        double stdError = error / travelDis;
+        double fixCoe = exp(-0.5 * stdError * stdError / convDistPerMeter);
 
         for (auto & loopTuple : alikeInsPair.second) {
             auto modifiedExitNum = static_cast<uint8_t>(arriveAt + get<2>(loopTuple));
@@ -83,7 +83,7 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
             auto newMap = get<0>(loopTuple)
                     ->arriveAtSimiliar(get<1>(loopTuple), modifiedExitNum);
             if (newMap != nullptr) {
-//                newMap->xConfidence(fixCoe); //TODO
+                newMap->xConfidence(fixCoe); //TODO
                 newMaps.push_back(newMap);
             }
         }
