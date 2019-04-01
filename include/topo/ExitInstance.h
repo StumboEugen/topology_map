@@ -36,7 +36,7 @@ public:
         return midPosY;
     }
 
-    /// the dir of the vector(mid to exit) in rad ENU (SENW = -90/0/90/180/270)
+    /// the dir of the vector(mid to exit) in rad ENU (SENWS = -90/0/90/180/-90)
     const double & getMidRad() const {
         return midRad;
     }

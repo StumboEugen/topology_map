@@ -165,25 +165,31 @@ void QNode::setRotation(double angle) {
 
 void QNode::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     QGraphicsItem::hoverMoveEvent(event);
-    auto thisTime = whichExitIsAtPos(event->pos());
-    if (thisTime != currentExitHoverOn) {
-        currentExitHoverOn = thisTime;
-        update();
+    if (realTimeMode) {
+        auto thisTime = whichExitIsAtPos(event->pos());
+        if (thisTime != currentExitHoverOn) {
+            currentExitHoverOn = thisTime;
+            update();
+        }
     }
 }
 
 void QNode::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     QGraphicsItem::hoverLeaveEvent(event);
-    currentExitHoverOn = -1;
-    update();
+    if (realTimeMode) {
+        currentExitHoverOn = -1;
+        update();
+    }
 }
 
 void QNode::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     QGraphicsItem::mousePressEvent(event);
-    if (event->button() == Qt::MouseButton::RightButton) {
-        const auto exit = whichExitIsAtPos(event->pos());
-        if (exit != -1) {
-            bigBrother->realTimeMode_sendMoveCmd(exit);
+    if (realTimeMode) {
+        if (event->button() == Qt::MouseButton::RightButton) {
+            const auto exit = whichExitIsAtPos(event->pos());
+            if (exit != -1) {
+                bigBrother->realTimeMode_sendMoveCmd(exit);
+            }
         }
     }
 }

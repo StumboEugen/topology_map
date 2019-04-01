@@ -646,9 +646,9 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw,
         auto * curQNode = static_cast<QNode*>(curNode->getAssistPtr());
         QPointF curPos = curQNode->pos();
 
-        if (curNode == robotPlace and drawRobot) {
-            auto Qrobot = new QRobot(curQNode);
-            mapScene.addItem(Qrobot);
+        if (curNode == robotPlace && drawRobot) {
+            robot = new QRobot(curQNode);
+            mapScene.addItem(robot);
             if (CURRENT_MODE == REALTIME_MODE) {
                 nodeScene.clear();
                 auto nodeForCmd = new QNode(curNode);
@@ -793,6 +793,7 @@ void TopoUI::jump2ReadingMapIndex() {
 void TopoUI::askForRealTimeMap() {
     if (!checkROS()) {
         setMsg("Please connect to ROS first");
+        return;
     }
 
     auto mapNeeded = uiDockRealTime->sbMapNeeded->text().toUInt();
@@ -834,8 +835,25 @@ void TopoUI::displayCandidateFromRealTime(int index) {
     displayMapAtMapGV(*maps[index], true, true, false);
 }
 
-void TopoUI::realTimeMode_sendMoveCmd(int) {
-    cout << "Send cmd!" << endl;
+void TopoUI::realTimeMode_sendMoveCmd(int exit) {
+    auto currentQNode = dynamic_cast<QNode*>(robot->getCurrentAt());
+    if (currentQNode != nullptr) {
+        if (!checkROS()) {
+            appendMsg("ROS connection FAIL!");
+            return;
+        }
+
+        topology_map::LeaveNode msg;
+        msg.leaveGate = static_cast<unsigned short>(exit);
+        msg.leaveDir = (float) currentQNode->getRelatedNodeTOPO()
+                        ->getInsCorrespond()->getExits()[exit].getMidRad();
+        pub_gateMove.publish(msg);
+
+        nodeGView->scene()->clear();
+        robot->move2(currentQNode->getQEdgeAtExit(exit));
+
+        appendMsg("pub Success, wait for the next approach to ask for new map");
+    }
 }
 
 
