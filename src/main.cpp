@@ -23,6 +23,8 @@ int main(int argc, char **argv)
     
     MapROSNode mapNode;    //callbacks are in this class
 
+    cout << "mapBuilding node start!" << endl;
+
     ros::spin();
 
     /**

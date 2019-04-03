@@ -66,7 +66,7 @@ float lastNodeX = 0.0f;
 float lastNodeY = 0.0f;
 bool aimComplete = false;
 
-float curMovingDIR;
+float curMovingDIR = pi;
 float midInImgx;
 float midInImgy;
 float m2px;
@@ -106,13 +106,14 @@ void stayAtSP(double ms = 0.0) {
     ros::spinOnce();
 }
 
-void fixRad2nppi(float & target) {
+double fixRad2nppi(double target) {
     if (target > pi) {
         target -= piTwo;
     }
     else if (target < -pi) {
         target += piTwo;
     }
+    return target;
 }
 
 #endif //TOPOLOGY_MAP_LOCALCONTROLLER_H

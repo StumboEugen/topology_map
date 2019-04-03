@@ -18,9 +18,11 @@ using namespace std;
 bool testMode = true;
 
 /// false: direct pass the aimming mode
-bool waitForNewGateCmd = true;
+bool waitForNewGateCmd = false;
 
 int main(int argc, char **argv) {
+
+    cout << "test mode: " << testMode << "\n" << "waitForNewGateCmd: " << waitForNewGateCmd << endl;
 
     ros::init(argc, argv, "localController");
     ros::NodeHandle n;
@@ -81,9 +83,11 @@ int main(int argc, char **argv) {
                     float thOfNode = atan2f(
                             imageInfo.nodePosY - midInImgy,
                             imageInfo.nodePosX - midInImgx);
+                    cout << "node X" << imageInfo.nodePosX << "\t" << imageInfo.nodePosY << endl;
                     cout << "the node dir is " << thOfNode << endl;
-                    const auto diffABS = fabsf(thOfNode - curMovingDIR);
-                    if (diffABS < piHalf || diffABS - piTwo < piHalf) {
+                    const auto diffABS = fabsf(thOfNode - (curMovingDIR + curPose.yaw - piTwo)); 
+                    cout << "diff: " << diffABS << endl;
+                    if (diffABS < piHalf || fabsf(diffABS - piTwo) < piHalf) {
                         cerr << "find a node in the front! we are landing!!" << endl;
                         mode = MODE_ARRIVING_NODE;
                     }
@@ -129,7 +133,7 @@ int main(int argc, char **argv) {
 
                 float aimErrinMeter = aimErrinPx / m2px;
 
-                float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw;
+                float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw - piHalf;
 
                 /// TODO  check if the coor is good in meter
                 float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.25, XY_INC_MIN);
@@ -169,7 +173,7 @@ int main(int argc, char **argv) {
                             nodeInstance.addExit(cosf(th), sinf(th), th * RAD2DEG);
                         }
                         nodeInstance.completeAdding();
-                        auto arrivedGateId = nodeInstance.getMidDirClosestExit(-curMovingDIR);
+                        auto arrivedGateId = nodeInstance.getMidDirClosestExit(fixRad2nppi(curMovingDIR + pi));
                         auto newNodeMsg = nodeInstance.encode2ROSmsg(arrivedGateId,
                                 curPose.x - lastNodeX, curPose.y - lastNodeY, 0.0);
                         pub_newNode.publish(newNodeMsg);
@@ -218,12 +222,11 @@ void cb_px4Pose(const px4_autonomy::Position & msg) {
     m2px = m2pxWithUnitZ / curPose.z;
     float correctionX = tan(curPose.roll) * curPose.z * m2px * 0.7;
     float correctionY = -tan(curPose.pitch) * curPose.z * m2px * 0.7;
-    cout << "m2px" << m2px << endl;
-    cout << "rp:" << curPose.roll << "\t" << curPose.pitch << endl;
-    cout << "correction in cb: " << correctionX << "\t" << correctionY << endl;
+    cout << "[cb_px4Pose] m2px: " << m2px << endl;
+    cout << "[cb_px4Pose] rp: " << curPose.roll << "\t" << curPose.pitch << endl;
+    cout << "[cb_px4Pose] correction: " << correctionX << "\t" << correctionY << endl;
     midInImgx = imageInfo.imageSizeX / 2.0f + correctionX;
     midInImgy = -imageInfo.imageSizeY / 2.0f + correctionY;
-    cout << "imgMidXY" << imageInfo.imageSizeX << "\t" << imageInfo.imageSizeY << endl;
 }
 
 void cb_image(const topology_map::ImageExract & msg) {
@@ -232,20 +235,19 @@ void cb_image(const topology_map::ImageExract & msg) {
     /// turn the coor to ENU
     imageInfo.nodePosY *= -1;
     for (int i = 0; i < imageInfo.ths.size(); i++) {
-        imageInfo.ths[i] *= -1;
-        fixRad2nppi(imageInfo.ths[i]);
+        imageInfo.ths[i] = fixRad2nppi(imageInfo.ths[i] * -1.0);
     }
     for (auto & th: imageInfo.exitDirs) {
-        th *= -1;
-        fixRad2nppi(th);
+        th = fixRad2nppi(th * -1);
     }
 }
 
 void cb_gateMove(const topology_map::LeaveNode &msg) {
+    cout << "[cb_gateMove] I got the leave Dir: " << msg.leaveDir << endl;
+    cout << "[cb_gateMove] I got the leave Gate: " << msg.leaveGate << endl;
     if (aimComplete) {
         mode = MODE_LEAVING_NODE;
-        curMovingDIR = msg.leaveDir;
-        fixRad2nppi(curMovingDIR);
+        curMovingDIR = fixRad2nppi(msg.leaveDir);
     } else {
         ROS_FATAL_STREAM("\nAIMMING NOT COMPLETE\nBUT GATE MOVE ORDER SENT");
     }
@@ -253,14 +255,15 @@ void cb_gateMove(const topology_map::LeaveNode &msg) {
 
 void findTheLineAndGiveSP() {
 
-    cerr << "[findTheLineAndGiveSP] into find line and give SP" << endl;
-
     /// pick the line most close to the dir
     float th = imageInfo.ths.front();
     float rh = imageInfo.rhs.front();
     float thux = cosf(th);
     float thuy = sinf(th);
-    float dirInLocal = curMovingDIR - curPose.yaw + piHalf; // TODO check if it's ok
+    float dirInLocal = curMovingDIR - (curPose.yaw - piHalf); // TODO check if it's ok
+    cerr << "[findTheLineAndGiveSP] Yaw in global is: " << curPose.yaw << endl;
+    cerr << "[findTheLineAndGiveSP] Dir target(in global): " << curMovingDIR << endl;
+    cerr << "[findTheLineAndGiveSP] Dir target(in img): " << dirInLocal << endl;
     float dirux = cosf(dirInLocal);
     float diruy = sinf(dirInLocal);
 
@@ -277,7 +280,7 @@ void findTheLineAndGiveSP() {
             rh = imageInfo.rhs[i];
         }
     }
-    cerr << "[findTheLineAndGiveSP] following line is: th = " << th << "; rh = " << rh << endl;
+    cerr << "[findTheLineAndGiveSP] following line's th: " << th << endl;
 
     /// find the dir cloest to the desire dir
     float ldir = th;
@@ -290,10 +293,12 @@ void findTheLineAndGiveSP() {
     if (dotld < 0) {
         ldir += pi;
     }
-    fixRad2nppi(ldir);
-    cerr << "[findTheLineAndGiveSP] I think the dir is: " << ldir << endl;
+    ldir = fixRad2nppi(ldir);
+    cerr << "[findTheLineAndGiveSP] I think the dir is(in img): " << ldir << endl;
 
     ldir += curPose.yaw - piHalf;
+
+    cerr << "[findTheLineAndGiveSP] I think the dir is(in global): " << ldir << endl;
 
     float mainIncx = XY_INC_MAX * cosf(ldir);
     float mainIncy = XY_INC_MAX * sinf(ldir);
@@ -325,8 +330,7 @@ void findTheLineAndGiveSP() {
     posCmd.y = curPose.y + corErry + mainIncy;
     posCmd.z = curiseHeight;
 
-    cerr << "[findTheLineAndGiveSP] cur pose: " << curPose.x << " : " << curPose.y << endl;
-    cerr << "[findTheLineAndGiveSP] cur sp: " << posCmd.x << " : " << posCmd.y << endl;
+    cerr << "[findTheLineAndGiveSP] cur sp+++: " << corErrx + mainIncx << " : " << corErry + mainIncy << endl;
 
     pub_spPose.publish(posCmd);
 }
