@@ -254,6 +254,7 @@ MapCandidate::~MapCandidate() {
 
 JSobj MapCandidate::toJS() const {
     JSobj obj;
+    obj["edges"] = Json::nullValue;
     for (const auto & edge: edges) {
         auto edgeJS = edge->toJS();
         if (edge == currentEdge) {
@@ -285,8 +286,13 @@ void MapCandidate::removeUseages() {
 MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
                            const JSobj & JSinfo) : fullEdgeNumber(0)
 {
+    /// the built Topo Node is stored here
     std::vector<TopoNode*> nodeDict{nodeInses.size(), nullptr};
     auto & JSedges = JSinfo["edges"];
+    if (JSedges.isNull()) {
+        const auto & theOnlyNode = addNewNode(nodeInses[0]);
+        nodeDict[0] = theOnlyNode;
+    }
     for (int i = 0; i < JSedges.size(); i++) {
         auto & JSedge = JSedges[i];
 

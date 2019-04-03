@@ -84,11 +84,13 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
         return false;
     }
 
-    if (!checkJSMember({"Ea", "Eb", "Ga", "Gb", "Oa", "Ox", "Oy"},
-                       JSmaps[0]["edges"][0])) {
-        return false;
-    }
+    if (!JSmaps[0]["edges"].empty()) {
+        if (!checkJSMember({"Ea", "Eb", "Ga", "Gb", "Oa", "Ox", "Oy"},
+                           JSmaps[0]["edges"][0])) {
+            return false;
+        }
 
+    }
     /**
      * input the name
      */
