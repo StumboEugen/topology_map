@@ -15,8 +15,10 @@ using namespace std;
 /// in test mode:
 /// HZ is 1,
 /// do not take off
-/// direct pass the aimming mode
 bool testMode = true;
+
+/// false: direct pass the aimming mode
+bool waitForNewGateCmd = true;
 
 int main(int argc, char **argv) {
 
@@ -31,6 +33,9 @@ int main(int argc, char **argv) {
     pub_spPose = n.advertise<px4_autonomy::Position>("/px4/cmd_pose", 1);
     pub_takeOff = n.advertise<px4_autonomy::Takeoff>("/px4/cmd_takeOff", 1);
     pub_newNode = n.advertise<topology_map::NewNodeMsg>(TOPO_STD_TOPIC_NAME_NODEINFO, 1);
+
+    ROSSLEEP(0.5);
+    ros::spinOnce();
 
     /// take off
     if (!testMode) {
@@ -51,14 +56,14 @@ int main(int argc, char **argv) {
             ros::spinOnce();
         }
 
-        posCmd.yaw = curPose.yaw;
-
         move2Z(curiseHeight);
     } else {
         m2px = m2pxWithUnitZ / 0.5f;
         midInImgx = 320;
         midInImgy = -240;
     }
+
+    posCmd.yaw = curPose.yaw;
         
     ros::Rate rate(RFRATE);
 
@@ -138,16 +143,23 @@ int main(int argc, char **argv) {
 
                 pub_spPose.publish(posCmd);
 
+                cout << "[AIMMING MODE] err in px" << aimErrx << "\t" << aimErry << endl;
+                cout << "[AIMMING MODE] err in meter" << aimErrinMeter << endl;
+                cout << "[AIMMING MODE] XY_TOLLERANCE:" << XY_TOLLERANCE << endl;
+                cout << "[AIMMING MODE] cor sp +++:" << aimCorrx << "\t" << aimCorry << endl;
+
+                static int aimC = 0;
                 /// if still aimming, check if the aim is good
                 if (aimErrinMeter < XY_TOLLERANCE && !aimComplete) {
-                    static int aimC = 0;
+                    
                     if (testMode) {
                         cout << "aimming good! times:" << aimC << endl;
                     }
                     aimC ++;
                     if (aimC > 5) {
+                        aimC = 0;
                         cout << "aimming good more than 5 times!" << endl;
-                        if (testMode) {
+                        if (!waitForNewGateCmd) {
                             cout << "[testMode] change to leaving mode" << endl;
                             mode = MODE_LEAVING_NODE;
                         }
@@ -165,10 +177,9 @@ int main(int argc, char **argv) {
                         lastNodeX = curPose.x;
 
                         aimComplete = true;
-
-                    } else {
-                        aimC = 0;
                     }
+                } else {
+                    aimC = 0;
                 }
 
                 break;
@@ -205,10 +216,14 @@ void cb_status(const std_msgs::UInt8 & msg) {
 void cb_px4Pose(const px4_autonomy::Position & msg) {
     curPose = msg;
     m2px = m2pxWithUnitZ / curPose.z;
-    float correctionX = tan(curPose.roll) * m2px;
-    float correctionY = -tan(curPose.pitch) * m2px;
+    float correctionX = tan(curPose.roll) * curPose.z * m2px * 0.7;
+    float correctionY = -tan(curPose.pitch) * curPose.z * m2px * 0.7;
+    cout << "m2px" << m2px << endl;
+    cout << "rp:" << curPose.roll << "\t" << curPose.pitch << endl;
+    cout << "correction in cb: " << correctionX << "\t" << correctionY << endl;
     midInImgx = imageInfo.imageSizeX / 2.0f + correctionX;
     midInImgy = -imageInfo.imageSizeY / 2.0f + correctionY;
+    cout << "imgMidXY" << imageInfo.imageSizeX << "\t" << imageInfo.imageSizeY << endl;
 }
 
 void cb_image(const topology_map::ImageExract & msg) {
@@ -245,7 +260,7 @@ void findTheLineAndGiveSP() {
     float rh = imageInfo.rhs.front();
     float thux = cosf(th);
     float thuy = sinf(th);
-    float dirInLocal = curMovingDIR - curPose.yaw; // TODO check if it's ok
+    float dirInLocal = curMovingDIR - curPose.yaw + piHalf; // TODO check if it's ok
     float dirux = cosf(dirInLocal);
     float diruy = sinf(dirInLocal);
 
@@ -278,7 +293,7 @@ void findTheLineAndGiveSP() {
     fixRad2nppi(ldir);
     cerr << "[findTheLineAndGiveSP] I think the dir is: " << ldir << endl;
 
-    ldir += curPose.yaw;
+    ldir += curPose.yaw - piHalf;
 
     float mainIncx = XY_INC_MAX * cosf(ldir);
     float mainIncy = XY_INC_MAX * sinf(ldir);

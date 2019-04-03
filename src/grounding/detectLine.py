@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     rospy.init_node('lineDetecter')
 
-    pub_imageInfo = rospy.Publisher("topo/cvInfo", ImageExract)
+    pub_imageInfo = rospy.Publisher("topo/cvInfo", ImageExract, queue_size = 0)
 
     rate = rospy.Rate(10)
 
@@ -101,6 +101,9 @@ if __name__ == "__main__":
         ret, imgori = cap.read()
         sizex = imgori.shape[1]
         sizey = imgori.shape[0]
+
+        imageExtract.imageSizeX = sizex
+        imageExtract.imageSizeY = sizey
 
         lowbd = np.array([110, 175, 110])
         highbd = np.array([255, 255, 255])
