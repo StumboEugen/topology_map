@@ -56,12 +56,16 @@ public:
 
     int inputMap(MapArranger &mapGroup);
 
+    void setSpliter(const string & spliter) {
+        TopoFile::spliter = spliter;
+    }
+
     int close();
 
     virtual ~TopoFile();
 
 private:
-//    std::string spliter = ",";
+    std::string spliter = "";
     std::string filePath;
     std::fstream fs;
 

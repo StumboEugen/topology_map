@@ -163,10 +163,10 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId 
     newMap->removeNode(newMap->currentNode);
 
     /// remove the last useage in the loop-closed node related ins
-    loopClosureNode->getTheLastRelatedIns()->removeUseage(this);
+    loopClosureNode->getTheLastRelatedIns()->removeUseage(newMap);
 
     /// add the useage in the latest ins
-    theLatestIns->addUseage(this, loopClosureNode);
+    theLatestIns->addUseage(newMap, loopClosureNode);
     loopClosureNode->addNewRelatedIns(theLatestIns);
 
     newMap->currentNode = loopClosureNode;

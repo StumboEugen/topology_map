@@ -47,9 +47,10 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
     auto & nodeSet = nodeSets[newIns->sizeOfExits()];
     auto iter = nodeSet.begin();
     while (iter != nodeSet.end()) {
-        if ((*iter)->haveNoUseages()) {
-            iter = nodeSet.erase(iter);
-        } else {
+        /// 20190408 no useages node ins is still required in the experiences
+//        if ((*iter)->haveNoUseages()) {
+//            iter = nodeSet.erase(iter);
+//        } else {
             auto & nodeInstance = *iter;
             /**they are alike! check the useage in map, if it is propriate*/
             int diff = newIns->alike(*nodeInstance);
@@ -63,7 +64,7 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
                 }
             }
             iter++;
-        }
+//        }
     }
 
     /// do the arrive at similiar task at here, because earlier the ins useages will be polluted

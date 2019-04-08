@@ -89,6 +89,7 @@ bool MapROSNode::srvSaveMap(topology_map::SaveMap::Request &req,
                          topology_map::SaveMap::Response &res) {
     TopoFile topoFile(mapGroup.getMapName());
     topoFile.open();
+    topoFile.setSpliter("\t");
     mapGroup.sortByConfidence();
     topoFile.outputMap(mapGroup);
     res.fileName = mapGroup.getMapName();

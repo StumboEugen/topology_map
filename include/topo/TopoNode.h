@@ -41,7 +41,7 @@ public:
 
     // TODO make this return an "average" ins
     NodeInstance *const getInsCorrespond() const {
-        return relatedInses[0];
+        return relatedInses.back();
     }
 
     NodeInstance *const getTheLastRelatedIns() const {

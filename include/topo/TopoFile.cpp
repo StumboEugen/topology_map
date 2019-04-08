@@ -117,7 +117,7 @@ int TopoFile::outputMap(MapArranger & mapGroup) {
     }
     Json::StreamWriterBuilder builder;
     builder["precision"] = 4;
-    builder["indentation"] = "";
+    builder["indentation"] = spliter;
     auto writer(builder.newStreamWriter());
     writer->write(mapGroup.toJS(), &fs);
     fs << endl;

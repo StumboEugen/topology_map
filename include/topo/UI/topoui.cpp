@@ -50,7 +50,7 @@ TopoUI::TopoUI(QWidget *parent) :
     bigBrother = this;
 
     uiMain->setupUi(this);
-    setWindowTitle("TOPO Simulator");
+    setWindowTitle("TOPO Viewer");
 
     modeGroup = new QActionGroup(this);
 
@@ -256,6 +256,8 @@ void TopoUI::loadReadingMap() {
         cout << "UI load map successful" << endl;
 
         setMsg("Total maps: " + QString::number(mapFromReading.getMapNumbers()) );
+
+        mapFromReading.sortByConfidence();
 
         int mapCounts = 0;
 
