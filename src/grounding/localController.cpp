@@ -15,10 +15,10 @@ using namespace std;
 /// in test mode:
 /// HZ is 1,
 /// do not take off
-bool testMode = true;
+bool testMode = false;
 
 /// false: direct pass the aimming mode
-bool waitForNewGateCmd = false;
+bool waitForNewGateCmd = true;
 
 int main(int argc, char **argv) {
 
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     ros::Subscriber sub_gateMove = n.subscribe(TOPO_STD_TOPIC_NAME_GATEMOVE, 1, cb_gateMove);
 
     pub_spPose = n.advertise<px4_autonomy::Position>("/px4/cmd_pose", 1);
-    pub_takeOff = n.advertise<px4_autonomy::Takeoff>("/px4/cmd_takeOff", 1);
+    pub_takeOff = n.advertise<px4_autonomy::Takeoff>("/px4/cmd_takeoff", 1);
     pub_newNode = n.advertise<topology_map::NewNodeMsg>(TOPO_STD_TOPIC_NAME_NODEINFO, 1);
 
     ROSSLEEP(0.5);
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
                             imageInfo.nodePosX - midInImgx);
                     cout << "node X" << imageInfo.nodePosX << "\t" << imageInfo.nodePosY << endl;
                     cout << "the node dir is " << thOfNode << endl;
-                    const auto diffABS = fabsf(thOfNode - (curMovingDIR + curPose.yaw - piTwo)); 
+                    const auto diffABS = fabsf(thOfNode - (curMovingDIR + curPose.yaw - piHalf)); 
                     cout << "diff: " << diffABS << endl;
                     if (diffABS < piHalf || fabsf(diffABS - piTwo) < piHalf) {
                         cerr << "find a node in the front! we are landing!!" << endl;
@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
 
                 static int aimC = 0;
                 /// if still aimming, check if the aim is good
-                if (aimErrinMeter < XY_TOLLERANCE && !aimComplete) {
+                if (aimErrinMeter < 0.15 && !aimComplete) {
                     
                     if (testMode) {
                         cout << "aimming good! times:" << aimC << endl;
@@ -319,7 +319,7 @@ void findTheLineAndGiveSP() {
     corErrInc = min(corErrInc, XY_INC_MIN);
     corErrInc = max(corErrInc, -XY_INC_MIN);
 
-    th += curPose.yaw;
+    th += curPose.yaw - piHalf;
 
     float corErrx = cosf(th) * corErrInc;
     float corErry = sinf(th) * corErrInc;
