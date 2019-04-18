@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
 
                 cout << "\nat mode: MODE_AIMMING_AT_NODE" << endl;
 
-                if (imageInfo.exitDirs.empty()) {
+                if (imageInfo.nodePosX < 0) {
 
                     cerr << "NO CROSS NODE DETECTED AT AIMMING MODE!" << endl;
 
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
                 float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw - piHalf;
 
                 /// TODO  check if the coor is good in meter
-                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.05, XY_INC_MIN);
+                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.0, 0.05);
 
                 float aimCorrx = aimCorr * cosf(aimErrTh);
                 float aimCorry = aimCorr * sinf(aimErrTh);
@@ -155,7 +155,8 @@ int main(int argc, char **argv) {
 
                 static int aimC = 0;
                 /// if still aimming, check if the aim is good
-                if (aimErrinMeter < 0.15 && !aimComplete) {
+                if (aimErrinMeter < XY_TOLLERANCE && !aimComplete
+                    && !imageInfo.exitDirs.empty()) {
                     
                     if (testMode) {
                         cout << "aimming good! times:" << aimC << endl;
@@ -221,8 +222,8 @@ void cb_status(const std_msgs::UInt8 & msg) {
 void cb_px4Pose(const px4_autonomy::Position & msg) {
     curPose = msg;
     m2px = m2pxWithUnitZ / curPose.z;
-    float correctionX = tan(curPose.roll) * curPose.z * m2px * 0.7;
-    float correctionY = -tan(curPose.pitch) * curPose.z * m2px * 0.7;
+    float correctionX = tan(curPose.roll) * curPose.z * m2px * 0.7f;
+    float correctionY = -tan(curPose.pitch) * curPose.z * m2px * 0.7f;
     cout << "[cb_px4Pose] m2px: " << m2px << endl;
     cout << "[cb_px4Pose] rp: " << curPose.roll << "\t" << curPose.pitch << endl;
     cout << "[cb_px4Pose] correction: " << correctionX << "\t" << correctionY << endl;
@@ -301,8 +302,8 @@ void findTheLineAndGiveSP() {
 
     cerr << "[findTheLineAndGiveSP] I think the dir is(in global): " << ldir << endl;
 
-    float mainIncx = XY_INC_MAX * cosf(ldir);
-    float mainIncy = XY_INC_MAX * sinf(ldir);
+    float mainIncx = XY_INC_MIN * cosf(ldir);
+    float mainIncy = XY_INC_MIN * sinf(ldir);
     cerr << "[findTheLineAndGiveSP] main inc: " << mainIncx << ":" << mainIncy << endl;
 
     /// cal the correction to follow the line
@@ -319,6 +320,7 @@ void findTheLineAndGiveSP() {
     float corErrInc = errorInMeterInThDIR * 0.5f;
     corErrInc = min(corErrInc, XY_INC_MIN);
     corErrInc = max(corErrInc, -XY_INC_MIN);
+    corErrInc *= 0.4;
 
     th += curPose.yaw - piHalf;
 
