@@ -858,4 +858,39 @@ void TopoUI::realTimeMode_sendMoveCmd(int exit) {
     }
 }
 
+void TopoUI::keyPressEvent(QKeyEvent *event) {
+    QWidget::keyPressEvent(event);
+
+    if (CURRENT_MODE == REALTIME_MODE && (event->modifiers() & Qt::ControlModifier)) {
+        switch (event->key()) {
+            case Qt::Key_R:
+                uiDockRealTime->btnGetRealTimeMap->click();
+                break;
+
+            case Qt::Key_0:
+                realTimeMode_sendMoveCmd(0);
+                break;
+
+            case Qt::Key_1:
+                realTimeMode_sendMoveCmd(1);
+                break;
+
+            case Qt::Key_2:
+                realTimeMode_sendMoveCmd(2);
+                break;
+
+            case Qt::Key_3:
+                realTimeMode_sendMoveCmd(3);
+                break;
+
+            case Qt::Key_4:
+                realTimeMode_sendMoveCmd(4);
+                break;
+
+
+            default:break;
+        }
+    }
+}
+
 

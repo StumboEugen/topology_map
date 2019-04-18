@@ -46,6 +46,9 @@ public:
 
     void realTimeMode_sendMoveCmd(int);
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
 private:
 
     Ui::TopoUI *uiMain;
