@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
                 float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw - piHalf;
 
                 /// TODO  check if the coor is good in meter
-                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.25, XY_INC_MIN);
+                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.05, XY_INC_MIN);
 
                 float aimCorrx = aimCorr * cosf(aimErrTh);
                 float aimCorry = aimCorr * sinf(aimErrTh);
@@ -145,6 +145,7 @@ int main(int argc, char **argv) {
                 posCmd.y = curPose.y + aimCorry;
                 posCmd.z = curiseHeight;
 
+                posCmd.header.stamp = ros::Time::now();
                 pub_spPose.publish(posCmd);
 
                 cout << "[AIMMING MODE] err in px" << aimErrx << "\t" << aimErry << endl;
@@ -332,5 +333,6 @@ void findTheLineAndGiveSP() {
 
     cerr << "[findTheLineAndGiveSP] cur sp+++: " << corErrx + mainIncx << " : " << corErry + mainIncy << endl;
 
+    posCmd.header.stamp = ros::Time::now();
     pub_spPose.publish(posCmd);
 }
