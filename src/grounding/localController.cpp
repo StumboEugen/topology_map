@@ -58,6 +58,8 @@ int main(int argc, char **argv) {
             ros::spinOnce();
         }
 
+        ROSSLEEP(2);
+
         move2Z(curiseHeight);
     } else {
         m2px = m2pxWithUnitZ / 0.5f;
@@ -136,7 +138,7 @@ int main(int argc, char **argv) {
                 float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw - piHalf;
 
                 /// TODO  check if the coor is good in meter
-                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.0, 0.05);
+                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.02, 0.09);
 
                 float aimCorrx = aimCorr * cosf(aimErrTh);
                 float aimCorry = aimCorr * sinf(aimErrTh);
@@ -320,7 +322,7 @@ void findTheLineAndGiveSP() {
     float corErrInc = errorInMeterInThDIR * 0.5f;
     corErrInc = min(corErrInc, XY_INC_MIN);
     corErrInc = max(corErrInc, -XY_INC_MIN);
-    corErrInc *= 0.4;
+    // corErrInc *= 0.8;
 
     th += curPose.yaw - piHalf;
 

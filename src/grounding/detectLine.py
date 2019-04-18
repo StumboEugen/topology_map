@@ -128,9 +128,9 @@ if __name__ == "__main__":
             cv2.imshow('im', img2v)
             cv2.waitKey()
 
-        if isShowingResult:
-            cv2.imshow('2vMap', img2v)
-            cv2.waitKey(1)
+        # if isShowingResult:
+        #     cv2.imshow('2vMap', img2v)
+        #     cv2.waitKey(1)
 
         # detect the edge
         imgLine = cv2.Canny(img2v, 5, 200, 3)
@@ -313,11 +313,11 @@ if __name__ == "__main__":
                     y2 = int(y0 - 1000 * a)
                     cv2.line(imgori, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-                if isShowingResult:
-                    cv2.imshow('2vMap', img2v)
-                    cv2.waitKey(1)
-                    cv2.imshow('res', imgori)
-                    cv2.waitKey(1)
+                # if isShowingResult:
+                #     cv2.imshow('2vMap', img2v)
+                #     cv2.waitKey(1)
+                #     cv2.imshow('res', imgori)
+                #     cv2.waitKey(1)
 
         rate.sleep()
 

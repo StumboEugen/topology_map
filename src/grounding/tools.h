@@ -74,6 +74,7 @@ typedef struct vec3f_s {
         pos.x = x;
         pos.y = y;
         pos.z = z;
+        pos.header.stamp = ros::Time::now();
     }
 
     px4_autonomy::Velocity toVelCmd() const {

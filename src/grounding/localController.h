@@ -29,7 +29,7 @@ enum TopoLocalControllerMode{
 
 const static float RFRATE = 10; // hz
 
-const static float curiseHeight = 0.7;
+const static float curiseHeight = 0.77;
 
 /// 60 degree cam
 const static float m2pxWithUnitZ = 600;
@@ -40,7 +40,7 @@ const static float Z_TOLLERANCE = 0.1;
 const static float Z_SAFEDIS = 0.3;
 
 const static float XY_INC_MAX = 0.3;
-const static float XY_INC_MIN = 0.1;
+const static float XY_INC_MIN = 0.08;
 const static float XY_TOLLERANCE = 0.1;
 const static float XY_SAFEDIS = 0.2;
 
