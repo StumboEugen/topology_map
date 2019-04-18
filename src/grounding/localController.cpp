@@ -118,7 +118,12 @@ int main(int argc, char **argv) {
                     cerr << "NO CROSS NODE DETECTED AT AIMMING MODE!" << endl;
 
                     static int errorCount = 0;
-                    errorCount++;
+
+                    if (errorCount++ == 0) {
+                        curSP.x = curPose.x;
+                        curSP.y = curPose.y;
+                    }
+
                     if (errorCount >= 3) {
                         ROS_FATAL_STREAM("NO CROSS NODE DETECTED AT AIMMING MODE FOR 3 times! "
                                          "throw!");
@@ -138,16 +143,16 @@ int main(int argc, char **argv) {
                 float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw - piHalf;
 
                 /// TODO  check if the coor is good in meter
-                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.02, 0.09);
+                float aimCorr = slopeCal(aimErrinMeter, 0.05, 0.3, 0.02, 0.15);
 
                 float aimCorrx = aimCorr * cosf(aimErrTh);
                 float aimCorry = aimCorr * sinf(aimErrTh);
 
-                posCmd.x = curPose.x + aimCorrx;
-                posCmd.y = curPose.y + aimCorry;
-                posCmd.z = curiseHeight;
+                curSP.x = curPose.x + aimCorrx;
+                curSP.y = curPose.y + aimCorry;
+                curSP.z = curiseHeight;
 
-                posCmd.header.stamp = ros::Time::now();
+                curSP.loadXYZ2POS(posCmd);
                 pub_spPose.publish(posCmd);
 
                 cout << "[AIMMING MODE] err in px" << aimErrx << "\t" << aimErry << endl;
@@ -226,9 +231,9 @@ void cb_px4Pose(const px4_autonomy::Position & msg) {
     m2px = m2pxWithUnitZ / curPose.z;
     float correctionX = tan(curPose.roll) * curPose.z * m2px * 0.7f;
     float correctionY = -tan(curPose.pitch) * curPose.z * m2px * 0.7f;
-    cout << "[cb_px4Pose] m2px: " << m2px << endl;
-    cout << "[cb_px4Pose] rp: " << curPose.roll << "\t" << curPose.pitch << endl;
-    cout << "[cb_px4Pose] correction: " << correctionX << "\t" << correctionY << endl;
+//    cout << "[cb_px4Pose] m2px: " << m2px << endl;
+//    cout << "[cb_px4Pose] rp: " << curPose.roll << "\t" << curPose.pitch << endl;
+//    cout << "[cb_px4Pose] correction: " << correctionX << "\t" << correctionY << endl;
     midInImgx = imageInfo.imageSizeX / 2.0f + correctionX;
     midInImgy = -imageInfo.imageSizeY / 2.0f + correctionY;
 }
@@ -331,12 +336,12 @@ void findTheLineAndGiveSP() {
 
     cerr << "[findTheLineAndGiveSP] cor err: " << corErrx << " : " << corErry << endl;
 
-    posCmd.x = curPose.x + corErrx + mainIncx;
-    posCmd.y = curPose.y + corErry + mainIncy;
-    posCmd.z = curiseHeight;
+    curSP.x = curPose.x + corErrx + mainIncx;
+    curSP.y = curPose.y + corErry + mainIncy;
+    curSP.z = curiseHeight;
 
     cerr << "[findTheLineAndGiveSP] cur sp+++: " << corErrx + mainIncx << " : " << corErry + mainIncy << endl;
 
-    posCmd.header.stamp = ros::Time::now();
+    curSP.loadXYZ2POS(posCmd);
     pub_spPose.publish(posCmd);
 }

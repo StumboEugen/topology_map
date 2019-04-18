@@ -17,6 +17,7 @@
 #include "tools.h"
 
 #include <cmath>
+#include <include/topo/TopoTools.h>
 
 #define ROSSLEEP(time) ros::Duration(time).sleep()
 
@@ -52,10 +53,10 @@ TopoLocalControllerMode mode = MODE_AIMMING_AT_NODE;
 
 int automony_status = 0;
 
-/// ENU N is 0, -pi ~ pi clockwise
+/// ENU E is 0, -pi ~ pi clockwise
 px4_autonomy::Position curPose;
 
-/// ENU N is 0, -pi ~ pi clockwise
+/// ENU E is 0, -pi ~ pi clockwise
 vec3f_t curSP;
 px4_autonomy::Position posCmd;
 
@@ -100,6 +101,7 @@ void move2Z(float targetZ) {
 }
 
 void stayAtSP(double ms = 0.0) {
+    std::cout << "Stay at SP: " << curSP.x << ":" << curSP.y << std::endl;
     curSP.loadXYZ2POS(posCmd);
     pub_spPose.publish(posCmd);
     ROSSLEEP(ms);
