@@ -143,7 +143,12 @@ int main(int argc, char **argv) {
                 float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw - piHalf;
 
                 /// TODO  check if the coor is good in meter
-                float aimCorr = slopeCal(aimErrinMeter, 0.05, 0.3, 0.02, 0.15);
+                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.0, 0.1);
+
+                static float lastAimCorr;
+                float aimCorrD = lastAimCorr - aimCorr;
+                aimCorr -= aimCorrD * 0.3;
+                lastAimCorr = aimCorr;
 
                 float aimCorrx = aimCorr * cosf(aimErrTh);
                 float aimCorry = aimCorr * sinf(aimErrTh);
@@ -311,6 +316,10 @@ void findTheLineAndGiveSP() {
 
     float mainIncx = XY_INC_MIN * cosf(ldir);
     float mainIncy = XY_INC_MIN * sinf(ldir);
+    if (mode == MODE_ARRIVING_NODE) {
+        mainIncx *= 0.6;
+        mainIncy *= 0.6;
+    }
     cerr << "[findTheLineAndGiveSP] main inc: " << mainIncx << ":" << mainIncy << endl;
 
     /// cal the correction to follow the line
