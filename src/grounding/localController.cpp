@@ -143,11 +143,11 @@ int main(int argc, char **argv) {
                 float aimErrTh = atan2f(aimErry, aimErrx) + curPose.yaw - piHalf;
 
                 /// TODO  check if the coor is good in meter
-                float aimCorr = slopeCal(aimErrinMeter, 0.05, XY_SAFEDIS, 0.0, 0.1);
+                float aimCorr = slopeCal(aimErrinMeter, 0.00, 0.2, 0.0, 0.08);
 
                 static float lastAimCorr;
                 float aimCorrD = lastAimCorr - aimCorr;
-                aimCorr -= aimCorrD * 0.3;
+                aimCorr -= aimCorrD * 0.4;
                 lastAimCorr = aimCorr;
 
                 float aimCorrx = aimCorr * cosf(aimErrTh);
@@ -211,7 +211,7 @@ int main(int argc, char **argv) {
 
                 findTheLineAndGiveSP();
 
-                if (imageInfo.exitDirs.empty()) {
+                if (imageInfo.nodePosX == -1) {
                     cout << "we can't see the node info, we have left" << endl;
                     mode = MODE_ON_EDGE;
                 }
