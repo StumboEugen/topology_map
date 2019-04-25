@@ -404,6 +404,7 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
 void TopoUI::sendNodeROSmsg(QNode *clickedNode, const QEdge *edgeWithRobot, int exit) {
     auto odomInfo = edgeWithRobot->getRelatedEdgeTOPO()
             ->getOdomData(clickedNode->getQNodeAtExit(exit)->getRelatedNodeTOPO());
+    //TODO arrange this better
     if (uiDockSimulation->cbEdgeNoise->isChecked()) {
         bool pass;
         double stdErr = uiDockSimulation->
@@ -688,14 +689,14 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw,
                 auto odomData = curEdge->getOdomData(curNode);  //todo
                 QPointF dist{odomData[0], -odomData[1]};
                 //ENU is different with the UI coor
-                const auto & exitOfAnotherNode =
-                        anotherNode->getInsCorrespond()->getExits()[anotherGate];
-                QPointF disInAnotherNode{ exitOfAnotherNode.getPosX(),
-                                         -exitOfAnotherNode.getPosY()};
-                dist -= disInAnotherNode;
-                const auto & exitOfThisNode =
-                        curNode->getInsCorrespond()->getExits()[edgeNo];
-                dist += {exitOfThisNode.getPosX(), -exitOfThisNode.getPosY()};
+//                const auto & exitOfAnotherNode =
+//                        anotherNode->getInsCorrespond()->getExits()[anotherGate];
+//                QPointF disInAnotherNode{ exitOfAnotherNode.getPosX(),
+//                                         -exitOfAnotherNode.getPosY()};
+//                dist -= disInAnotherNode;
+//                const auto & exitOfThisNode =
+//                        curNode->getInsCorrespond()->getExits()[edgeNo];
+//                dist += {exitOfThisNode.getPosX(), -exitOfThisNode.getPosY()};
                 auto anotherQNode = new QNode(anotherNode);
                 anotherNode->setAssistPtr(anotherQNode);
                 anotherQNode->setPos(curPos + dist * METER_TO_PIXLE);

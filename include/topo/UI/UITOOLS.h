@@ -7,7 +7,10 @@
 
 const uint32_t INS_TYPE_SERIAL = 1074;
 
-const int METER_TO_PIXLE = 30;
+const int METER_TO_PIXLE = 120;
+const int QNODE_CIRCLE_SIZE = METER_TO_PIXLE / 4;
+const double SCALE_TIME = 1.2;
+const double SCALE_MAX = 10.0;
 
 enum UIMode {
     READ_MODE,

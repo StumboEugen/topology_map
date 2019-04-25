@@ -48,17 +48,21 @@ void TopoNodeGView::mouseMoveEvent(QMouseEvent *event) {
 void TopoNodeGView::mouseReleaseEvent(QMouseEvent *event) {
     QGraphicsView::mouseReleaseEvent(event);
 
+    //TODO ARRANGE THIS
+    // this is caused by the size problem
     if (drawingLine) {
         drawingLine = false;
         for (const auto & exit : drawingIns->getExits()) {
             QPointF point{exit.getPosX(), -exit.getPosY()};
-            point *= METER_TO_PIXLE;
-            if (QLineF{point, theDrawingLine->line().p2()}.length() < 10) {
+            QLineF line{{0,0}, point};
+            line.setLength(QNODE_CIRCLE_SIZE);
+            if (QLineF{line.p2(), theDrawingLine->line().p2()}.length() < 10) {
+                scene()->removeItem(theDrawingLine);
                 return;
             }
         }
-        drawingIns->addExit( theDrawingLine->line().x2() / METER_TO_PIXLE,
-                            -theDrawingLine->line().y2() / METER_TO_PIXLE,
+        drawingIns->addExit( theDrawingLine->line().x2() / QNODE_CIRCLE_SIZE,
+                            -theDrawingLine->line().y2() / QNODE_CIRCLE_SIZE,
                             -theDrawingLine->line().angle() + 90);
     }
 }
@@ -71,7 +75,7 @@ QLineF TopoNodeGView::getLineDrawingFromOrigin(const QPointF point) {
     if (point.x() == 0 && point.y() == 0) {
         return {0,0,0,0};
     }
-    QLineF dir{{0,0}, {1 * METER_TO_PIXLE, 0}};// len is 30 now
+    QLineF dir{{0,0}, {QNODE_CIRCLE_SIZE, 0}};
     double angle = atan2(point.y(), point.x());
     double index = angle / piHalf;
     if (index > 1.5 || index < -1.5) {

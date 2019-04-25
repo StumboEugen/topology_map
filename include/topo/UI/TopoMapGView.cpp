@@ -11,9 +11,9 @@
 #include "QNode.h"
 #include "QEdge.h"
 #include "topoui.h"
+#include "UITOOLS.h"
 
-#define SCALE_TIME 1.2
-#define SCALE_MAX 4.0
+
 
 extern UIMode CURRENT_MODE;
 

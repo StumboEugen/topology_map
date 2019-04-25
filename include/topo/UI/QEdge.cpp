@@ -131,8 +131,12 @@ void QEdge::setLength(double length) {
 }
 
 void QEdge::refreshOdom() {
-    double odomx = line().dx() / METER_TO_PIXLE;
-    double odomy = -line().dy() / METER_TO_PIXLE;
+    auto edgePartInNodeA = QNodeA->posOfExitInItem(gateA);
+    auto edgePartInNodeB = QNodeB->posOfExitInItem(gateB);
+    double odomx = line().dx() + edgePartInNodeA.x() - edgePartInNodeB.x();
+    double odomy = line().dy() + edgePartInNodeA.y() - edgePartInNodeB.y();
+    odomx /= METER_TO_PIXLE;
+    odomy /= -METER_TO_PIXLE;
     if (abs(odomx) < 0.01) odomx = 0.0;
     if (abs(odomy) < 0.01) odomy = 0.0;
     relatedEdgeTOPO->setOdomDataDirectly(odomx, odomy, 0); //TODO

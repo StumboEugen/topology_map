@@ -22,7 +22,8 @@ QNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget 
                       RECT_SIZE_HALF * 2, RECT_SIZE_HALF * 2};
     if (drawDetail) {
         QPainterPath path;
-        path.addEllipse(-20,-20,40,40);
+        path.addEllipse(- QNODE_CIRCLE_SIZE / 2,- QNODE_CIRCLE_SIZE / 2,
+                        QNODE_CIRCLE_SIZE, QNODE_CIRCLE_SIZE);
         path.setFillRule(Qt::WindingFill);
         painter->setBrush(Qt::yellow);
         QPen pen = painter->pen();
@@ -37,9 +38,10 @@ QNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget 
         const auto & exits = ins->getExits();
         for (int i = 0; i < exits.size(); i++) {
             const auto & exit = exits[i];
-            QPointF exitGatePoint{exit.getPosX() * METER_TO_PIXLE,
-                                  -exit.getPosY() * METER_TO_PIXLE};
-            painter->drawLine({0,0}, exitGatePoint);
+            QPointF exitGatePoint{exit.getPosX(), -exit.getPosY()};
+            QLineF line{{0,0}, exitGatePoint};
+            line.setLength(QNODE_CIRCLE_SIZE);
+            painter->drawLine(line);
 
             if (realTimeMode && currentExitHoverOn == i) {
                 painter->save();
@@ -48,7 +50,7 @@ QNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget 
                 painter->restore();
             }
 //            painter->rotate(-rotation);
-            painter->drawText(exitGatePoint, QString::number(i));
+            painter->drawText(line.p2(), QString::number(i));
 //            painter->rotate(rotation);
 
             // stop drawing dir
@@ -119,8 +121,8 @@ QPointF QNode::posOfExitInItem(int i) {
     }
     const auto & exits = relatedNodeTOPO->getInsCorrespond()->getExits();
     QPointF exitPos{exits[i].getPosX(), -exits[i].getPosY()};
-    exitPos *= METER_TO_PIXLE;
     QLineF line{{0,0}, exitPos};
+    line.setLength(QNODE_CIRCLE_SIZE);   // TODO now we ommit the len info
 //    line.setAngle(line.angle() + rotation);
     return line.p2();
 }

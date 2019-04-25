@@ -5,6 +5,7 @@
 #include "QRobot.h"
 #include "QNode.h"
 #include "QEdge.h"
+#include "UITOOLS.h"
 
 #include <QPainter>
 
@@ -12,7 +13,8 @@ void
 QRobot::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     move2(currentAt);
     painter->setBrush(Qt::red);
-    painter->drawEllipse(-10, -10, 20, 20);
+    painter->drawEllipse(-QNODE_CIRCLE_SIZE / 4, -QNODE_CIRCLE_SIZE / 4,
+                          QNODE_CIRCLE_SIZE / 2, QNODE_CIRCLE_SIZE / 2);
 }
 
 QRectF QRobot::boundingRect() const {
