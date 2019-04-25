@@ -64,7 +64,7 @@ public:
 
     void clear();
 
-    void calSumOfConfidence();
+    double calSumOfConfidence();
 
     double getSumOfConfidence() const {
         return sumOfConfidence;

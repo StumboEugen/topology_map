@@ -64,6 +64,7 @@ MapROSNode::MapROSNode(const std::string &fileName) {
 }
 
 void MapROSNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
+    ROS_INFO("START_NEW_NODE");
     auto nodeInstance = new NodeInstance();
     for (int i = 0; i < msgP.exitNum; i++) {
         nodeInstance->addExit(msgP.midPosXs[i], msgP.midPosYs[i], msgP.outDirs[i]);
@@ -71,7 +72,16 @@ void MapROSNode::cbNewNode(const topology_map::NewNodeMsg &msgP) {
     nodeInstance->completeAdding();
     mapGroup.arriveInstance(nodeInstance, static_cast<gateId>(msgP.arriveAt), msgP.odomX,
                             msgP.odomY, msgP.odomYaw);
+    ROS_INFO("END_NEW_NODE");
+
+    auto k = mapGroup.getNodeCollection().experienceSize();
+    auto sum = mapGroup.getMapCollection().calSumOfConfidence();
+    auto & sorted = mapGroup.getMapCollection().getOrderedMaps();
     cout << "rec new node complete, current candidates: " << mapGroup.getMapNumbers() << endl;
+    if (sorted.size() > 1) {
+        cout << "\n best confidence: " << sorted[0]->getConfidence(k) / sum
+             << "second best:" << sorted[1]->getConfidence(k) / sum << endl;
+    }
 //    for (auto & map : mapGroup.getMapCollection().getMaps()) {
 //        cout << map->getConfidencePURE() << endl;
 //    }
