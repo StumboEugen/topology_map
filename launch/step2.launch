@@ -1,6 +1,0 @@
-<launch>
-	<node pkg="topolo" name="xbee_receive" type="xbee_receive" output="screen">
-	</node>
-
-	<include file="$(find px4_autonomy)/launch/px4_autonomy.launch"/>
-</launch>

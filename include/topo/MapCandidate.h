@@ -80,6 +80,10 @@ public:
 
     void xConfidence(double coe);
 
+    /**
+     * cal the confidence of this map (not normalized)
+     * @param experienceCountK the experience count, from node collection
+     */
     double getConfidence(double experienceCountK) const;
 
     /// get the confidence with out N logk

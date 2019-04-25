@@ -261,11 +261,14 @@ void TopoUI::loadReadingMap() {
 
         int mapCounts = 0;
 
-        for (const auto & mapCand: mapFromReading.getMapCollection().getMaps()) {
+        auto & mapCollection = mapFromReading.getMapCollection();
+        mapCollection.calSumOfConfidence();
+        for (const auto & mapCand: mapCollection.getMaps()) {
             QString comboInfo = QString("#%1 Confidence:%2")
                     .arg(mapCounts)
                     .arg(mapCand->getConfidence(
-                            mapFromReading.getNodeCollection().experienceSize()));
+                            mapFromReading.getNodeCollection().experienceSize())
+                         / mapCollection.getSumOfConfidence());
             comboBoxMaps.push_back(mapCand);
             uiDockReadMap->cmboMapCandidate->addItem(comboInfo); // TODO use variant
             mapCounts++;
@@ -810,9 +813,12 @@ void TopoUI::askForRealTimeMap() {
         mapFromRealTime.readFromStr(response.mapJS);
 
         int mapCounts = 0;
-        for (auto mapCand : mapFromRealTime.getMapCollection().getOrderedMaps()) {
+        auto & mapCollection = mapFromRealTime.getMapCollection();
+        mapCollection.calSumOfConfidence();
+        for (auto mapCand : mapCollection.getOrderedMaps()) {
             double confidence = mapCand->getConfidence(
                                         mapFromRealTime.getNodeCollection().experienceSize());
+            confidence /= mapCollection.getSumOfConfidence();
             QString comboInfo = QString("#%1 Confidence:%2")
                     .arg(mapCounts++)
                     .arg(confidence);

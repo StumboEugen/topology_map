@@ -136,3 +136,10 @@ MapCollection::MapCollection(MapArranger *parent)
 {
 
 }
+
+void MapCollection::calSumOfConfidence() {
+    sumOfConfidence = 0;
+    for (const auto & map: maps) {
+        sumOfConfidence += map->getConfidence(parent->getNodeCollection().experienceSize());
+    }
+}

@@ -64,6 +64,12 @@ public:
 
     void clear();
 
+    void calSumOfConfidence();
+
+    double getSumOfConfidence() const {
+        return sumOfConfidence;
+    }
+
 private:
     MapArranger * const parent;
     /**
@@ -73,6 +79,8 @@ private:
 
     /// a temp container
     std::vector<MapCandidate*> orderedMaps;
+
+    double sumOfConfidence = 0.0;
 };
 
 
