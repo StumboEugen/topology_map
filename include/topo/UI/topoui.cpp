@@ -363,21 +363,23 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
                             topology_map::LeaveNode nodeLeavingMsg;
                             nodeLeavingMsg.leaveGate = QEdgeMoved->getRelatedEdgeTOPO()
                                     ->getAnotherGate(clickedNode->getRelatedNodeTOPO());
-                            nodeLeavingMsg.leaveDir = (float)nodeWithRobot->getRelatedNodeTOPO()
+                            nodeLeavingMsg.leaveDir =
+                                    (float)nodeWithRobot->getRelatedNodeTOPO()
                                             ->getInsCorrespond()->getExits()
                                             .at(nodeLeavingMsg.leaveGate).getMidRad();
                             pub_gateMove.publish(nodeLeavingMsg);
-                        }
 
-                        if (uiDockSimulation->cbNodeMoveDirectly->isChecked()) {
-                            robot->move2(clickedNode);
+                            if (uiDockSimulation->cbNodeMoveDirectly->isChecked()) {
+                                ros::Duration(0.1).sleep();
+                                robot->move2(clickedNode);
 
-                            /// send node msg
-                            if (checkROS()) {
-                                sendNodeROSmsg(clickedNode, QEdgeMoved, i);
+                                /// send node msg
+                                if (checkROS()) {
+                                    sendNodeROSmsg(clickedNode, QEdgeMoved, i);
+                                }
+                            } else {
+                                robot->move2(QEdgeMoved);
                             }
-                        } else {
-                            robot->move2(QEdgeMoved);
                         }
                         return;
                     }
