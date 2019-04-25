@@ -749,7 +749,7 @@ void TopoUI::initROS() {
     }
     int argc = 0;
     char ** argv = nullptr;
-    ros::init(argc, argv, "TopoUINode");
+    ros::init(argc, argv, "TopoUINode", ros::init_options::AnonymousName);
     if (!checkROS()) {
         infoView->setText("CANT find the ROS master, plz run roscore and try again");
         return;
@@ -781,7 +781,7 @@ void TopoUI::changeNodeMovable(bool movable) {
 }
 
 bool TopoUI::checkROS() {
-    return ros::master::check();
+    return ros::isInitialized();
 }
 
 void TopoUI::jump2ReadingMapIndex() {

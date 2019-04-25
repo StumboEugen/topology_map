@@ -17,7 +17,7 @@
 int main(int argc, char **argv)
 {
 
-    ros::init(argc, argv, "TopoLayer");
+    ros::init(argc, argv, "TopoMain");
 
     ros::NodeHandle n;
     
