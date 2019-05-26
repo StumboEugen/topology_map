@@ -49,6 +49,8 @@ public:
      */
     void sortByConfidence(size_t topCount);
 
+
+    /// this is used for UI building mode
     void addNodeDirectly(TopoNode *);
 
     void addEdgeDirectly(TopoEdge *);

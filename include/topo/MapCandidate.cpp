@@ -265,6 +265,11 @@ JSobj MapCandidate::toJS() const {
         }
         obj["edges"].append(edgeJS);
     }
+    
+    for (const auto & node: nodes) {
+        obj["nodes"].append(node->toJS());
+    }
+    
     obj["curNode"] = currentNode->getInsCorrespond()->getSerialNumber();
     obj["lEiOe"] = lastEdgeIsOldEdge; //TODO is this needed?
     obj["edgeFullNum"] = fullEdgeNumber;
@@ -284,7 +289,7 @@ void MapCandidate::removeUseages() {
 /**
  * generate a candidate from the JS info
  * @param nodeInses the serialNum-nodeInstance pair container
- * @param JSinfo the JSinfo
+ * @param JSinfo the JSinfo of a map
  */
 MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
                            const JSobj & JSinfo) : fullEdgeNumber(0)
@@ -296,31 +301,73 @@ MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
         const auto & theOnlyNode = addNewNode(nodeInses[0]);
         nodeDict[0] = theOnlyNode;
     }
-    for (int i = 0; i < JSedges.size(); i++) {
-        auto & JSedge = JSedges[i];
-
-        size_t serial_A = JSedge["Ea"].asUInt();
-        if (nodeDict[serial_A] == nullptr) {
-            nodeDict[serial_A] = addNewNode(nodeInses[serial_A]);
+    
+    /// new version(since 2019-5-26) and old version split here
+    if (JSinfo.isMember("nodes")) {
+        // new version
+        const auto & JSnodes = JSinfo["nodes"];
+        
+        // firstly build the nodes
+        for (int i = 0; i < JSnodes.size(); ++i) {
+            /// it's a array of related inses in the order of time
+            const auto & JSnode = JSnodes[i];
+            auto newNode = addNewNode(nodeInses[JSnode[0].asUInt()]);
+            for (int j = 1; j < JSnode.size(); ++j) {
+                newNode->addNewRelatedIns(nodeInses[JSnode[j].asUInt()]);
+            }
+            const auto theLastRelatedSerial = (--JSnode.end())->asUInt();
+            nodeDict[theLastRelatedSerial] = newNode;
+            nodeInses[theLastRelatedSerial]->addUseage(this, newNode);
         }
+        
+        // then the edges
+        for (int i = 0; i < JSedges.size(); ++i) {
+            const auto & JSedge = JSedges[i];
+            size_t serial_A = JSedge["Ea"].asUInt();
+            size_t serial_B = JSedge["Eb"].asUInt();
+            
+            auto tempEdgePtr = addNewEdge(
+                    nodeDict[serial_A], static_cast<gateId>(JSedge["Ga"].asUInt()),
+                    nodeDict[serial_B], static_cast<gateId>(JSedge["Gb"].asUInt()));
 
-        size_t serial_B = JSedge["Eb"].asUInt();
-        if (nodeDict[serial_B] == nullptr) {
-            nodeDict[serial_B] = addNewNode(nodeInses[serial_B]);
+            tempEdgePtr->addOdomData(JSedge["Ox"].asDouble(),
+                                     JSedge["Oy"].asDouble(),
+                                     JSedge["yaw"].asDouble(),
+                                     nodeDict[serial_A]);
+
+            if (JSedge.isMember("cur")) {
+                this->currentEdge = tempEdgePtr;
+            }
         }
+    } else {
+        // old version
 
-        auto tempEdgePtr = addNewEdge(
-                nodeDict[serial_A], static_cast<gateId>(JSedge["Ga"].asUInt()),
-                nodeDict[serial_B], static_cast<gateId>(JSedge["Gb"].asUInt()));
+        // construct the edges
+        for (int i = 0; i < JSedges.size(); i++) {
+            auto & JSedge = JSedges[i];
 
-        tempEdgePtr->addOdomData(JSedge["Ox"].asDouble(),
-                                 JSedge["Oy"].asDouble(),
-                                 JSedge["yaw"].asDouble(),
-                                 nodeDict[serial_A]);
-        //TODO add directly
+            size_t serial_A = JSedge["Ea"].asUInt();
+            if (nodeDict[serial_A] == nullptr) {
+                nodeDict[serial_A] = addNewNode(nodeInses[serial_A]);
+            }
 
-        if (JSedge.isMember("cur")) {
-            this->currentEdge = tempEdgePtr;
+            size_t serial_B = JSedge["Eb"].asUInt();
+            if (nodeDict[serial_B] == nullptr) {
+                nodeDict[serial_B] = addNewNode(nodeInses[serial_B]);
+            }
+
+            auto tempEdgePtr = addNewEdge(
+                    nodeDict[serial_A], static_cast<gateId>(JSedge["Ga"].asUInt()),
+                    nodeDict[serial_B], static_cast<gateId>(JSedge["Gb"].asUInt()));
+
+            tempEdgePtr->addOdomData(JSedge["Ox"].asDouble(),
+                                     JSedge["Oy"].asDouble(),
+                                     JSedge["yaw"].asDouble(),
+                                     nodeDict[serial_A]);
+
+            if (JSedge.isMember("cur")) {
+                this->currentEdge = tempEdgePtr;
+            }
         }
     }
 
@@ -328,10 +375,10 @@ MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
     this->currentNode = nodeDict[JSinfo["curNode"].asUInt()];
     this->lastEdgeIsOldEdge = JSinfo["lEiOe"].asBool();
 
-    // using this as a way of checking
-    if (JSinfo["edgeFullNum"].asUInt() != this->fullEdgeNumber) {
-        std::cerr << "[ERROR] JS to Map errpr, full edge number not equal!" << endl;
-    }
+//    // using this as a way of checking
+//    if (JSinfo["edgeFullNum"].asUInt() != this->fullEdgeNumber) {
+//        std::cerr << "[ERROR] JS to Map errpr, full edge number not equal!" << endl;
+//    }
 }
 
 void MapCandidate::cleanAllNodeFlagsAndPtr() {

@@ -44,6 +44,7 @@ public:
         nodeCollection.addInstanceDirectly(ins);
     }
 
+    /// this is used for UI building mode
     void addTopoNodeDirectly(TopoNode * node) {
         mapCollection.addNodeDirectly(node);
     }

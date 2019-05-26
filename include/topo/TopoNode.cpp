@@ -20,7 +20,11 @@ TopoNode::TopoNode(NodeInstance *const nodeInstance):
 }
 
 JSobj TopoNode::toJS() const {
-    return JSobj();
+    JSobj obj;
+    for (const auto & ins: relatedInses) {
+        obj.append(ins->getSerialNumber());
+    }
+    return std::move(obj);
 }
 
 /**
