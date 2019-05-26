@@ -61,7 +61,8 @@ public:
     /**
      * compare two nodes if it IS ALIKE
      * @param rnode
-     * @return -1: unlike  other: the serial ID difference, 1: the serial of this need to +1
+     * @return -1: unlike; other : the dislocation of the gate NO. example: 1: gate NO. of
+     * this to +1
      */
     int alike(const NodeInstance &) const;
 

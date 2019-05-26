@@ -164,6 +164,9 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(mapGView, SIGNAL(QGI_Node_clicked(QNode *))
             , this, SLOT(onQGI_NodeLeftClicked(QNode * )));
 
+    connect(mapGView, SIGNAL(rightClickOn_QGI_Node(QNode *))
+            , this, SLOT(onQGI_NodeRightClicked(QNode *)));
+
     connect(modeGroup, SIGNAL(triggered(QAction*))
             , this, SLOT(changeMode(QAction*)));
 
@@ -193,9 +196,6 @@ TopoUI::TopoUI(QWidget *parent) :
 
     connect(qactConnectToROS, SIGNAL(changed())
             , this, SLOT(initROS()));
-
-    connect(mapGView, SIGNAL(rightClickOn_QGI_Node(QNode *))
-            , this, SLOT(onQGI_NodeRightClicked(QNode *)));
 
     connect(uiDockBuildMap->cbNodesMovable, SIGNAL(toggled(bool))
             , this, SLOT(changeNodeMovable(bool)));

@@ -36,7 +36,8 @@ public:
         return midPosY;
     }
 
-    /// the dir of the vector(mid to exit) in rad ENU (SENWS = -90/0/90/180/-90)
+    /// the dir of the vector(mid to exit) in rad ENU (from atan2)
+    /// @example SENWS = -90/0/90/180/-90
     const double & getMidRad() const {
         return midRad;
     }
@@ -76,7 +77,7 @@ private:
     double midPosX;
     // relative coor to the mid of the instance, ENU
     double midPosY;
-    // the dir of the vector(mid to exit), ENU (NORTH = 0/360)
+    // the dir of the vector(middle point to exit), ENU (from atan2)
     double midRad;
 };
 
