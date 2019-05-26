@@ -42,6 +42,17 @@ public:
         throw;
     }
 
+    void resetGate(TopoNode * node, gateId newGateID) {
+        if (node == exitA) {
+            gateA = newGateID;
+        } else if (node == exitB) {
+            gateB = newGateID;
+        } else {
+            std::cerr << "TopoEdge resetGate FAILURE" << std::endl;
+            throw;
+        }
+    }
+
     TopoNode *const getNodeA() const {
         return exitA;
     }

@@ -37,10 +37,11 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
      * firstly copy all the TopoNode instances
      */
     for (auto oriNode: copyFrom.nodes) {
+        //todo
         TopoNode *clonedNodePtr = * this->nodes.emplace
-                (new TopoNode(oriNode->getInsCorrespond())).first;
+                (new TopoNode(oriNode)).first;
         /**the useage should be added oustide of the constructor
-         * because there is no map info in constructor
+         * because there is no map info in TopoNode's constructor
          */
         clonedNodePtr->getInsCorrespond()->addUseage(this, clonedNodePtr);
         oriNode->clonedTo = clonedNodePtr;
@@ -129,14 +130,15 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
 
 /**
  * SPLIT A NEW CANDIDATE FROM A JUST ADDED NEW NODE CANDIDATE.
- * in the new candidate, we should really arrive at the (arriveNode) at gate (arriveGate)
+ * in the new candidate, we should arrive acturally at the (arriveNode) at gate (arriveGate)
  * @param arriveNode
  * @param arriveGate
  * @return if it is a similar return the new similar ptr, otherwise a nullptr
  */
 MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId arriveGate) {
     //TODO move this outwards
-    /**you may match a node on a map, but just moved on a known edge, in this case, return*/
+    /**you may match a node on a map, but the arrived gate is occupied(has been moved through),
+     * in this case, return*/
     if (!arriveNode->isExitEmpty(arriveGate)) {
         /**because it is called for a new candidate, so we don't let @this suicide()*/
         return nullptr;
@@ -163,7 +165,8 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId 
     newMap->removeNode(newMap->currentNode);
 
     /// remove the last useage in the loop-closed node related ins
-    loopClosureNode->getTheLastRelatedIns()->removeUseage(newMap);
+    /// maybe this line is wrong, delete TODO
+//    loopClosureNode->getTheLastRelatedIns()->removeUseage(newMap);
 
     /// add the useage in the latest ins
     theLatestIns->addUseage(newMap, loopClosureNode);

@@ -4,7 +4,10 @@
 #include "NodeInstance.h"
 #include "TopoNode.h"
 
-
+/**
+ * create a TopoNode according to the nodeInstance
+ * @param nodeInstance
+ */
 TopoNode::TopoNode(NodeInstance *const nodeInstance):
         relatedInses(1, nodeInstance),
         edgeConnected(nodeInstance->sizeOfExits(), nullptr),
@@ -18,5 +21,17 @@ TopoNode::TopoNode(NodeInstance *const nodeInstance):
 
 JSobj TopoNode::toJS() const {
     return JSobj();
+}
+
+/**
+ * clone a TopoNode, including the relatedInses
+ * @param that
+ */
+TopoNode::TopoNode(const TopoNode *that) :
+        relatedInses(that->relatedInses),
+        edgeConnected(that->edgeConnected.size(), nullptr),
+        tempFlags(0),
+        clonedTo(nullptr)
+{
 }
 

@@ -24,6 +24,8 @@ public:
 
     explicit TopoNode(NodeInstance * nodeInstance);
 
+    TopoNode(const TopoNode *that);
+
     /**
      * @return if the gateId corresponded edge is empty
      */
@@ -39,7 +41,6 @@ public:
         return edgeConnected[number];
     }
 
-    // TODO make this return an "average" ins
     NodeInstance *const getInsCorrespond() const {
         return relatedInses.back();
     }
@@ -81,7 +82,6 @@ public:
         } else {
             tempFlags &= ~(1u << index);
         }
-
     }
 
     bool chkFlag(uint8_t index) {
@@ -99,6 +99,7 @@ public:
 
 private:
 
+    /// a list of related inses in the order of time
     std::vector<NodeInstance *> relatedInses;
 
 //    ///the corresponded instance
