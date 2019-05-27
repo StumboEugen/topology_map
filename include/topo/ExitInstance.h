@@ -43,7 +43,7 @@ public:
     }
 
     /**
-     * sort according to the midRad(fron atan2) ENU
+     * sort according to the midRad(from atan2) ENU
      */
     bool operator < (const ExitInstance & anotherNode) const {
         return this->midRad < anotherNode.midRad;

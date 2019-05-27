@@ -41,6 +41,7 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
 
     vector<MapCandidate *> newMaps;
 
+    // TODO use faster structure
     /// alike xxx instance, with useage of xxx map at xxx node with xxx diff
     map< NodeInstance*, vector<tuple<MapCandidate *, TopoNode*, int>>> loopDetected;
     /**find data group we need to check*/
@@ -55,7 +56,7 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
             /**they are alike! check the useage in map, if it is propriate*/
             int diff = newIns->alike(*nodeInstance);
             if (diff >= 0) {
-                for (auto & useage : nodeInstance->getNodeUseages()) {
+                for (const auto & useage : nodeInstance->getNodeUseages()) {
                     MapCandidate * relatedMap = useage.first;
                     if (!relatedMap->isJustMovedOnKnownEdge()) {
                         loopDetected[nodeInstance].emplace_back(
@@ -67,22 +68,25 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
 //        }
     }
 
-    /// do the arrive at similiar task at here, because earlier the ins useages will be polluted
+    /// do the arrive at similiar task at here, if earlier, the ins useages would be polluted
     for (auto & alikeInsPair: loopDetected) {
         auto & alikeIns = alikeInsPair.first;
 
+        /// calculate the fixCoe according to the odom along the walking path
         double travelDis = newIns->getTravelDis() - alikeIns->getTravelDis();
         double error = topo::calDis(
                 alikeIns->getGlobalX() - newIns->getGlobalX(),
                 alikeIns->getGlobalY() - newIns->getGlobalY());
         double stdError = error / travelDis;
         double fixCoe = exp(-0.5 * stdError * stdError / convDistPerMeter);
+        ///////////////////////////
 
         for (auto & loopTuple : alikeInsPair.second) {
-            auto modifiedExitNum = static_cast<uint8_t>(arriveAt + get<2>(loopTuple));
+            const auto diff = get<2>(loopTuple);
+            auto modifiedExitNum = static_cast<uint8_t>(arriveAt + diff);
             modifiedExitNum %= newIns->sizeOfExits();
             auto newMap = get<0>(loopTuple)
-                    ->arriveAtSimiliar(get<1>(loopTuple), modifiedExitNum);
+                    ->arriveAtSimiliar(get<1>(loopTuple), modifiedExitNum, diff);
             if (newMap != nullptr) {
                 newMap->xConfidence(fixCoe); //TODO
                 newMaps.push_back(newMap);

@@ -26,7 +26,8 @@ public:
     void setLeaveFrom(gateId exit);
     bool arriveAtNode(NodeInstance *const instance, gateId arriveAt, const double dis_x,
                           const double dis_y, const double yaw);
-    MapCandidate *const arriveAtSimiliar(TopoNode *arriveNode, gateId arriveGate);
+    MapCandidate *const
+    arriveAtSimiliar(TopoNode *arriveNode, gateId arriveGate, int gateDiff);
 
     size_t getFullEdgeNumber() const {
         return fullEdgeNumber;
@@ -97,6 +98,8 @@ public:
 
 private:
     void arriveNewNode(NodeInstance *instance, gateId arriveAt);
+
+    //todo using vector might is better
     set<TopoNode *> nodes;
     set<TopoEdge *> edges;
 

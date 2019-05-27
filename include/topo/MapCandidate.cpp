@@ -131,11 +131,14 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
 /**
  * SPLIT A NEW CANDIDATE FROM A JUST ADDED NEW NODE CANDIDATE.
  * in the new candidate, we should arrive acturally at the (arriveNode) at gate (arriveGate)
- * @param arriveNode
- * @param arriveGate
- * @return if it is a similar return the new similar ptr, otherwise a nullptr
+ * @param arriveNode the node that may happen loop closeure
+ * @param arriveGate the arriveGate No in the older instance
+ * @param gateDiff new instance's gateID + gateDiff = older instance's gateID
+ * @return if it can be a similar map return the new map's ptr, otherwise a nullptr
  */
-MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId arriveGate) {
+MapCandidate *const MapCandidate::arriveAtSimiliar(
+        TopoNode *arriveNode, gateId arriveGate, int gateDiff) {
+
     //TODO move this outwards
     /**you may match a node on a map, but the arrived gate is occupied(has been moved through),
      * in this case, return*/
@@ -152,21 +155,21 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId 
     auto newMap = new MapCandidate(*this);
     /**@attention change is applied on the new map, not "this" */
 
-    /// the node that happens loop close
+    /// the node that happens loop close (in the new map)
     auto loopClosureNode = arriveNode->clonedTo;
 
     /// in the new map, the edge should connect form the last node to the loop-closed node
     newMap->currentEdge->changeExitTo(newMap->currentNode, loopClosureNode, arriveGate);
 
-    /// record the newset ins, because we are going to kill and unregister the old cur node
+    /// the newly arrived instance
     auto theLatestIns = newMap->currentNode->getTheLastRelatedIns();
 
-    /// remove the node and unregister
+    /// remove the node and unregister the useage in instance
     newMap->removeNode(newMap->currentNode);
 
     /// remove the last useage in the loop-closed node related ins
-    /// maybe this line is wrong, delete TODO
-//    loopClosureNode->getTheLastRelatedIns()->removeUseage(newMap);
+    /// because we only uses the newest instance to detect loop closure
+    loopClosureNode->getTheLastRelatedIns()->removeUseage(newMap);
 
     /// add the useage in the latest ins
     theLatestIns->addUseage(newMap, loopClosureNode);
@@ -174,6 +177,10 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(TopoNode *arriveNode, gateId 
 
     newMap->currentNode = loopClosureNode;
 
+    if (gateDiff != 0) {
+        loopClosureNode->ringRotate(
+                loopClosureNode->getInsCorrespond()->sizeOfExits()-gateDiff);
+    }
 //    auto & nodes = newMap->getNodes();
 //    auto & edges = newMap->getEdges();
 //    for (auto & edge : edges) {

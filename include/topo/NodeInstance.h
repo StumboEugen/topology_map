@@ -61,8 +61,9 @@ public:
     /**
      * compare two nodes if it IS ALIKE
      * @param rnode
-     * @return -1: unlike; other : the dislocation of the gate NO. example: 1: gate NO. of
-     * this to +1
+     * @return -1: unlike;
+     * other : the dislocation of the gate NO.;
+     * example: 1: gate NO. of #this# to +1
      */
     int alike(const NodeInstance &) const;
 
@@ -71,9 +72,9 @@ public:
     topology_map::NewNodeMsgPtr
     encode2ROSmsg(unsigned char arriveAt, float odomX, float odomY, float yaw);
 
+    // TODO split this(ROS related) out of the lib
     topology_map::NewNodeMsgPtr
     encode2ROSmsg(unsigned char arriveAt, const array<double, 3> & odomMsg);
-    // TODO split this(ROS related) out of the lib
 
     const uint8_t sizeOfExits() const {
         return exitNums;
@@ -159,7 +160,9 @@ private:
     // determine if the instance is add complete
     bool addComplete = false;
 
-    //container to store the exit infos
+    ///container to store the exit infos
+    /// after completeAdding() is called
+    /// they will be sorted according to the point dir(ENU atan2)
     vector<ExitInstance> exits;
     uint8_t exitNums = 0;
 

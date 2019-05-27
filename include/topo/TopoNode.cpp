@@ -3,6 +3,7 @@
 //
 #include "NodeInstance.h"
 #include "TopoNode.h"
+#include "TopoEdge.h"
 
 /**
  * create a TopoNode according to the nodeInstance
@@ -37,5 +38,26 @@ TopoNode::TopoNode(const TopoNode *that) :
         tempFlags(0),
         clonedTo(nullptr)
 {
+}
+
+void TopoNode::ringRotate(int diff) {
+    auto size = edgeConnected.size();
+    if (diff < 0) {
+        diff += size * (-diff / size + 1);
+    } else {
+        diff %= size;
+    }
+
+    auto copy = edgeConnected;
+
+    for (int i = 0; i < size - diff; ++i) {
+        edgeConnected[i + diff] = copy[i];
+        copy[i]->resetGate(this, static_cast<gateId>(i + diff));
+    }
+
+    for (auto i = size - diff; i < size; ++i) {
+        edgeConnected[i + diff - size] = copy[i];
+        copy[i]->resetGate(this, static_cast<gateId>(i + diff - size));
+    }
 }
 

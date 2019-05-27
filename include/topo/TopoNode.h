@@ -24,7 +24,7 @@ public:
 
     explicit TopoNode(NodeInstance * nodeInstance);
 
-    TopoNode(const TopoNode *that);
+    explicit TopoNode(const TopoNode *that);
 
     /**
      * @return if the gateId corresponded edge is empty
@@ -96,6 +96,11 @@ public:
     void setAssistPtr(void *helperPtr) {
         TopoNode::assistPtr = helperPtr;
     }
+     /**
+      * rotate the exits
+      * @param diff the diff that this TopoNode needs to plus @example diff = 1 :  0123 -> 3012
+      */
+    void ringRotate(int diff);
 
 private:
 

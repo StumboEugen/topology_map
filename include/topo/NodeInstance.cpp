@@ -90,11 +90,11 @@ int NodeInstance::alike(const NodeInstance & rnode) const {
     // we only need to change if difOri is not the smallest
     if (difOri > difL1RB || difOri > difLBR1) {
         if (difL1RB < difLBR1) {
-            // in this case, consider lE = 1, rE = 359
+            // in this case, consider lE = WS(-pi), rE = WN(+pi)
             differNum = static_cast<int>(lExits.size() - 1);
             rExit = rExitBack;
         } else {
-            // in this case, consider lE = 359, rE = 1
+            // in this case, consider lE = WN(+pi), rE = WS(-pi)
             differNum = 1;
             lExit = lExitBack;
         }
