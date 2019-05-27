@@ -65,13 +65,13 @@ public:
      * the pos tollerance
      */
     static double posTollerance() {
-        return 0.5;
+        return 0.3;
     }
 
     JSobj toJS() const;
 
 private:
-    // the exit outward direction(NOTHING to do with the instance) ENU
+    // the exit outward direction(no relationship with the midpoint) ENU
     double outDir;
     // relative coor to the mid of the instance, ENU
     double midPosX;

@@ -52,12 +52,14 @@ void TopoNode::ringRotate(int diff) {
 
     for (int i = 0; i < size - diff; ++i) {
         edgeConnected[i + diff] = copy[i];
-        copy[i]->resetGate(this, static_cast<gateId>(i + diff));
+        if (copy[i])
+            copy[i]->resetGate(this, static_cast<gateId>(i + diff));
     }
 
     for (auto i = size - diff; i < size; ++i) {
         edgeConnected[i + diff - size] = copy[i];
-        copy[i]->resetGate(this, static_cast<gateId>(i + diff - size));
+        if (copy[i])
+            copy[i]->resetGate(this, static_cast<gateId>(i + diff - size));
     }
 }
 

@@ -107,7 +107,9 @@ private:
 
     bool loadMapGroupFromFile(const QString & fileName, MapArranger & dist);
 
-    void sendNodeROSmsg(QNode *clickedNode, const QEdge *edgeWithRobot, int exit);
+    void sendNodeROSmsg(QNode *clickedNode, const QEdge *edgeWithRobot, int exitGate);
+
+    NodeInstance * instanceWithNoise = nullptr;
 
 private Q_SLOTS:
     void loadReadingMap();

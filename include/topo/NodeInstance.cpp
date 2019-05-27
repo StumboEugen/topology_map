@@ -224,3 +224,16 @@ gateId NodeInstance::getMidDirClosestExit(double midDir) {
     return static_cast<gateId>(curI);
 }
 
+gateId NodeInstance::figureOutWhichExitItis(double posx, double posy) {
+    int ans = 0;
+    double dist = abs(posx - exits[0].getPosX()) + abs(posy - exits[0].getPosY());
+    for (int i = 1; i < exits.size(); ++i) {
+        double newDist = abs(posx - exits[i].getPosX()) + abs(posy - exits[i].getPosY());
+        if (newDist < dist) {
+            ans = i;
+            dist = newDist;
+        }
+    }
+    return static_cast<gateId>(ans);
+}
+

@@ -133,6 +133,8 @@ public:
         return travelDis;
     }
 
+    gateId figureOutWhichExitItis(double posx, double posy);
+
 private:
     /**
      * check & adjust the dir to 0-360°

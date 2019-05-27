@@ -33,6 +33,7 @@
 #include <random>
 #include <ctime>
 #include <topology_map/LeaveNode.h>
+#include <topology_map/NewNodeMsg.h>
 
 using namespace std;
 
@@ -351,23 +352,41 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
         int nums = clickedNode->getExitNums();
         if (robot != nullptr) {
             auto currentAt = robot->getCurrentAt();
+            /// check if the robot currently is on edge or node
             if (auto nodeWithRobot = dynamic_cast<QNode*>(currentAt)) {
                 for (int i = 0; i < nums; i++) {
                     /// check if the robot is in the nearby node
                     if (nodeWithRobot == clickedNode->getQNodeAtExit(i)) {
 
+                        // the edge between the click node and the robot's node
                         const auto QEdgeMoved = clickedNode->getQEdgeAtExit(i);
 
                         /// send gate through msg
                         if (checkROS()) {
                             topology_map::LeaveNode nodeLeavingMsg;
-                            nodeLeavingMsg.leaveGate = QEdgeMoved->getRelatedEdgeTOPO()
+                            // the left gate in ground truth
+                            const auto leftGate = QEdgeMoved->getRelatedEdgeTOPO()
                                     ->getAnotherGate(clickedNode->getRelatedNodeTOPO());
+                            nodeLeavingMsg.leaveGate = leftGate;
                             nodeLeavingMsg.leaveDir =
                                     (float)nodeWithRobot->getRelatedNodeTOPO()
                                             ->getInsCorrespond()->getExits()
                                             .at(nodeLeavingMsg.leaveGate).getMidRad();
-                            pub_gateMove.publish(nodeLeavingMsg);
+
+                            if (instanceWithNoise) {
+                                // means that the exit noise is added
+                                const auto & theLeftNode = 
+                                        QEdgeMoved->getRelatedEdgeTOPO()->getAnotherNode
+                                        (clickedNode->getRelatedNodeTOPO());
+                                const auto & theLeftExit = theLeftNode->getInsCorrespond()
+                                        ->getExits()[leftGate];
+                                nodeLeavingMsg.leaveGate =
+                                        instanceWithNoise->figureOutWhichExitItis(
+                                        theLeftExit.getPosX(), theLeftExit.getPosY());
+                                pub_gateMove.publish(nodeLeavingMsg);
+                            } else {
+                                pub_gateMove.publish(nodeLeavingMsg);
+                            }
 
                             if (uiDockSimulation->cbNodeMoveDirectly->isChecked()) {
                                 ros::Duration(0.1).sleep();
@@ -401,9 +420,9 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
     }
 }
 
-void TopoUI::sendNodeROSmsg(QNode *clickedNode, const QEdge *edgeWithRobot, int exit) {
+void TopoUI::sendNodeROSmsg(QNode *clickedNode, const QEdge *edgeWithRobot, int exitGate) {
     auto odomInfo = edgeWithRobot->getRelatedEdgeTOPO()
-            ->getOdomData(clickedNode->getQNodeAtExit(exit)->getRelatedNodeTOPO());
+            ->getOdomData(clickedNode->getQNodeAtExit(exitGate)->getRelatedNodeTOPO());
     //TODO arrange this better
     if (uiDockSimulation->cbEdgeNoise->isChecked()) {
         bool pass;
@@ -416,11 +435,78 @@ void TopoUI::sendNodeROSmsg(QNode *clickedNode, const QEdge *edgeWithRobot, int 
             odomInfo[0] += n(e) * dist;
             odomInfo[1] += n(e) * dist;
         } else {
-            setMsg("Please enter a right number");
+            setMsg("Please enter a right number in the edge odom noise");
         }
     }
-    pub_nodeInfo.publish(clickedNode->getRelatedNodeTOPO()
-                                 ->getInsCorrespond()->encode2ROSmsg(exit, odomInfo));
+
+    topology_map::NewNodeMsg newNodeMsg;
+    newNodeMsg.odomX = static_cast<float>(odomInfo[0]);
+    newNodeMsg.odomY = static_cast<float>(odomInfo[1]);
+
+
+    const auto & theRelatedIns = clickedNode->getRelatedNodeTOPO()->getInsCorrespond();
+    newNodeMsg.exitNum = theRelatedIns->sizeOfExits();
+
+    if (instanceWithNoise) {
+        delete instanceWithNoise;
+        instanceWithNoise = nullptr;
+    }
+
+    if (uiDockSimulation->cbExitNoise->isChecked()) {
+        bool pass;
+        double range = uiDockSimulation->leNodeNoise->text().toDouble(&pass);
+        if (pass) {
+            default_random_engine e(time(nullptr));
+            uniform_real_distribution<> u(-range, range);
+
+            static bool fakeB = false;
+
+            /// for the correct arrive at, we need to build a new nodeInstance
+            instanceWithNoise = new NodeInstance(false);
+            for (const auto & exitIns: theRelatedIns->getExits()) {
+
+//                { //TODO DELETE THIS FOR DEBUG
+//                    double e1 = fakeB ? 0.05 : -0.05;
+//                    double e2 = fakeB ? 0.05 : -0.05;
+//                    fakeB = !fakeB;
+//
+//                    instanceWithNoise->addExit(
+//                            exitIns.getPosX() + e1,
+//                            exitIns.getPosY() + e2,
+//                            exitIns.getOutDir());
+//                }
+
+                instanceWithNoise->addExit(
+                        exitIns.getPosX() + u(e),
+                        exitIns.getPosY() + u(e),
+                        exitIns.getOutDir());
+            }
+            instanceWithNoise->completeAdding();
+
+            const auto & theExitInsInGroundTruth = theRelatedIns->getExits()[exitGate];
+            newNodeMsg.arriveAt = instanceWithNoise->figureOutWhichExitItis(
+                    theExitInsInGroundTruth.getPosX(),
+                    theExitInsInGroundTruth.getPosY());
+
+            for (const auto & exitIns: instanceWithNoise->getExits()) {
+                newNodeMsg.midPosXs.push_back((float &&) exitIns.getPosX());
+                newNodeMsg.midPosYs.push_back((float &&) exitIns.getPosY());
+                newNodeMsg.outDirs.push_back((float &&) exitIns.getOutDir());
+            }
+
+        } else {
+            setMsg("Please enter a right number in the node exit noise");
+        }
+    } else {
+        for (const auto & exitIns: theRelatedIns->getExits()) {
+            newNodeMsg.midPosXs.push_back((float &&) exitIns.getPosX());
+            newNodeMsg.midPosYs.push_back((float &&) exitIns.getPosY());
+            newNodeMsg.outDirs.push_back((float &&) exitIns.getOutDir());
+        }
+        newNodeMsg.arriveAt = static_cast<unsigned short>(exitGate);
+    }
+
+    pub_nodeInfo.publish(newNodeMsg);
 }
 
 void TopoUI::changeMode(QAction * action) {
