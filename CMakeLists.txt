@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
     roscpp
     rospy
     std_msgs
-    qt_build
+#    qt_build
     message_generation
 )
 
@@ -131,7 +131,19 @@ catkin_package(
 
 # this comes from qt_build's qt-ros.cmake which is automatically
 # included via the dependency call in package.xml
-rosbuild_prepare_qt4 (QtCore QtGui) # Add the appropriate components to the component list here
+#rosbuild_prepare_qt4 (QtCore QtGui) # Add the appropriate components to the component list here
+
+#set(QT Core Gui Widgets Network DBus Sql)
+#find_package(Qt5 REQUIRED ${QT})
+#find_package(Qt5Core)
+#find_package(Qt5Widgets)
+#find_package(Qt5Gui)
+#include_directories(${Qt5Widgets_INCLUDE_DIRS})
+#add_definitions(${Qt5Widgets_DEFINITIONS})
+
+find_package(Qt4 REQUIRED)
+INCLUDE(${QT_USE_FILE})
+ADD_DEFINITIONS (${QT_DEFINITIONS})
 
 ###########
 ## Build ##
@@ -170,7 +182,7 @@ file(GLOB TopoFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 file(GLOB JsonFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         include/json/*.cpp include/json/*.h)
 
-add_library(topoLayer_UI ${Topo_UI_FORM} ${Topo_UI_SOURCES})
+add_library(topoLayer_UI  ${Topo_UI_SOURCES})
 add_library(topoLayer ${TopoFILES})
 add_library(jsonCpp ${JsonFILES})
 
@@ -182,7 +194,7 @@ add_executable(localController
     src/grounding/localController.h)
 
 target_link_libraries(topoLayer jsonCpp)
-target_link_libraries(topoLayer_UI topoLayer)
+target_link_libraries(topoLayer_UI topoLayer ${QT_LIBRARIES})
 target_link_libraries(main topoLayer)
 target_link_libraries(localController topoLayer)
 target_link_libraries(TopoUI topoLayer_UI)
@@ -200,7 +212,7 @@ target_link_libraries(FakeOB topoLayer)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(main ${catkin_LIBRARIES})
-target_link_libraries(TopoUI ${catkin_LIBRARIES} ${QT_LIBRARIES})
+target_link_libraries(TopoUI ${catkin_LIBRARIES})
 target_link_libraries(FakeOB ${catkin_LIBRARIES})
 target_link_libraries(localController ${catkin_LIBRARIES})
 
@@ -212,6 +224,10 @@ add_dependencies(topoLayer ${PROJECT_NAME}_gencpp)
 add_dependencies(main ${PROJECT_NAME}_gencpp)
 add_dependencies(FakeOB ${PROJECT_NAME}_gencpp)
 add_dependencies(localController ${PROJECT_NAME}_gencpp)
+
+#qt5_use_modules(TopoUI Widgets)
+#qt5_use_modules(topoLayer_UI Widgets)
+
 
 #############
 ## Install ##
