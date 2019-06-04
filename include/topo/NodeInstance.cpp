@@ -11,8 +11,42 @@
 
 using namespace std;
 
-size_t NodeInstance::serialCount = 0;
+size_t NodeInstance::serialCount = 1;
 
+/**
+ * @param registerSerial if the serial number is registered
+ * @see serialNumber
+ */
+NodeInstance::NodeInstance(bool registerSerial)
+{
+    if (registerSerial) {
+        serialNumber = serialCount++;
+    } else {
+        serialNumber = SIZE_MAX;
+    }
+}
+
+/**
+ * @param lIns the copyed node instance
+ * @param registerSerial if the serial number is registered
+ * @see serialNumber
+ */
+NodeInstance::NodeInstance(const NodeInstance & lIns, bool registerSerial)
+        :exitNums(lIns.exitNums),
+         extraMsg(lIns.extraMsg),
+         exits(lIns.exits),
+         addComplete(lIns.addComplete){
+    if (registerSerial) {
+        serialNumber = serialCount++;
+    }
+}
+
+/**
+* @param posx the posx relative to the middle of the instance
+* @param posy the posy relative to the middle of the instance
+* @param dir the outward of the exit 0-360
+* @example instance like 'G', exit is like : (1,1,120) and (0,0,270)
+*/
 void NodeInstance::addExit(double posx, double posy, double dir) {
     if (addComplete) {
         cout << "[NodeInstance::addExit] you add an exit to a completed node!" << endl;
@@ -22,32 +56,50 @@ void NodeInstance::addExit(double posx, double posy, double dir) {
     exitNums ++;
 }
 
+/**
+ * @see ExitInstance::operator<()
+ */
 void NodeInstance::completeAdding() {
     sort(exits.begin(), exits.end());
     exitNums = static_cast<uint8_t>(exits.size());
     addComplete = true;
 }
 
+/**
+* @param d reference of the dir
+* @return the adjusted direction
+*/
 const double & NodeInstance::checkDir(double &d) {
     if (d >= 360.0 || d < 0.0) {
-        cout << "[WARNING] you add a direction out of range:" << (int)d << endl;
         d -= 360.0 * floor(d/360.0);
     }
     return d;
 }
 
+/**
+ * @param usedMap the MapCandidate (this should be unique)
+ * @param usedAt the related TopoNode in the MapCandidate
+ */
 void NodeInstance::addUseage(MapCandidate *usedMap, TopoNode *usedAt) {
     nodeUseages.insert({usedMap, usedAt});
 }
 
 void NodeInstance::removeUseage(MapCandidate *map2unbind) {
     nodeUseages.erase(map2unbind);
-    if (nodeUseages.empty()) {
-        //TODO need suicide?
-    }
 }
 
-
+/**
+ * @param rnode the other node
+ * @return -1: unlike\n
+ * other : the dislocation of the gate NO.\
+ * @note
+ * \b example: \n
+ * that: (-pi, 0, pi/2)\n
+ * this: (0, pi/2, pi)\n
+ * the return would be 1\n
+ * means: gate NO. of \a this needs to +1
+ *
+ */
 int NodeInstance::alike(const NodeInstance & rnode) const {
     const NodeInstance * lnode = this;
 
@@ -140,21 +192,13 @@ int NodeInstance::alike(const NodeInstance & rnode) const {
     return differNum;
 }
 
-NodeInstance::NodeInstance(bool registerSerial)
-        : serialNumber(serialCount)
-{
-    if (registerSerial) {
-        serialNumber = serialCount++;
-    }
-}
-
 /**
- * encode the instance to the rosMsg, which need 3 paras about the movement to the node
  * ENU
- * @param arriveAt
- * @param odomX
- * @param odomY
- * @return
+ * @param arriveAt the arriving at Exit ID of this instance
+ * @param odomX the odom movement since last instance in X
+ * @param odomY the odom movement since last instance in X
+ * @return the built ROS msg structure
+ * @todo split this(ROS related) out of the lib
  */
 topology_map::NewNodeMsgPtr
 NodeInstance::encode2ROSmsg(unsigned char arriveAt,
@@ -177,6 +221,13 @@ NodeInstance::encode2ROSmsg(unsigned char arriveAt,
     return msgPtr;
 }
 
+/**
+ * @return
+ * ["No"] int serialNO \n
+ * ["Extra"] string the index info\n
+ * ["Exits"] array of exits
+ * @see ExitInstance::toJS()
+ */
 JSobj NodeInstance::toJS() const {
     JSobj obj;
     obj["No"] = serialNumber;
@@ -188,27 +239,28 @@ JSobj NodeInstance::toJS() const {
     return std::move(obj);
 }
 
-NodeInstance::NodeInstance(const NodeInstance & lIns, bool registerSerial)
-        :exitNums(lIns.exitNums),
-         extraMsg(lIns.extraMsg),
-         exits(lIns.exits),
-         addComplete(lIns.addComplete){
-    if (registerSerial) {
-        serialNumber = serialCount++;
-    }
-}
+//topology_map::NewNodeMsgPtr
+//NodeInstance::encode2ROSmsg(unsigned char arriveAt, const array<double, 3> & odomMsg) {
+//    return encode2ROSmsg(arriveAt, (float) odomMsg[0], (float) odomMsg[1], (float) odomMsg[2]);
+//}
 
-topology_map::NewNodeMsgPtr
-NodeInstance::encode2ROSmsg(unsigned char arriveAt, const array<double, 3> & odomMsg) {
-    return encode2ROSmsg(arriveAt, (float) odomMsg[0], (float) odomMsg[1], (float) odomMsg[2]);
-}
-
+/**
+ *
+ * @param x the global odom in X
+ * @param y the global odom in Y
+ * @param movedDis the distance moved since the origin
+ * @attention movedDis isn't since last instance
+ */
 void NodeInstance::setGlobalPos(double x, double y, double movedDis) {
     globalX = x;
     globalY = y;
     travelDis = movedDis;
 }
 
+/**
+ * @param midDir in rad
+ * @return the closest exit id
+ */
 gateId NodeInstance::getMidDirClosestExit(double midDir) {
     midDir = topo::fixRad2nppi(midDir);
     double curDif = piTwo;
@@ -224,6 +276,12 @@ gateId NodeInstance::getMidDirClosestExit(double midDir) {
     return static_cast<gateId>(curI);
 }
 
+/**
+ * @param posx the search pos's x
+ * @param posy the search pos's y
+ * @return the cloest gate's id
+ * @attention for speed, the distance doesn't use sqrt
+ */
 gateId NodeInstance::figureOutWhichExitItis(double posx, double posy) {
     int ans = 0;
     double dist = abs(posx - exits[0].getPosX()) + abs(posy - exits[0].getPosY());
@@ -236,4 +294,5 @@ gateId NodeInstance::figureOutWhichExitItis(double posx, double posy) {
     }
     return static_cast<gateId>(ans);
 }
+
 

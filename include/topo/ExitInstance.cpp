@@ -27,7 +27,9 @@ bool ExitInstance::alike(const ExitInstance & rExit) const {
     double posDif = abs(rExit.midPosX - lExit.midPosX) + abs(rExit.midPosY - lExit.midPosY);
     return  posDif < posTollerance();   //just to kill warning, may not a good idea
 }
-
+/**
+ * stub
+ */
 JSobj ExitInstance::toJS() const {
     JSobj obj;
     obj["pos"].append(midPosX);
