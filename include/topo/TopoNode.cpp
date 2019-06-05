@@ -5,8 +5,9 @@
 #include "TopoNode.h"
 #include "TopoEdge.h"
 
+/// create a TopoNode according to the nodeInstance
 /**
- * create a TopoNode according to the nodeInstance
+ * @note here we didn't access to the NodeInstance 's usages, the work is done by the caller
  * @param nodeInstance
  */
 TopoNode::TopoNode(NodeInstance *const nodeInstance):
@@ -20,6 +21,11 @@ TopoNode::TopoNode(NodeInstance *const nodeInstance):
     }
 }
 
+/// convert the TopoNode to JSON structure
+/**
+ * @return
+ * [] array of related NodeInstances
+ */
 JSobj TopoNode::toJS() const {
     JSobj obj;
     for (const auto & ins: relatedInses) {
@@ -28,9 +34,12 @@ JSobj TopoNode::toJS() const {
     return std::move(obj);
 }
 
+/// copy constructor from another TopoNode
 /**
- * clone a TopoNode, including the relatedInses
- * @param that
+ * clone a TopoNode, including the relatedInses, but don;t modify the usage
+ * @param that another TopoNode
+ * @warning the related NodeInstance's useage is not modified, the work belongs to the caller
+ * because we don't know the usage arrangments here
  */
 TopoNode::TopoNode(const TopoNode *that) :
         relatedInses(that->relatedInses),
@@ -40,6 +49,19 @@ TopoNode::TopoNode(const TopoNode *that) :
 {
 }
 
+/// rotate the exits' ID
+/**
+ * it is because, sometimes two NodeInstance from a same place (in real world) has different
+ * index caused by margin effect at west direction(-pi to pi)
+ * @param diff the diff that this TopoNode needs to plus
+ *
+ * @note \b example\n
+ * if diff = 1, then the gate id will be changed like this: 0123 -> 3012
+ *
+ * @attention we assume that the diff will never be 0, so we don't check if it is 0
+ *
+ * @see MapCandidate::arriveAtSimiliar()
+ */
 void TopoNode::ringRotate(int diff) {
     auto size = edgeConnected.size();
     if (diff < 0) {
