@@ -13,71 +13,74 @@
 using namespace std;
 
 /**
- * represent an exit in a node instance
+ * represent an exit in a NodeInstance
  */
 class ExitInstance {
 public:
     ExitInstance() = delete;
 
+    // the only constructure of ExitInstance
     explicit ExitInstance(double posx, double posy, double dir);
 
-    /// the exit outward direction(NOTHING to do with the instance) ENU
+    // sort according to the midRad(from atan2) ENU
+    bool operator < (const ExitInstance & anotherNode) const;
+
+    // compare another ExitInstance if they are alike
+    bool alike(const ExitInstance &) const;
+
+    //convert ExitInstance into a JSON structure
+    JSobj toJS() const;
+
+    // the exit outward direction (be different with the mid rad) ENU
     const double & getOutDir() const {
         return outDir;
     }
 
-    /// relative coor to the mid of the instance, ENU
+    // relative coor to the mid of the instance, ENU
     const double & getPosX() const {
         return midPosX;
     }
 
-    /// relative coor to the mid of the instance, ENU
+    // relative coor to the mid of the instance, ENU
     const double & getPosY() const {
         return midPosY;
     }
 
     /// the dir of the vector(mid to exit) in rad ENU (from atan2)
-    /// @example SENWS = -90/0/90/180/-90
+    /// @note \b example \n
+    /// south/ east / north / \b west / east = \n -halfPI / 0 / halfPI / PI / -halfPI
     const double & getMidRad() const {
         return midRad;
     }
 
-    /**
-     * sort according to the midRad(from atan2) ENU
-     */
-    bool operator < (const ExitInstance & anotherNode) const {
-        return this->midRad < anotherNode.midRad;
-    }
+private: // function
 
-    /**
-     * determine if the two exits are alike
-     */
-    bool alike(const ExitInstance &) const;
-
-    /**
-     * the eixt outward dir tollerance
-     */
+    //the eixt outward dir tollerance in degree
     static double dirTollerance() {
         return 30.0;
     }
 
-    /**
-     * the pos tollerance
-     */
+    // the tollerance of the pos
     static double posTollerance() {
         return 0.3;
     }
 
-    JSobj toJS() const;
-
-private:
-    // the exit outward direction(no relationship with the midpoint) ENU
+private: // members
+    /// the exit outward direction ENU
+    /// @attention the direction has no relationship with ExitInstance::midRad \n
+    /// for example, the door is at (1,1) but the outward is pointing at (0,1) north, it is
+    /// different if it is pointing at (1,0) east
     double outDir;
-    // relative coor to the mid of the instance, ENU
+
+    /// relative coor to the mid of the instance, ENU
     double midPosX;
-    // relative coor to the mid of the instance, ENU
+
+    /// relative coor to the mid of the instance, ENU
     double midPosY;
-    // the dir of the vector(middle point to exit), ENU (from atan2)
+
+    /// the dir of the vector(middle point to exit), ENU (from atan2)
+    /// @note \b example \n
+    /// south/ east / north / \b west / east = \n -halfPI / 0 / halfPI / PI / -halfPI
     double midRad;
 };
 

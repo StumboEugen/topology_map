@@ -28,42 +28,42 @@ using std::string;
 class NodeInstance {
 public:
 
-    /// purest constructor of a empty NodeInstance
+    // purest constructor of a empty NodeInstance
     explicit NodeInstance(bool registerSerial = true);
 
-    /// copy constructor from another NodeInstance
+    // copy constructor from another NodeInstance
     NodeInstance(const NodeInstance &, bool registerSerial = true);
 
-    ///add an exit to this instance (ENU)
+    //add an exit to this instance (ENU)
     void addExit(double posx, double posy, double dir);
     
-    /// the final step of adding is sorting exitInstances
+    // the final step of adding is sorting exitInstances
     void completeAdding();
 
-    /// add the map useage to this node instance
+    // add the map useage to this node instance
     void addUseage(MapCandidate *usedMap, TopoNode *usedAt);
 
-    /// remove the map useage form the record
+    // remove the map useage form the record
     void removeUseage(MapCandidate *map2unbind);
 
-    /// compare another node if they are alike
+    // compare another node if they are alike
     int alike(const NodeInstance &) const;
 
     // TODO maybe using pos rather than id is better
-    /// encode the instance to the rosMsg, which need 3 paras about the movement to the node
+    // encode the instance to the rosMsg, which need 3 paras about the movement to the node
     topology_map::NewNodeMsgPtr
     encode2ROSmsg(unsigned char arriveAt, float odomX, float odomY, float yaw);
 
-    /// get the cloest exit of the dir
+    // get the cloest exit of the dir
     gateId getMidDirClosestExit(double midDir);
 
-    /// turn NodeInstance to JSON structure
+    // convert NodeInstance to JSON structure
     JSobj toJS() const;
 
-    ///set the pos in global, (from the origin) and the distance moved
+    //set the pos in global, (from the origin) and the distance moved
     void setGlobalPos(double x, double y, double movedDis);
 
-    /// find the closest exit of the given pos
+    // find the closest exit of the given pos
     gateId figureOutWhichExitItis(double posx, double posy);
 
     const uint8_t sizeOfExits() const {

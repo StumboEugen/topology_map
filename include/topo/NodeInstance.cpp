@@ -13,6 +13,7 @@ using namespace std;
 
 size_t NodeInstance::serialCount = 1;
 
+/// purest constructor of a empty NodeInstance
 /**
  * @param registerSerial if the serial number is registered
  * @see serialNumber
@@ -26,6 +27,7 @@ NodeInstance::NodeInstance(bool registerSerial)
     }
 }
 
+/// copy constructor from another NodeInstance
 /**
  * @param lIns the copyed node instance
  * @param registerSerial if the serial number is registered
@@ -41,6 +43,7 @@ NodeInstance::NodeInstance(const NodeInstance & lIns, bool registerSerial)
     }
 }
 
+///add an exit to this instance (ENU)
 /**
 * @param posx the posx relative to the middle of the instance
 * @param posy the posy relative to the middle of the instance
@@ -56,6 +59,7 @@ void NodeInstance::addExit(double posx, double posy, double dir) {
     exitNums ++;
 }
 
+/// the final step of adding is sorting exitInstances
 /**
  * @see ExitInstance::operator<()
  */
@@ -76,6 +80,7 @@ const double & NodeInstance::checkDir(double &d) {
     return d;
 }
 
+/// add the map useage to this node instance
 /**
  * @param usedMap the MapCandidate (this should be unique)
  * @param usedAt the related TopoNode in the MapCandidate
@@ -84,10 +89,12 @@ void NodeInstance::addUseage(MapCandidate *usedMap, TopoNode *usedAt) {
     nodeUseages.insert({usedMap, usedAt});
 }
 
+/// remove the map useage form the record
 void NodeInstance::removeUseage(MapCandidate *map2unbind) {
     nodeUseages.erase(map2unbind);
 }
 
+/// compare another node if they are alike
 /**
  * @param rnode the other node
  * @return -1: unlike\n
@@ -192,6 +199,7 @@ int NodeInstance::alike(const NodeInstance & rnode) const {
     return differNum;
 }
 
+/// encode the instance to the rosMsg, which need 3 paras about the movement to the node
 /**
  * ENU
  * @param arriveAt the arriving at Exit ID of this instance
@@ -221,6 +229,7 @@ NodeInstance::encode2ROSmsg(unsigned char arriveAt,
     return msgPtr;
 }
 
+/// convert NodeInstance to JSON structure
 /**
  * @return
  * ["No"] int serialNO \n
@@ -244,8 +253,8 @@ JSobj NodeInstance::toJS() const {
 //    return encode2ROSmsg(arriveAt, (float) odomMsg[0], (float) odomMsg[1], (float) odomMsg[2]);
 //}
 
+///set the pos in global, (from the origin) and the distance moved
 /**
- *
  * @param x the global odom in X
  * @param y the global odom in Y
  * @param movedDis the distance moved since the origin
@@ -257,6 +266,7 @@ void NodeInstance::setGlobalPos(double x, double y, double movedDis) {
     travelDis = movedDis;
 }
 
+/// get the cloest exit of the dir
 /**
  * @param midDir in rad
  * @return the closest exit id
@@ -276,6 +286,7 @@ gateId NodeInstance::getMidDirClosestExit(double midDir) {
     return static_cast<gateId>(curI);
 }
 
+/// find the closest exit of the given pos
 /**
  * @param posx the search pos's x
  * @param posy the search pos's y
