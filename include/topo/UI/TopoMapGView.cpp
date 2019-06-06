@@ -101,7 +101,7 @@ void TopoMapGView::mouseReleaseEvent(QMouseEvent *event) {
                         auto * edge = new TopoEdge(nodeAofDrawingEdge, exitAofDrawingEdge,
                                                    nodeItem->getRelatedNodeTOPO(),
                                                    static_cast<uint8_t>(exitNumber));
-                        edge->registerAtNodes();
+//                        edge->registerAtNodes();
                         theDrawingEdge->setRelatedEdgeTOPO(edge);
                         Q_EMIT newEdgeConnected(edge);
 //                        const auto & firstPos = theDrawingEdge->line().p1();

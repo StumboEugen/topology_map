@@ -55,7 +55,7 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
                                        oriEdge->getNodeB()->clonedTo);
         this->edges.insert(clonedEdge);
         /**add the relationships in nodes;*/
-        clonedEdge->registerAtNodes();
+//        clonedEdge->registerAtNodes();
 
 //        if (nodes.find(clonedEdge->getNodeA()) == nodes.end() ||
 //            nodes.find(clonedEdge->getNodeB()) == nodes.end()) {
@@ -227,12 +227,12 @@ TopoNode *const MapCandidate::addNewNode(NodeInstance *const instance) {
  */
 TopoEdge *const
 MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, TopoNode *const eb, gateId gb) {
-    //TODO cancel this check
-    if (nodes.find(ea) == nodes.end() || nodes.find(eb) == nodes.end()) {
-        cerr << "[MapCandidate::addNewEdge]"
-                "you try to connect two node that didn't belong to this mapcandidate!"
-                << endl;
-    }
+//    //TODO cancel this check
+//    if (nodes.find(ea) == nodes.end() || nodes.find(eb) == nodes.end()) {
+//        cerr << "[MapCandidate::addNewEdge]"
+//                "you try to connect two node that didn't belong to this mapcandidate!"
+//                << endl;
+//    }
 
     auto edgeResult = edges.emplace(new TopoEdge(ea, ga, eb, gb));
     if (!edgeResult.second) {
@@ -240,7 +240,7 @@ MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, TopoNode *const eb, gate
         throw;
     }
     auto newEdge = (* edgeResult.first);
-    newEdge->registerAtNodes();
+//    newEdge->registerAtNodes();
 //    ea->addEdge(ga, newEdge);
 //    eb->addEdge(gb, newEdge);
     return newEdge;
