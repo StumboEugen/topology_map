@@ -21,6 +21,8 @@ class TopoEdge;
  * There might be sreval related NodeInstances,
  * because we may arrive at a same place at different time.
  * @note the main related NodeInstance is the back of the TopoNode::relatedInses
+ * @attention no information about the MapCandidate is stored here, so we can't find
+ * MapCandidate from TopoNode
  */
 class TopoNode {
 

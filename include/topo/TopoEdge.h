@@ -11,47 +11,41 @@
 class TopoNode;
 
 /**
- * represent an edge in map candidate
+ * represent an edge in MapCandidate.
+ *
  */
 class TopoEdge {
 
 public:
+    // constructor of a empty Edge
     TopoEdge(TopoNode * ea, uint8_t ga, TopoNode * eb, uint8_t gb);
 
-    TopoEdge(const TopoEdge& edge, TopoNode * ea, TopoNode * eb);
+    // copy constructor from another TopoEdge.
+    TopoEdge(const TopoEdge& that, TopoNode * ea, TopoNode * eb);
 
-    TopoNode *const getAnotherNode(TopoNode* node) const {
-        if (node == exitA) {
-            return exitB;
-        }
-        if (node == exitB) {
-            return exitA;
-        }
-        std::cout << "TopoEdge another node FAILURE" << std::endl;
-        throw;
-    }
+    // get a connected TopoNode from another TopoNode
+    TopoNode *const getAnotherNode(TopoNode* node) const;
 
-    unsigned char getAnotherGate(TopoNode* node) const {
-        if (node == exitA) {
-            return gateB;
-        }
-        if (node == exitB) {
-            return gateA;
-        }
-        std::cout << "TopoEdge another gate FAILURE" << std::endl;
-        throw;
-    }
+    // get a gateNO from another TopoNode
+    unsigned char getAnotherGate(TopoNode* node) const;
 
-    void resetGate(TopoNode * node, gateId newGateID) {
-        if (node == exitA) {
-            gateA = newGateID;
-        } else if (node == exitB) {
-            gateB = newGateID;
-        } else {
-            std::cerr << "TopoEdge resetGate FAILURE" << std::endl;
-            throw;
-        }
-    }
+    // change gate's NO
+    void resetGateNO(TopoNode *node, gateId newGateID);
+
+    // change one exit to another exit
+    void changeExitTo(TopoNode * oldNode, TopoNode * newNode, unsigned char newGate);
+
+    // add new odom data to this edge, and get a fix coefficient from the observation.
+    double addOdomData(double dis_x, double dis_y, double yaw, TopoNode *leftNode);
+
+    // set odom data violently
+    void setOdomDataDirectly(double x, double y, double yaw);
+
+    // get the odom data.
+    std::array<double, 3> getOdomData(TopoNode *oriNode);
+
+    // convert the TopoEdge to JSON structure
+    JSobj toJS() const;
 
     TopoNode *const getNodeA() const {
         return exitA;
@@ -69,27 +63,6 @@ public:
         return gateB;
     }
 
-    void registerAtNodes();
-
-    void changeExitTo(TopoNode * oldNode, TopoNode * newNode, unsigned char newGate);
-
-    void leaveFromNode(TopoNode *leftnode);
-
-    bool haveLeftFromNode(TopoNode *leftnode);
-
-    /**
-     * @param dis_x right
-     * @param dis_y forward
-     * @param yaw turn yaw, conter clockwise is +, in RAD
-     * @param leftNode
-     * @return
-     */
-    double addOdomData(double dis_x, double dis_y, double yaw, TopoNode *leftNode);
-
-    void setOdomDataDirectly(double x, double y, double yaw);
-
-    std::array<double, 3> getOdomData(TopoNode *oriNode);
-
     double getOdomX() const {
         return odomX;
     }
@@ -102,19 +75,44 @@ public:
         return yawOdom;
     }
 
-    JSobj toJS() const;
+    // set has left from node (unused yet)
+    void leaveFromNode(TopoNode *leftnode);
+
+    // check if have left from node (unused yet)
+    bool haveLeftFromNode(TopoNode *leftnode);
 
 private:
+    // register edge info at TopoNode
+    void registerAtNodes();
+
+    /// the connected TopoNode A
     TopoNode * exitA;
+
+    /// the connected TopoNode B
     TopoNode * exitB;
+
+    /// the exitNO at TopoNode A
     uint8_t gateA;
+
+    /// the exitNO at TopoNode B
     uint8_t gateB;
+
+    /// if a2b has moved (unused yet)
     bool a2bMoved;
+
+    /// if b2a has moved (unused yet)
     bool b2aMoved;
+
+    /// odom data at X-axis
     double odomX;
+
+    /// odom data at Y-axis
     double odomY;
-    /// in RAD
+
+    /// odom data in turnning in RAD (unused yet)
     double yawOdom;
+
+    /// the amount of odom data observed
     uint16_t odomCount;
 };
 

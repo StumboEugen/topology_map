@@ -55,7 +55,7 @@ TopoNode::TopoNode(const TopoNode *that) :
  * index caused by margin effect at west direction(-pi to pi)
  * @param diff the diff that this TopoNode needs to plus
  *
- * @note \b example\n
+ * @note \b example \n
  * if diff = 1, then the gate id will be changed like this: 0123 -> 3012
  *
  * @attention we assume that the diff will never be 0, so we don't check if it is 0
@@ -75,13 +75,13 @@ void TopoNode::ringRotate(int diff) {
     for (int i = 0; i < size - diff; ++i) {
         edgeConnected[i + diff] = copy[i];
         if (copy[i])
-            copy[i]->resetGate(this, static_cast<gateId>(i + diff));
+            copy[i]->resetGateNO(this, static_cast<gateId>(i + diff));
     }
 
     for (auto i = size - diff; i < size; ++i) {
         edgeConnected[i + diff - size] = copy[i];
         if (copy[i])
-            copy[i]->resetGate(this, static_cast<gateId>(i + diff - size));
+            copy[i]->resetGateNO(this, static_cast<gateId>(i + diff - size));
     }
 }
 
