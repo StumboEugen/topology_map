@@ -48,24 +48,23 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
     auto & nodeSet = nodeSets[newIns->sizeOfExits()];
     auto iter = nodeSet.begin();
     while (iter != nodeSet.end()) {
-        /// 20190408 no useages node ins is still required in the experiences
-//        if ((*iter)->haveNoUseages()) {
-//            iter = nodeSet.erase(iter);
-//        } else {
-            auto & nodeInstance = *iter;
+        auto & oldInstance = *iter;
+        if (oldInstance->haveNoUseages()) {
+            iter = nodeSet.erase(iter);
+        } else {
             /**they are alike! check the useage in map, if it is propriate*/
-            int diff = newIns->alike(*nodeInstance);
+            int diff = newIns->alike(*oldInstance);
             if (diff >= 0) {
-                for (const auto & useage : nodeInstance->getNodeUseages()) {
+                for (const auto & useage : oldInstance->getNodeUseages()) {
                     MapCandidate * relatedMap = useage.first;
                     if (!relatedMap->isJustMovedOnKnownEdge()) {
-                        loopDetected[nodeInstance].emplace_back(
+                        loopDetected[oldInstance].emplace_back(
                                 relatedMap, useage.second, diff);
                     }
                 }
             }
             iter++;
-//        }
+        }
     }
 
     /// do the arrive at similiar task at here, if earlier, the ins useages would be polluted
