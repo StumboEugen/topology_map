@@ -16,33 +16,37 @@
 using namespace std;
 
 /**
- * compare the instace with every node and find the similiar ones
- * the new maps caused by moving to similiar nodes will be returned
- * @param newIns
- * @param arriveAt
- * @param dis_x
- * @param dis_y
+ * compare the instances with every node and return the maps happen loop-closure.
+ * the new maps caused by moving to similiar nodes will be returned.
+ * @param newIns the newly arrived NodeInstance
+ * @param arriveAt the gate that arrived at
+ * @param dis_x the odom movement in X-axis
+ * @param dis_y the odom movement in Y-axis
  * @return the new maps caused by moving to similiar nodes
+ *
+ * @attention the new NodeInstance 's owner is passed to this NodeCollection
  */
 vector<MapCandidate *> NodeCollection::addInstanceAndCompare
         (NodeInstance *newIns, uint8_t arriveAt, double dis_x, double dis_y) {
 
 
+    ///////////////////// add nodeInstance to vector collection
+
     if (experiences.empty()) {
         newIns->setGlobalPos(0.0, 0.0, 0.0);
     } else {
         double dis = sqrt(dis_x * dis_x + dis_y * dis_y);
-        const auto lastIns = experiences.back();
+        const auto & lastIns = experiences.back();
         newIns->setGlobalPos(dis_x + lastIns->getGlobalX(),
                              dis_y + lastIns->getGlobalY(),
                              dis + lastIns->getTravelDis());
     }
     experiences.push_back(newIns);
 
-    vector<MapCandidate *> newMaps;
+    ///////////////////// find similiar NodeInstance s
 
-    // TODO use faster structure
     /// alike xxx instance, with useage of xxx map at xxx node with xxx diff
+    /// @todo use faster structure
     map< NodeInstance*, vector<tuple<MapCandidate *, TopoNode*, int>>> loopDetected;
     /**find data group we need to check*/
     auto & nodeSet = nodeSets[newIns->sizeOfExits()];
@@ -67,6 +71,9 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
         }
     }
 
+    ////////////////////// check if loop-closure availabile
+
+    vector<MapCandidate *> newMaps;
     /// do the arrive at similiar task at here, if earlier, the ins useages would be polluted
     for (auto & alikeInsPair: loopDetected) {
         auto & alikeIns = alikeInsPair.first;
@@ -98,6 +105,13 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
     return std::move(newMaps);
 }
 
+/**
+ * @brief convert the NodeCollection to JSON structure
+ * @return
+ * [] array of NodeInstance
+ * @see NodeInstance::toJS()
+ * @note the order of time is implyed in the serial number
+ */
 JSobj NodeCollection::toJS() const {
     JSobj obj;
     for (const auto & nodeSet: nodeSets) {
@@ -108,6 +122,10 @@ JSobj NodeCollection::toJS() const {
     return std::move(obj);
 }
 
+/**
+ * @brief clear all info and destroy NodeInstances.
+ * @attention NodeInstance would be delete
+ */
 void NodeCollection::clear() {
     for (const auto & nodeSet: nodeSets) {
         for (const auto & node: nodeSet.second) {
@@ -118,11 +136,21 @@ void NodeCollection::clear() {
     nodeSets.clear();
 }
 
+/**
+ * @brief manually add a NodeInstance.
+ * this is usually used for building fake map
+ * @param newNode the new Node
+ */
 void NodeCollection::addInstanceDirectly(NodeInstance *newNode) {
     nodeSets[newNode->sizeOfExits()].insert(newNode);
     experiences.push_back(newNode);
 }
 
+/**
+ * @brief the main constructor.
+ * for conveient, we need NodeCollection knows the parent MapArranger
+ * @param parent the MapArranger that contains this
+ */
 NodeCollection::NodeCollection(MapArranger *parent):
         parent(parent)
 {

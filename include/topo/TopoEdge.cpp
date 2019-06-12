@@ -202,6 +202,7 @@ double TopoEdge::addOdomData(double dis_x, double dis_y, double yaw, TopoNode *l
 }
 
 /// set odom data violently ENU
+/// @attention the odom count will be set to 1
 void TopoEdge::setOdomDataDirectly(double x, double y, double yaw) {
     odomCount = 1;
     odomX = x;
