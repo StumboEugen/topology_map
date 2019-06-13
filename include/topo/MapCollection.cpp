@@ -68,6 +68,7 @@ void MapCollection::clear() {
         delete map;
     }
     maps.clear();
+    orderedMaps.clear();
 }
 
 void MapCollection::addNodeDirectly(TopoNode * node)  {
@@ -123,6 +124,7 @@ void MapCollection::purgeBadMaps(int survival) {
 
     for (int i = survival; i < orderedMaps.size(); i++) {
         auto map2delete = orderedMaps[i];
+        map2delete->removeUseages();
         maps.erase(map2delete);
         map2delete->detachAllInstances();
         delete map2delete;
