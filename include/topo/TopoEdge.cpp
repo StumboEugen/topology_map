@@ -230,14 +230,14 @@ array<double, 3> TopoEdge::getOdomData(TopoNode *oriNode) {
 /**
  * convert the TopoEdge to JSON structure
  * @return
- * ["Ea"] int the serial number of the exitA TopoNode 's corresponding NodeInstance
- * ["Eb"] int the serial number of the exitB TopoNode 's corresponding NodeInstance
- * ["Ga"] int the gateNO at exitA TopoNode
- * ["Gb"] int the gateNO at exitB TopoNode
- * ["Ox"] float odom data X-axis
- * ["Oy"] float odom data Y-axis
- * ["Oa"] int the ammount of observation
- * ["yaw"] the turn data
+ * ["Ea"] int the serial number of the exitA TopoNode 's corresponding NodeInstance \n
+ * ["Eb"] int the serial number of the exitB TopoNode 's corresponding NodeInstance \n
+ * ["Ga"] int the gateNO at exitA TopoNode \n
+ * ["Gb"] int the gateNO at exitB TopoNode \n
+ * ["Ox"] float odom data X-axis \n
+ * ["Oy"] float odom data Y-axis \n
+ * ["Oa"] int the ammount of observation \n
+ * ["yaw"] the turn data \n
  */
 JSobj TopoEdge::toJS() const {
     JSobj obj;
