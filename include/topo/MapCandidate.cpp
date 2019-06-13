@@ -10,7 +10,8 @@
 
 
 /**
- * usually called at the very beginning
+ * @brief generate a MapCandidate that only has a TopoNode
+ * usually called at the very beginning, no edge has been moved through.
  * @param firstInstance the first node instance
  */
 MapCandidate::MapCandidate( NodeInstance *const firstInstance):
@@ -24,8 +25,10 @@ MapCandidate::MapCandidate( NodeInstance *const firstInstance):
 }
 
 /**
- * to copy a brand new map
- * @param copyFrom
+ * @brief copy constructor
+ * copy a MapCandidate, includes new TopoNode s and TopoEdge s, the new usages resulted from
+ * the new MapCandidate would be refreshed too
+ * @param copyFrom the MapCandidate copy source
  */
 MapCandidate::MapCandidate(const MapCandidate & copyFrom)
         :leaveFrom(copyFrom.leaveFrom),
@@ -40,7 +43,7 @@ MapCandidate::MapCandidate(const MapCandidate & copyFrom)
         //todo
         TopoNode *clonedNodePtr = * this->nodes.emplace
                 (new TopoNode(oriNode)).first;
-        /**the useage should be added oustide of the constructor
+        /**the useage should be added oustide of the TopoNode's constructor
          * because there is no map info in TopoNode's constructor
          */
         clonedNodePtr->getInsCorrespond()->addUseage(this, clonedNodePtr);
@@ -95,10 +98,23 @@ inline void MapCandidate::arriveNewNode(NodeInstance *const instance, gateId arr
 }
 
 /**
- * firstly called when a arrive action happened
+ * @brief inform the MapCandidate the robot arrives at a NodeInstance
  * @param instance the node instance
  * @param arriveAt the arrive gate
  * @return if the arrivial is OK for this map
+ *
+ * firstly called when a arrival action happened. In this function, this map would be deduced
+ * to check if the new arrival is appropriate.
+ *
+ * For the MapCandidate that moves on a known TopoEdge, the new arrived NodeInstance would be
+ * checked with the TopoNode that should to be.
+ *
+ * For the MapCandidate that moves on a unknown TopoEdge, the newly arrived NodeInstance
+ * would be considered as a new TopoNode.
+ *
+ * Then the loop-closure would be checked at NodeCollection::addInstanceAndCompare
+ *
+ * @see NodeCollection::addInstanceAndCompare
  */
 bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
                                 const double dis_x, const double dis_y, const double yaw) {
@@ -129,8 +145,13 @@ bool MapCandidate::arriveAtNode(NodeInstance *const instance, gateId arriveAt,
 }
 
 /**
+ * @brief clone another MapCandidate from the origin one with a loop-closure
  * SPLIT A NEW CANDIDATE FROM A JUST ADDED NEW NODE CANDIDATE.
- * in the new candidate, we should arrive acturally at the (arriveNode) at gate (arriveGate)
+ *
+ * This is called from NodeInstance, when the newly arrived NodeInstance is similiar to a
+ * known TopoNode in this MapCandidate. Then a cloned MapCandidate with loop-closure would be
+ * made.
+ *
  * @param arriveNode the node that may happen loop closeure
  * @param arriveGate the arriveGate No in the older instance
  * @param gateDiff new instance's gateID + gateDiff = older instance's gateID
@@ -193,10 +214,10 @@ MapCandidate *const MapCandidate::arriveAtSimiliar(
     return newMap;
 }
 
-//TODO we may need a fuction to move according to pos & dir, not the id
 /**
- * be called after the real leave action
+ * @brief set the robot's state in \b this MapCandidate to leave at exit
  * @param exit set the exit number to leave
+ * @todo we may need a fuction to move according to pos & dir, not the id
  */
 void MapCandidate::setLeaveFrom(gateId exit) {
     leaveFrom = exit;
@@ -204,8 +225,8 @@ void MapCandidate::setLeaveFrom(gateId exit) {
 }
 
 /**
- * add a new node in the set
- * @param instance
+ * @brief create a new node into the nodes set
+ * @param instance the NodeInstance of the new TopoNode
  * @return the ptr of the node
  */
 TopoNode *const MapCandidate::addNewNode(NodeInstance *const instance) {
@@ -221,8 +242,8 @@ TopoNode *const MapCandidate::addNewNode(NodeInstance *const instance) {
 }
 
 /**
- * add a new edge in the set
- * @warning didn't check if the TopoNodes belongs to this Mapcandidate
+ * @brief create a new edge into the nodes set
+ * @attention didn't check if the TopoNodes belongs to this Mapcandidate
  * @return the ptr of the edge
  */
 TopoEdge *const
@@ -246,6 +267,11 @@ MapCandidate::addNewEdge(TopoNode *const ea, gateId ga, TopoNode *const eb, gate
     return newEdge;
 }
 
+/**
+ * @brief erase a TopoNode (destroy) in the nodes set
+ * The ueage in the NodeInstance would be purged too.
+ * @param node2remove the TopoNode to remove
+ */
 void MapCandidate::removeNode(TopoNode *node2remove) {
     fullEdgeNumber -= node2remove->getInsCorrespond()->sizeOfExits();
     node2remove->getInsCorrespond()->removeUseage(this);
@@ -253,6 +279,9 @@ void MapCandidate::removeNode(TopoNode *node2remove) {
     nodes.erase(node2remove);
 }
 
+/**
+ * @brief the destructor destroy all TopoEdge and TopoNode.
+ */
 MapCandidate::~MapCandidate() {
     for (auto edge: edges) {
         delete edge;
@@ -262,6 +291,20 @@ MapCandidate::~MapCandidate() {
     }
 }
 
+/**
+ * @brief convert MapCandidate to JSON structure
+ * @return
+ * ["edges"] null if there are no edges yet(when just created) \n
+ *           array of TopoEdges \n
+ * ["cur"] bool the MapCandidate::currentEdge's "cur" would be true \n
+ * ["nodes"] array of TopoNodes \n
+ * ["curNode"] int MapCandidate::currentNode's serial number \n
+ * ["lEiOe"] bool if the last moved on edge is a old edge \n
+ * ["edgeFullNum"] int MapCandidate::fullEdgeNumber no need any more
+ * ["confidence"] float the confidence of this MapCandidate, but it is PURE
+ * @see TopoEdge::toJS()
+ * @see TopoNode::toJS()
+ */
 JSobj MapCandidate::toJS() const {
     JSobj obj;
     obj["edges"] = Json::nullValue;
@@ -285,7 +328,9 @@ JSobj MapCandidate::toJS() const {
 }
 
 /**
+ * @brief remove all usages of the TopoNode s in related NodeInstances
  * call this function when this map has conflict, and need to be deleted
+ * @warning You must call this before delete map
  */
 void MapCandidate::removeUseages() {
     for (auto node: nodes) {
@@ -294,9 +339,17 @@ void MapCandidate::removeUseages() {
 }
 
 /**
- * generate a candidate from the JS info
+ * @brief generate a MapCandidate from the JSON info
  * @param nodeInses the serialNum-nodeInstance pair container
  * @param JSinfo the JSinfo of a map
+ * @see MapCandidate::toJS()
+ *
+ * All work is done in MapCandidate class.
+ *
+ * @note
+ * There are two versions of JSON structure, the difference is at the TopoNode related
+ * NodeInstances. TopoNode in the newer one has several NodeInsatnce s stored
+ *
  */
 MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
                            const JSobj & JSinfo) : fullEdgeNumber(0)
@@ -388,6 +441,9 @@ MapCandidate::MapCandidate(const std::vector<NodeInstance *> & nodeInses,
 //    }
 }
 
+/**
+ * @brief clear all assistance flags and ptrs of the TopoNodes
+ */
 void MapCandidate::cleanAllNodeFlagsAndPtr() {
     for (const auto & node : nodes) {
         node->cleanFlags();
@@ -395,22 +451,19 @@ void MapCandidate::cleanAllNodeFlagsAndPtr() {
     }
 }
 
+/**
+ * @brief update the confidence
+ * @param coe the coefficient to x
+ */
 void MapCandidate::xConfidence(double coe) {
     confidence *= coe;
 }
 
+/**
+ * @brief calculate the confidence of this map (not normalized)
+ * @param experienceCountK the experience count, from node collection
+ */
 double MapCandidate::getConfidence(double experienceCountK) const {
     double N = nodes.size();
     return confidence * exp(-N * log(experienceCountK));
 }
-
-void MapCandidate::detachAllInstances() {
-    for (auto & node : nodes) {
-        node->getInsCorrespond()->removeUseage(this);
-    }
-}
-
-double MapCandidate::getConfidencePURE() const {
-    return confidence;
-}
-

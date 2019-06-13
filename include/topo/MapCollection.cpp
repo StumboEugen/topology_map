@@ -172,7 +172,6 @@ void MapCollection::purgeBadMaps(int survivorCount) {
         auto map2delete = orderedMaps[i];
         map2delete->removeUseages();
         maps.erase(map2delete);
-        map2delete->detachAllInstances();
         delete map2delete;
     }
 
