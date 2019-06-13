@@ -12,18 +12,49 @@
 
 class MapArranger;
 /**
- * collection of the MapCandidates
- * a member of the mapArranger
+ * collection of the MapCandidates.
+ * a member of the MapArranger.
  */
 class MapCollection {
 public:
+    // constructor of MapCollection.
     explicit MapCollection(MapArranger * parent);
 
+    // deduce every MapCandidate in this to arrive at next NodeInstance.
     void arriveNodeInstance(NodeInstance *, uint8_t arriveAt, double dis_x, double dis_y,
                                 double yaw);
+
+    // directly add a new MapCandidate
     void addNewMap(MapCandidate *);
+
+    // set every MapCandidate 's robot to move throuth a gate.
     void everyMapThroughGate(gateId exit);
 
+    // purge assigned number of maps according to the confidence.
+    void purgeBadMaps(int survivorCount);
+
+    // sort the map according to confidence, the sorted map will be stored in orderedMaps
+    void sortByConfidence(size_t topCount);
+
+    // add TopoNode to MapCollection directly.
+    void addNodeDirectly(TopoNode *);
+
+    // add TopoEdge to MapCollection directly.
+    void addEdgeDirectly(TopoEdge *);
+
+    // convert MapCollection to JSON structure
+    JSobj toJS() const;
+
+    // convert MapCollection to JSON structure with a limited amount of maps
+    JSobj toJSWithSortedMaps(size_t mapCount = 0);
+
+    // clear and destroy all MapCandidates.
+    void clear();
+
+    // calculate the sum of confidence
+    double calSumOfConfidence();
+
+public:
     size_t mapNumbers() const {
         return maps.size();
     }
@@ -41,47 +72,24 @@ public:
         return maps.begin().operator*();
     }
 
-    void purgeBadMaps(int survival);
-
-    /**
-     * sort the map according to confidence, the sorted map will be stored in orderedMaps
-     * @param topCount only topCount of maps are stored
-     */
-    void sortByConfidence(size_t topCount);
-
-
-    /// this is used for UI building mode
-    void addNodeDirectly(TopoNode *);
-
-    void addEdgeDirectly(TopoEdge *);
-
-    JSobj toJS() const;
-
-    /**
-     * turn the map collection into a JSON obj
-     * @param mapCount the count of map you would like to save (0 == whole)
-     * @return the JS obj
-     */
-    JSobj toJSWithSortedMaps(size_t mapCount = 0);
-
-    void clear();
-
-    double calSumOfConfidence();
-
     double getSumOfConfidence() const {
         return sumOfConfidence;
     }
 
 private:
+    /// the MapArranger that owns this MapCollection
     MapArranger * const parent;
-    /**
-     * using list to store the map candidate to sort them quickly
-     */
+
+    /// for quick remove, the maps are stored in std::set
     std::set<MapCandidate*> maps;
 
-    /// a temp container
+    /// a temp container for ordered maps. usually it contians all maps in set and the first
+    /// TopCount of maps are in order
+    /// @see sortByConfidence()
     std::vector<MapCandidate*> orderedMaps;
 
+    /// the sum of all maps' confidence, for easy normalization
+    /// @see calSumOfConfidence()
     double sumOfConfidence = 0.0;
 };
 
