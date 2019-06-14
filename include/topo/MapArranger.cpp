@@ -8,6 +8,25 @@ using namespace std;
 #include "Topo.h"
 #include "MapArranger.h"
 
+/**
+ * @brief constructor of MapArranger, a name is required to assign name
+ * @param mapName the default name is local time, precise to minute
+ * the name is mainly for save file's name
+ */
+MapArranger::MapArranger(const std::string & mapName)
+        : mapName(mapName),
+          mapCollection(this),
+          nodeCollection(this)
+{}
+
+/**
+ * @brief tell the core that the robot arrives at a new NodeInstance
+ * @param instance the new NodeInstance
+ * @param arriveAt the exit arriving at
+ * @param odomX odom data since last NodeInstance in X-axis
+ * @param odomY odom data since last NodeInstance in Y-axis
+ * @param yaw odom data since last NodeInstance in yaw (unused yet)
+ */
 void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
                                  double odomX, double odomY, double yaw) {
     if (!instance->isAddComplete()) {
@@ -30,20 +49,31 @@ void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
     experiences ++;
 }
 
+/**
+ * @brief tell the core that the robot moves through a gate
+ * @param exit the id of the exit
+ */
 void MapArranger::moveThroughGate(gateId exit) {
     mapCollection.everyMapThroughGate(exit);
 }
 
+/**
+ * @brief get the size of maps
+ */
 size_t MapArranger::getMapNumbers() {
     return mapCollection.mapNumbers();
 }
 
-MapArranger::MapArranger()
-        : mapName(topo::getCurrentTimeString()),
-          mapCollection(this),
-          nodeCollection(this)
-{}
-
+/**
+ * @brief convert the built possibile maps into JSON structure
+ * @param mapCount the number of mapCandidate you would like to save (0 == whole)
+ * @return
+ * ["nodeInstance"] NodeCollection
+ * ["mapInstance"] MapCollection
+ * ["Name"] string the name of the MapArranger
+ * @see NodeCollection::toJS()
+ * @see MapCollection::toJSWithSortedMaps()
+ */
 JSobj MapArranger::toJS(size_t mapCount) {
     JSobj obj;
     obj["nodeInstance"] = nodeCollection.toJS();
@@ -52,15 +82,16 @@ JSobj MapArranger::toJS(size_t mapCount) {
     return std::move(obj);
 }
 
-using topo::checkJSMember;
-
 /**
- * decode from a JSON obj
+ * @brief input according to a JSON structure
  * @param obj the JSON obj
  * @return true if success, false if unsuccess
+ * @warning all remaining data would be deleted
  */
 bool MapArranger::readFromJSON(const JSobj &obj) {
     selfClean();
+
+    using topo::checkJSMember;
 
     /**
      * verify the JS structor
@@ -147,10 +178,34 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
 }
 
 /**
- * load the file according to he file name ~/topoMaps/<fileName>
- * if fail, the whole group will be cleared
- * @param fileName
+ * @brief input according to a JSON structure in string
+ * @param str the JSON obj in string
+ * @return true if success, false if unsuccess
+ * @warning all remaining data would be deleted
+ * @see readFromJSON()
+ */
+bool MapArranger::readFromStr(const std::string & str) {
+    selfClean();
+    Json::CharReaderBuilder b;
+    char const* begin = str.data();
+    char const* end = begin + str.size();
+    std::unique_ptr<Json::CharReader> const reader(b.newCharReader());
+    JSobj js;
+    string err;
+    bool ok = reader->parse(begin, end, &js, &err);
+    if (ok) {
+        return readFromJSON(js);
+    } else {
+        return false;
+    }
+}
+
+/**
+ * @brief load the file according to the file name
+ * if fail, the whole group will be cleared.
+ * @param fileName default is ~/topoMaps/<fileName>.
  * @return if the reload is successful
+ * @see TopoFile::setFileName(string fileName)
  */
 bool MapArranger::reloadFromFile(const std::string & fileName) {
     TopoFile existFile(fileName);
@@ -176,10 +231,20 @@ void MapArranger::selfClean() {
     nodeCollection.clear();
 }
 
+/**
+ * @brief sort the maps according the confidence.
+ * @param topCount the amout of maps you would likd to sort
+ */
 void MapArranger::sortByConfidence(size_t topCount) {
         mapCollection.sortByConfidence(topCount);
 }
 
+/**
+ * turn the whold map into a str in JSON format
+ * @param mapCount the number of mapCandidate you would like to save (0 == whole)
+ * @return the str in JSON format
+ * @see toJS()
+ */
 string MapArranger::toString(size_t mapCount) {
     stringstream ss;
     Json::StreamWriterBuilder builder;
@@ -188,20 +253,4 @@ string MapArranger::toString(size_t mapCount) {
     std::unique_ptr<Json::StreamWriter> const writer(builder.newStreamWriter());
     writer->write(toJS(mapCount), &ss);
     return std::move(ss.str());
-}
-
-bool MapArranger::readFromStr(const std::string & str) {
-    selfClean();
-    Json::CharReaderBuilder b;
-    char const* begin = str.data();
-    char const* end = begin + str.size();
-    std::unique_ptr<Json::CharReader> const reader(b.newCharReader());
-    JSobj js;
-    string err;
-    bool ok = reader->parse(begin, end, &js, &err);
-    if (ok) {
-        return readFromJSON(js);
-    } else {
-        return false;
-    }
 }

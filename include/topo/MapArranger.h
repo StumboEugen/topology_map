@@ -10,16 +10,45 @@
 #include "NodeCollection.h"
 
 /**
- * A boss class of the map part
+ * @brief The surface class of the Topo map core
+ * contain a NodeCollection and a MapCollection.
  */
 class MapArranger {
 public:
-    MapArranger();
+    // constructor of MapArranger, a name is required to assign name
+    explicit MapArranger(const std::string & mapName = topo::getCurrentTimeString());
 
+    // tell the core that we arrive at a new NodeInstance
     void arriveInstance(NodeInstance *instance, gateId arriveAt, double odomX, double odomY,
                             double yaw);
+
+    // tell the core that the robot moves through a gate
     void moveThroughGate(gateId gate);
+
+    // get the size of maps
     size_t getMapNumbers();
+
+    // sort the maps according the confidence.
+    void sortByConfidence(size_t topCount = 0);
+
+    // input according to a JSON structure
+    bool readFromJSON(const JSobj & obj);
+
+    // input according to a JSON structure in string format
+    bool readFromStr(const std::string & str);
+
+    // convert the built possibile maps into JSON structure
+    JSobj toJS(size_t mapCount = 0);
+
+    // turn the whold map into a str in JSON format
+    string toString(size_t mapCount = 0);
+
+    // load the file according to the file name
+    bool reloadFromFile(const std::string & fileName);
+
+    // clean everything, data, ptrs
+    void selfClean();
+
     size_t experienceNum() {
         return experiences;
     }
@@ -53,43 +82,17 @@ public:
         mapCollection.addEdgeDirectly(edge);
     }
 
-    /**
-     * sort the map, if the count asked is 0, sort every map
-     * @param topCount
-     */
-    void sortByConfidence(size_t topCount = 0);
-
-    bool readFromJSON(const JSobj & obj);
-
-    bool readFromStr(const std::string & str);
-
-
-    /**
-     * turn the map into a JSON obj
-     * @param mapCount the number of mapCandidate you would like to save (0 == whole)
-     * @return the js obj
-     */
-    JSobj toJS(size_t mapCount = 0);
-
-    /**
-     * turn the whold map into a str in JSON format
-     * @param mapCount the number of mapCandidate you would like to save (0 == whole)
-     * @return the str
-     */
-    string toString(size_t mapCount = 0);
-
-    bool reloadFromFile(const std::string & fileName);
-
-    void selfClean();
-
 private:
+    /// the NodeInstance that has moved through
     size_t experiences = 0;
+
+    /// the NodeCollection
     NodeCollection nodeCollection;
+
+    /// the MapCollection
     MapCollection mapCollection;
 
-    /**
-     * the name of this map group, it should be "const" like
-     */
+    /// name of the whole map
     std::string mapName;
 };
 
