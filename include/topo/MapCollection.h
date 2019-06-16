@@ -12,7 +12,7 @@
 
 class MapArranger;
 /**
- * collection of the MapCandidates.
+ * container of MapCandidate s.
  * a member of the MapArranger.
  */
 class MapCollection {

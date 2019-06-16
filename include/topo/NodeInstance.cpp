@@ -48,7 +48,7 @@ NodeInstance::NodeInstance(const NodeInstance & lIns, bool registerSerial)
 * @param posx the posx relative to the middle of the instance
 * @param posy the posy relative to the middle of the instance
 * @param dir the outward of the exit 0-360
-* @example instance like 'G', exit is like : (1,1,120) and (0,0,270)
+* @note \b example: instance like 'G', exit is like : (1,1,120) and (0,0,270)
 */
 void NodeInstance::addExit(double posx, double posy, double dir) {
     if (addComplete) {

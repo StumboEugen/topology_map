@@ -209,7 +209,7 @@ bool MapArranger::readFromStr(const std::string & str) {
  */
 bool MapArranger::reloadFromFile(const std::string & fileName) {
     TopoFile existFile(fileName);
-    if (existFile.open(std::ios::in) != 0) {
+    if (existFile.open(TopoFile::inputMapMode) != 0) {
         cerr << "[MapArranger::reloadFromFile] "
                 "open file failure, fall back to empty map" << endl;
         selfClean();

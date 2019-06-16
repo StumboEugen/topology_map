@@ -15,7 +15,7 @@ using namespace std;
 
 class MapArranger;
 /**
- * a container of NodeInstance.
+ * a container of NodeInstance s.
  * currently there are two container in this, vector contains the NodeInstance in a time order.
  * which means the experience of the environment.
  * \n

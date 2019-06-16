@@ -15,7 +15,7 @@
 using namespace std;
 
 /**
- * represent a possibility of the real topo structure map.
+ * @brief represent a possible option of the real topo structure map.
  *
  * includes TopoEdge s and TopoNode s. a MapCandidate is stored and arranged by
  * MapCollection.
