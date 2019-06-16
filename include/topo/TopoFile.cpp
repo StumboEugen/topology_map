@@ -13,11 +13,19 @@
 
 using namespace std;
 
+/**
+ * @brief constructor, the file's Name can be assigned
+ * @param fileName the path of the file, default("") is ~/topoMaps/<current Time>.
+ * absolute path is not supported
+ * @note \b example:
+ * filename = abc/map will create the map at ~/abc/map
+ */
 TopoFile::TopoFile(const string &fileName) {
     /**move to the user floder*/
     setFileName(fileName);
 }
 
+/// move the current dir to user's floder ~/
 void TopoFile::chDir2UserPath() {
     uid_t uid;
     struct passwd* pwd;
@@ -26,6 +34,13 @@ void TopoFile::chDir2UserPath() {
     chdir(pwd->pw_dir);
 }
 
+/**
+ * @brief set the file path
+ * @param fileName the path of the file, default("") is ~/topoMaps/<current Time>.
+ * absolute path is not supported
+ * @note \b example:
+ * filename = abc/map will create the map at ~/abc/map
+ */
 int TopoFile::setFileName(string fileName) {
 
     chDir2UserPath();
@@ -93,6 +108,12 @@ int TopoFile::setFileName(string fileName) {
     return 0;
 }
 
+/**
+ * @brief open file
+ * you should open file at first, if fail, will automanticly turn to default path and name
+ * @param mode outputMapMode, inputMapMode
+ * @return 0 if successful, -1 if failed(but would fall back to default setting)
+ */
 int TopoFile::open(std::_Ios_Openmode mode) {
     chDir2UserPath();
     fs.open(filePath, mode);
@@ -107,11 +128,19 @@ int TopoFile::open(std::_Ios_Openmode mode) {
     }
 }
 
+/**
+ * write the mapGroup you assign to the file in JSON style
+ * @param mapGroup the maps to record
+ * @return 0 if success, -1 if fail
+ * @see MapArranger::toJS()
+ * @attention you can set the spliter
+ * @see spliter
+ */
 int TopoFile::outputMap(MapArranger & mapGroup) {
     if (!fs.is_open()) {
         cout << "[TopoFile::outputMap] you didn't open at first! "
                 "Try to open now ..." << endl;
-        if ( open(std::ios::out | std::ios::trunc) != 0) {
+        if ( open(outputMapMode) != 0) {
             return -1;
         }
     }
@@ -124,11 +153,19 @@ int TopoFile::outputMap(MapArranger & mapGroup) {
     return 0;
 }
 
+/**
+ * @brief input the related file to assigned MapArranger
+ * @param mapGroup the assigned MapArranger to input
+ * @return if read successful, return 0 <br>
+ * if file didn't open, return -1 <br>
+ * if read failure, return -2
+ * @see setFileName()
+ */
 int TopoFile::inputMap(MapArranger &mapGroup) {
     if (!fs.is_open()) {
         cout << "[TopoFile::inputMap] you didn't open at first! "
                 "Try to open now ..." << endl;
-        if (open(std::ios::in) != 0) {
+        if (open(inputMapMode) != 0) {
             return -1;
         }
     }

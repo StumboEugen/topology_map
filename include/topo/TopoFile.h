@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-err58-cpp"
 //
 // Created by stumbo on 18-9-18.
 //
@@ -22,56 +24,63 @@
 #include "NodeInstance.h"
 
 /**
- * a tool class for TopoMap IO
+ * @brief a tool class for TopoMap IO.
+ * @note
+ * \b step1 set the file name, the default file would be at ~/topoMaps/<current Time> <br>
+ * \b step2 call open <br>
+ * \b step3 call outputMap or intputMap
+ *
+ * @see open()
+ * @see outputMap()
+ * @see inputMap()
  */
 class TopoFile {
 public:
-    /**
-     * constructor, the fileName can be assigned
-     * @param fileName the path of the file, default("") is ~/topoMaps/<current Time>.
-     * absolute path is not supported
-     * @example
-     * filename = abc/map will create the map at ~/abc/map
-     */
+    /// the output mode, would remove the origin file
+    const static std::_Ios_Openmode outputMapMode = std::ios::out | std::ios::trunc;
+    /// the input mode
+    const static std::_Ios_Openmode inputMapMode = std::ios::in;
+
+public:
+    // constructor, the fileName can be assigned
     explicit TopoFile(const std::string &fileName = "");
-    /**
-     * @param fileName the path of the file, default("") is ~/topoMaps/<current Time>.
-     * absolute path is not supported
-     * @example
-     * filename = abc/map will create the map at ~/abc/map
-     */
+
+    // set the file name
     int setFileName(std::string fileName);
-    /**
-     * open file at first, if fail, will automanticly turn to default path and name
-     * @param mode out, trunc(delete at first), in
-     * @return 0 if successful, -1 if failed(but the default setting will work)
-     */
-    int open(std::_Ios_Openmode mode = std::ios::out | std::ios::trunc);
-    /**
-     * write the mapGroup you assign to the file in JSON style
-     * @param mapGroup the maps to record
-     * @return 0 if success, -1 if fail
-     */
+
+    // open file
+    int open(std::_Ios_Openmode mode = outputMapMode);
+
+    //write the mapGroup you assign to the file in JSON style
     int outputMap(MapArranger & mapGroup);
 
+    // input the related file to assigned MapArranger
     int inputMap(MapArranger &mapGroup);
-
-    void setSpliter(const string & spliter) {
-        TopoFile::spliter = spliter;
-    }
 
     int close();
 
     virtual ~TopoFile();
 
-private:
-    std::string spliter = "";
-    std::string filePath;
-    std::fstream fs;
+    void setSpliter(const string & spliter) {
+        TopoFile::spliter = spliter;
+    }
 
-    /**move to the user floder*/
+private: // functions
+    // move the current dir to user's floder ~/
     void chDir2UserPath();
+
+private: // members
+    /// the spliter used in JSON file, for compress, use ""
+    std::string spliter = "";
+
+    /// the file's path
+    std::string filePath;
+
+    /// the file stream to arrange the output and input
+    std::fstream fs;
 };
 
 
 #endif //TOPOLOGY_MAP_TOPOFILE_H
+
+#pragma clang diagnostic pop
