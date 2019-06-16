@@ -48,10 +48,17 @@ static const double RAD2DEG = 180 / pi;
 #define TOPO_STD_SERVICE_NAME_GETMAPS "topoSrv/GetMaps"
 
 namespace topo {
+    // a tool to get a string represents time (only in LINUX)
     const std::string getCurrentTimeString();
+
+    // check if the required names is a member of the JSON object
     bool checkJSMember(const std::vector<std::string> &strs, const JSobj &js);
+
+    // calculate the sqrt (x^2 + y^2)
     double calDis(double x, double y);
-    double fixRad2nppi(double target);
+
+    // convert a number to [-pi, pi] in a cycle of 2pi
+    double fixRad2nppi(double target) noexcept ;
 }
 
 #endif //TOPOLOGY_MAP_TOPOTOOL_H
