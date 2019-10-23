@@ -5,23 +5,25 @@ navigation based on topo map
 # BASIC STEPS
 
 install ROS
+```
+cd catkin_ws/src
 
-$cd catkin_ws/src
+git clone
 
-$git clone
+cd ..
 
-(remember to switch to your version)
-$ sudo apt-get install ros-kinetic-qt-build
-
-$cd ..
-
-$catkin_make --pkg topology_map
+catkin_make --pkg topology_map
+```
 
 the mapping node:
-$rosrun topology_map main
+```
+rosrun topology_map main
+```
 
 the UI:
-$rosrun topology_map TopoUI
+```
+rosrun topology_map TopoUI
+```
 
 save the building map:
 $rosrun topology_map saveMapClient.py
@@ -41,3 +43,12 @@ $rosrun topology_map TopoUI
 switch to build mode, build your own map
 switch to the simulation mode, connect to ROS, then start moving mode, watch the effect in main node
 you can rosrun another TopoUI, and use the realtime node to watch the building node from UI
+
+#TODO big list
+search through the built map
+
+auto select in unknown maps
+
+sub nodes
+
+local topo struct abstraction
