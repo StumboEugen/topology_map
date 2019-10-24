@@ -125,7 +125,7 @@
       <item>
        <widget class="QLineEdit" name="etFileName">
         <property name="text">
-         <string>built</string>
+         <string>4x4</string>
         </property>
        </widget>
       </item>

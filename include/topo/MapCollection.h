@@ -77,6 +77,10 @@ public:
         return sumOfConfidence;
     }
 
+    TopoPath & getTopoPath() {
+        return currentPath;
+    }
+
 private:
     /// the MapArranger that owns this MapCollection
     MapArranger * const parent;
@@ -93,6 +97,7 @@ private:
     /// @see calSumOfConfidence()
     double sumOfConfidence = 0.0;
 
+    /// the planned path storage
     TopoPath currentPath;
 };
 

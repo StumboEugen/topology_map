@@ -43,6 +43,23 @@
      <widget class="QComboBox" name="cbCandidates"/>
     </item>
     <item>
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbEnablePathPlanning">
+      <property name="text">
+       <string>enable path planning</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
      <spacer name="endSpacer">
       <property name="orientation">
        <enum>Qt::Vertical</enum>

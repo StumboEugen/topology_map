@@ -162,11 +162,17 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockReadMap->btnJump2Map, SIGNAL(clicked())
             , this, SLOT(jump2ReadingMapIndex()));
 
+    connect(uiDockReadMap->cbMoveNode, SIGNAL(toggled(bool))
+            , this, SLOT(changeNodeMovable(bool)));
+
     connect(mapGView, SIGNAL(QGI_Node_clicked(QNode *))
             , this, SLOT(onQGI_NodeLeftClicked(QNode * )));
 
     connect(mapGView, SIGNAL(rightClickOn_QGI_Node(QNode *))
             , this, SLOT(onQGI_NodeRightClicked(QNode *)));
+
+    connect(mapGView, SIGNAL(newEdgeConnected(TopoEdge *))
+            , this, SLOT(newEdgeConnected(TopoEdge *)));
 
     connect(modeGroup, SIGNAL(triggered(QAction*))
             , this, SLOT(changeMode(QAction*)));
@@ -180,9 +186,6 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockBuildMap->btnDrawEdge, SIGNAL(toggled(bool))
             , mapGView, SLOT(switch2DrawEdgeMode(bool)));
 
-    connect(mapGView, SIGNAL(newEdgeConnected(TopoEdge *))
-            , this, SLOT(newEdgeConnected(TopoEdge *)));
-
     connect(uiDockBuildMap->btnSetEdgeOdom, SIGNAL(clicked())
             , this, SLOT(setEdgeOdom()));
 
@@ -195,14 +198,11 @@ TopoUI::TopoUI(QWidget *parent) :
     connect(uiDockBuildMap->btnLoadMap, SIGNAL(clicked())
             , this, SLOT(loadBuiltMap()));
 
-    connect(qactConnectToROS, SIGNAL(changed())
-            , this, SLOT(initROS()));
-
     connect(uiDockBuildMap->cbNodesMovable, SIGNAL(toggled(bool))
             , this, SLOT(changeNodeMovable(bool)));
 
-    connect(uiDockReadMap->cbMoveNode, SIGNAL(toggled(bool))
-            , this, SLOT(changeNodeMovable(bool)));
+    connect(qactConnectToROS, SIGNAL(changed())
+            , this, SLOT(initROS()));
 
     connect(uiDockRealTime->btnGetRealTimeMap, SIGNAL(clicked())
             , this, SLOT(askForRealTimeMap()));
@@ -416,6 +416,24 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
             } else {
                 cerr << "[TopoUI::onQGI_NodeRightClicked] ROBOT at nowhere!!!!" << endl;
             }
+        }
+    }
+    else if (CURRENT_MODE == REALTIME_MODE)
+    {
+        if (uiDockRealTime->cbEnablePathPlanning->isChecked())
+        {
+            auto & mapCollection = mapFromRealTime.getMapCollection();
+            auto & path = mapCollection.getTopoPath();
+            auto robotPlace = dynamic_cast<QNode*>(robot->getCurrentAt());
+            if (robotPlace == nullptr) {
+                setMsg("plan failure:\nrobot is not at node");
+                return;
+            }
+            path.findPath(currentDrawnMap,
+                    robotPlace->getRelatedNodeTOPO()->getInsCorrespond(),
+                    clickedNode->getRelatedNodeTOPO()->getInsCorrespond());
+            robotPlace->setSelected(true);
+            clickedNode->setSelected(true);
         }
     }
 }
@@ -715,6 +733,8 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw,
                                bool drawRobot, bool detailed, bool movable) {
     mapGView->scene()->clear();
     map2Draw.cleanAllNodeFlagsAndPtr();
+
+    currentDrawnMap = &map2Draw;
 
     const auto & robotPlace = map2Draw.getCurrentNode();
 

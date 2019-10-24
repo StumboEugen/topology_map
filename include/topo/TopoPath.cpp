@@ -10,3 +10,11 @@ MapCandidate* TopoPath::setInvalid()
     relatedMap = nullptr;
     return res;
 }
+
+bool
+TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginNode, NodeInstance* goalNode)
+{
+    targetNode = goalNode;
+    relatedMap = targetMap;
+    return true;
+}

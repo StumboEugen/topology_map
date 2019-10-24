@@ -23,7 +23,7 @@ class TopoPath
 public:
 
     bool findPath(
-            MapCandidate * targetMap, NodeInstance * beginNode, NodeInstance * targetNode);
+            MapCandidate * targetMap, NodeInstance * beginNode, NodeInstance * goalNode);
 
     MapCandidate* setInvalid();
 

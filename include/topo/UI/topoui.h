@@ -72,6 +72,8 @@ private:
     MapArranger mapFromBuilding;
     MapArranger mapFromRealTime;
 
+    MapCandidate * currentDrawnMap;
+
     QHBoxLayout * centerLayout;
 
     TopoMapGView * mapGView;
