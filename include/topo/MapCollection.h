@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "TopoTools.h"
+#include "TopoPath.h"
 
 class MapArranger;
 /**
@@ -91,6 +92,8 @@ private:
     /// the sum of all maps' confidence, for easy normalization
     /// @see calSumOfConfidence()
     double sumOfConfidence = 0.0;
+
+    TopoPath currentPath;
 };
 
 

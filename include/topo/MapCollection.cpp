@@ -20,10 +20,19 @@ void MapCollection::arriveNodeInstance(NodeInstance *instance, uint8_t arriveAt,
         auto firstMap = new MapCandidate(instance);
         maps.insert(firstMap);
     } else {
+
+        MapCandidate* currentPathRelatedMap = currentPath.getRelatedMap();
+
         auto iter = maps.begin();
         while (iter != maps.end()) {
             auto & map = *iter;
             if(!map->arriveAtNode(instance, arriveAt, dis_x, dis_y, yaw)) {
+
+                if (currentPathRelatedMap == map)
+                {
+                    currentPath.setInvalid();
+                }
+
                 map->removeUseages();
                 delete map;
                 iter = maps.erase(iter);

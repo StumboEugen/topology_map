@@ -12,7 +12,7 @@
 #include <ostream>
 #include "TopoTools.h"
 
-using namespace std;
+class TopoPath;
 
 /**
  * @brief represent a possible option of the real topo structure map.
@@ -85,11 +85,11 @@ public:
         return edges.size();
     }
 
-    const set<TopoNode *> & getNodes() const {
+    const std::set<TopoNode *> & getNodes() const {
         return nodes;
     }
 
-    const set<TopoEdge *> & getEdges() const {
+    const std::set<TopoEdge *> & getEdges() const {
         return edges;
     }
 
@@ -122,18 +122,18 @@ private: // member
 
     /// the container of the TopoNode
     /// @todo using vector might is better, (remember to delete the new TopoNode after copy)
-    set<TopoNode *> nodes;
+    std::set<TopoNode *> nodes;
 
     /// the container of the TopoNode
     /// @todo using vector might is better, (remember to delete the new TopoNode after copy)
-    set<TopoEdge *> edges;
+    std::set<TopoEdge *> edges;
 
     /// the confidence of this map (the KEY of this project), begin with 1.0
     double confidence = 1.0;
 
     /**
      * @brief the TopoNode state of robot
-     * on edge -> the node just leave
+     * on edge -> the node just left
      *
      * on node -> current node
      */
