@@ -165,11 +165,21 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
         /**
          * construct the node collection
          */
+
+//        for (const auto & theIns: nodeInsesDict) {
+//            if (theIns != nullptr) {
+//                nodeCollection.addInstanceDirectly(theIns);
+//            }
+//        }
+
         for (const auto & theIns: nodeInsesDict) {
-            if (theIns != nullptr) {
-                nodeCollection.addInstanceDirectly(theIns);
+            if (theIns == nullptr) {
+                cerr << __FILE__ << ":" << __LINE__ << "the dict has empty nodes!" << endl;
             }
         }
+        nodeCollection.addInstancesFromVector(std::move(nodeInsesDict));
+
+
     } catch (exception & e) {
         cerr << "decode JSON file FAIL!\n" << e.what() << endl;
         return false;

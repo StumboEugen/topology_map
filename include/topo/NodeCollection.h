@@ -40,6 +40,8 @@ public:
     // manually add a NodeInstance.
     void addInstanceDirectly(NodeInstance * newNode);
 
+    void addInstancesFromVector(std::vector<NodeInstance* > && nodeDict);
+
     const map<int, set<NodeInstance *>> &getNodeSets() const {
         return nodeSets;
     }

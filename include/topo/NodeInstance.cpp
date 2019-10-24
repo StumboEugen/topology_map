@@ -239,11 +239,11 @@ NodeInstance::encode2ROSmsg(unsigned char arriveAt,
  */
 JSobj NodeInstance::toJS() const {
     JSobj obj;
-    obj["No"] = serialNumber;
+//    obj["No"] = serialNumber;
     obj["Extra"] = extraMsg;
     auto & exitJS = obj["Exits"];
     for (const auto & exit: exits) {
-        exitJS.append(exit.toJS());
+        exitJS.append(std::move(exit.toJS()));
     }
     return std::move(obj);
 }

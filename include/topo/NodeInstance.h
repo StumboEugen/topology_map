@@ -140,15 +140,16 @@ private: // member
     /**
      * each NodeInstance has a unique serial number, accumulated from this
      * @see serialNumber
-     * @todo the static solution might be a problem
+     * @todo the static solution might be a problem, this should be arranged by NodeCollection
      */
     static size_t serialCount;
 
     /**
-     * the unique serial number of this NodeInstance.
-     * it is designed for JSON storage
+     * the unique serial number of this NodeInstance in one NodeCollection.
+     * it is designed for JSON storage and communication
      * @see toJS
      * @see MapArranger::readFromJSON
+     * @note in the real maps, the serial# starts from 0
      */
     size_t serialNumber;
 
