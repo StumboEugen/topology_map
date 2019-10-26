@@ -283,3 +283,8 @@ bool TopoEdge::haveLeftFromNode(TopoNode *leftnode) {
         throw;
     }
 }
+
+double TopoEdge::getOdomLen() const
+{
+    return sqrt(odomX * odomX + odomY * odomY);
+}

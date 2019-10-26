@@ -63,6 +63,8 @@ public:
         return gateB;
     }
 
+    double getOdomLen() const;
+
     double getOdomX() const {
         return odomX;
     }
