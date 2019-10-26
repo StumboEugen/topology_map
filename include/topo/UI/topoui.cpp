@@ -432,7 +432,14 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
             path.findPath(currentDrawnMap,
                     robotPlace->getRelatedNodeTOPO()->getInsCorrespond(),
                     clickedNode->getRelatedNodeTOPO()->getInsCorrespond());
-            robotPlace->setSelected(true);
+            QNode* currentQNode = robotPlace;
+            for (const auto & step : path.getPath()) {
+                currentQNode->setSelected(true);
+                auto gateId = step.beginNode->gateIdOfTheTopoEdge(step.stepEdge);
+                QEdge* nextEdge = currentQNode->getQEdgeAtExit(gateId);
+                nextEdge->setSelected(true);
+                currentQNode = nextEdge->getAnotherNode(currentQNode);
+            }
             clickedNode->setSelected(true);
         }
     }
