@@ -306,4 +306,21 @@ gateId NodeInstance::figureOutWhichExitItis(double posx, double posy) {
     return static_cast<gateId>(ans);
 }
 
+/**
+ * @brief find the related TopoNode of given MapCandidate
+ * @param givenMap the key MapCandidate you would like to find
+ * @return the Node usage in the given MapCandidate, if not found, return nullptr
+ */
+TopoNode* NodeInstance::getNodeUsageOfGivenMap(MapCandidate* givenMap) const
+{
+    auto it = nodeUseages.find(givenMap);
+    if (it == nodeUseages.end()) {
+        cerr << __FILE__ << ":" << __LINE__ << "[ERROR] you find inexist useage in "
+                                               "NodeInstance!" << endl;
+        return nullptr;
+    } else {
+        return it->second;
+    }
+}
+
 

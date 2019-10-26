@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <set>
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <iostream>
 
@@ -16,10 +16,6 @@
 
 #include "TopoTools.h"
 #include "ExitInstance.h"
-
-using std::map;
-using std::vector;
-using std::string;
 
 /**
  * represent a real node and include detail information, stored in the NodeCollection.
@@ -66,15 +62,18 @@ public:
     // find the closest exit of the given pos
     gateId figureOutWhichExitItis(double posx, double posy);
 
-    const uint8_t sizeOfExits() const {
+    // find the related TopoNode of given MapCandidate
+    TopoNode* getNodeUsageOfGivenMap(MapCandidate* givenMap) const;
+
+    uint8_t sizeOfExits() const {
         return exitNums;
     }
 
-    const bool isAddComplete() const {
+    bool isAddComplete() const {
         return addComplete;
     }
 
-    inline const map<MapCandidate *, TopoNode *> &getNodeUseages() const {
+    inline const std::unordered_map<MapCandidate *, TopoNode *> &getNodeUseages() const {
         return nodeUseages;
     }
 
@@ -163,7 +162,7 @@ private: // member
     string extraMsg;
 
     /// the useage of the nodes, in which map at which node
-    map<MapCandidate*, TopoNode*> nodeUseages;
+    std::unordered_map<MapCandidate*, TopoNode*> nodeUseages;
 
     /// the odom pos X
     double globalX;
