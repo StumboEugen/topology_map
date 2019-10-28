@@ -136,7 +136,7 @@ void QNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
     bigBrother->setMsg("POS: " +
                        QString::number(pos().x()) + " : " +
                        QString::number(pos().y()));
-    bigBrother->appendMsg("Serial NO of the last:" +
+    bigBrother->appendMsg("Serial NO: " +
             QString::number(relatedNodeTOPO->getInsCorrespond()->getSerialNumber()));
 }
 

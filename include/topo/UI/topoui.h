@@ -104,8 +104,11 @@ private:
 
     QDockWidget * initTheDock(const char *objectName);
 
-    void displayMapAtMapGV(MapCandidate &, bool drawRobot = false, bool detailed = true, bool
-            movable = false);
+    void displayMapAtMapGV(MapCandidate &,
+            bool drawRobot = false,
+            bool detailed = true,
+            bool movable = false,
+            bool fillInsOdom = false);
 
     bool loadMapGroupFromFile(const QString & fileName, MapArranger & dist);
 

@@ -214,7 +214,7 @@ void TopoEdge::setOdomDataDirectly(double x, double y, double yaw) {
  * get the odom data.
  * because A2B and B2A is different, we need the origin TopoNode
  * @param oriNode the origin TopoNode of the odom data
- * @return the odominfo in array <odomX, odomY, yawOdom> ENU
+ * @return the odominfo in array (odomX, odomY, yawOdom) ENU
  */
 array<double, 3> TopoEdge::getOdomData(TopoNode *oriNode) {
     if (oriNode == exitA) {

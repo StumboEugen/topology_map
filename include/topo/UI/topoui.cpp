@@ -317,7 +317,8 @@ void TopoUI::loadBuiltMap() {
                                "ARE YOU SURE? Now we just display the first map");
         }
         displayMapAtMapGV(*mapCollection.getTheFirstMap(), false, true,
-                          uiDockBuildMap->cbNodesMovable->isChecked());
+                          uiDockBuildMap->cbNodesMovable->isChecked(),
+                          true);
 
     } else {
         setMsg("ERROR! CANT read the map:" + name);
@@ -782,7 +783,10 @@ void TopoUI::setNodeRotation() {
 
 
 void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw,
-                               bool drawRobot, bool detailed, bool movable) {
+                               bool drawRobot,
+                               bool detailed,
+                               bool movable,
+                               bool fillInsOdom) {
     mapGView->scene()->clear();
     map2Draw.cleanAllNodeFlagsAndPtr();
 
@@ -791,6 +795,12 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw,
     const auto & robotPlace = map2Draw.getCurrentNode();
 
     auto beginNode = map2Draw.getOneTopoNode();
+    if (fillInsOdom)
+    {
+        for (auto & ins: beginNode->getRelatedInses()) {
+            ins->setGlobalPos(0.0, 0.0, 0.0);
+        }
+    }
 
     queue<TopoNode*> lookupQueue;
 
@@ -864,6 +874,14 @@ void TopoUI::displayMapAtMapGV(MapCandidate & map2Draw,
                 }
                 if (movable) {
                     anotherQNode->setFlag(QGraphicsItem::ItemIsMovable);
+                }
+                if (fillInsOdom) {
+                    for (auto & ins : anotherNode->getRelatedInses()) {
+                        NodeInstance* curIns = curNode->getInsCorrespond();
+                        ins->setGlobalPos(curIns->getGlobalX() + odomData[0],
+                                          curIns->getGlobalY() + odomData[1],
+                                          0.0);
+                    }
                 }
             }
 
@@ -1000,8 +1018,10 @@ void TopoUI::displayCandidateFromRealTime(int index) {
     if (index >= maps.size()) {
         return;
     }
-
-    displayMapAtMapGV(*maps[index], true, true, false);
+    
+    bool fillInsOdom = index == 0;
+    displayMapAtMapGV(*maps[index], true,
+            true, false, fillInsOdom);
 }
 
 void TopoUI::realTimeMode_sendMoveCmd(int exit) {
