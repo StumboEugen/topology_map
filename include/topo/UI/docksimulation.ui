@@ -98,6 +98,20 @@
      </widget>
     </item>
     <item>
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbPathPlanning">
+      <property name="text">
+       <string>A* path planning click</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <spacer name="endSpacer">
       <property name="orientation">
        <enum>Qt::Vertical</enum>

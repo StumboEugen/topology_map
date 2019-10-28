@@ -349,73 +349,118 @@ void TopoUI::onQGI_NodeLeftClicked(QNode *qgiNode) {
 
 void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
     if (CURRENT_MODE == SIMULATION_MODE) {
-        int nums = clickedNode->getExitNums();
-        if (robot != nullptr) {
-            auto currentAt = robot->getCurrentAt();
-            /// check if the robot currently is on edge or node
-            if (auto nodeWithRobot = dynamic_cast<QNode*>(currentAt)) {
-                for (int i = 0; i < nums; i++) {
-                    /// check if the robot is in the nearby node
-                    if (nodeWithRobot == clickedNode->getQNodeAtExit(i)) {
+        if (!uiDockSimulation->cbPathPlanning->isChecked())
+        {
+            int nums = clickedNode->getExitNums();
+            if (robot != nullptr)
+            {
+                auto currentAt = robot->getCurrentAt();
+                /// check if the robot currently is on edge or node
+                if (auto nodeWithRobot = dynamic_cast<QNode*>(currentAt))
+                {
+                    for (int i = 0; i < nums; i++)
+                    {
+                        /// check if the robot is in the nearby node
+                        if (nodeWithRobot == clickedNode->getQNodeAtExit(i))
+                        {
 
-                        // the edge between the click node and the robot's node
-                        const auto QEdgeMoved = clickedNode->getQEdgeAtExit(i);
+                            // the edge between the click node and the robot's node
+                            const auto QEdgeMoved = clickedNode->getQEdgeAtExit(i);
 
-                        /// send gate through msg
-                        if (checkROS()) {
-                            topology_map::LeaveNode nodeLeavingMsg;
-                            // the left gate in ground truth
-                            const auto leftGate = QEdgeMoved->getRelatedEdgeTOPO()
-                                    ->getAnotherGate(clickedNode->getRelatedNodeTOPO());
-                            nodeLeavingMsg.leaveGate = leftGate;
-                            nodeLeavingMsg.leaveDir =
-                                    (float)nodeWithRobot->getRelatedNodeTOPO()
-                                            ->getInsCorrespond()->getExits()
-                                            .at(nodeLeavingMsg.leaveGate).getMidRad();
+                            /// send gate through msg
+                            if (checkROS())
+                            {
+                                topology_map::LeaveNode nodeLeavingMsg;
+                                // the left gate in ground truth
+                                const auto leftGate = QEdgeMoved->getRelatedEdgeTOPO()
+                                        ->getAnotherGate(clickedNode->getRelatedNodeTOPO());
+                                nodeLeavingMsg.leaveGate = leftGate;
+                                nodeLeavingMsg.leaveDir =
+                                        (float) nodeWithRobot->getRelatedNodeTOPO()
+                                                ->getInsCorrespond()->getExits()
+                                                .at(nodeLeavingMsg.leaveGate).getMidRad();
 
-                            if (instanceWithNoise) {
-                                // means that the exit noise is added
-                                const auto & theLeftNode = 
-                                        QEdgeMoved->getRelatedEdgeTOPO()->getAnotherNode
-                                        (clickedNode->getRelatedNodeTOPO());
-                                const auto & theLeftExit = theLeftNode->getInsCorrespond()
-                                        ->getExits()[leftGate];
-                                nodeLeavingMsg.leaveGate =
-                                        instanceWithNoise->figureOutWhichExitItis(
-                                        theLeftExit.getPosX(), theLeftExit.getPosY());
-                                pub_gateMove.publish(nodeLeavingMsg);
-                            } else {
-                                pub_gateMove.publish(nodeLeavingMsg);
-                            }
-
-                            if (uiDockSimulation->cbNodeMoveDirectly->isChecked()) {
-                                ros::Duration(0.1).sleep();
-                                robot->move2(clickedNode);
-
-                                /// send node msg
-                                if (checkROS()) {
-                                    sendNodeROSmsg(clickedNode, QEdgeMoved, i);
+                                if (instanceWithNoise)
+                                {
+                                    // means that the exit noise is added
+                                    const auto& theLeftNode =
+                                            QEdgeMoved->getRelatedEdgeTOPO()->getAnotherNode
+                                                    (clickedNode->getRelatedNodeTOPO());
+                                    const auto& theLeftExit =
+                                            theLeftNode->getInsCorrespond()
+                                            ->getExits()[leftGate];
+                                    nodeLeavingMsg.leaveGate =
+                                            instanceWithNoise->figureOutWhichExitItis(
+                                                    theLeftExit.getPosX(),
+                                                    theLeftExit.getPosY());
+                                    pub_gateMove.publish(nodeLeavingMsg);
                                 }
-                            } else {
-                                robot->move2(QEdgeMoved);
+                                else
+                                {
+                                    pub_gateMove.publish(nodeLeavingMsg);
+                                }
+
+                                if (uiDockSimulation->cbNodeMoveDirectly->isChecked())
+                                {
+                                    ros::Duration(0.1).sleep();
+                                    robot->move2(clickedNode);
+
+                                    /// send node msg
+                                    if (checkROS())
+                                    {
+                                        sendNodeROSmsg(clickedNode, QEdgeMoved, i);
+                                    }
+                                }
+                                else
+                                {
+                                    robot->move2(QEdgeMoved);
+                                }
+                            }
+                            return;
+                        }
+                    }
+                }
+                else if (auto edgeWithRobot = dynamic_cast<QEdge*>(currentAt))
+                {
+                    for (int i = 0; i < nums; i++)
+                    {
+                        if (edgeWithRobot == clickedNode->getQEdgeAtExit(i))
+                        {
+                            robot->move2(clickedNode);
+                            if (checkROS())
+                            {
+                                sendNodeROSmsg(clickedNode, edgeWithRobot, i);
                             }
                         }
-                        return;
                     }
                 }
-            }
-            else if (auto edgeWithRobot = dynamic_cast<QEdge*>(currentAt)) {
-                for (int i = 0; i < nums; i++) {
-                    if (edgeWithRobot == clickedNode->getQEdgeAtExit(i)) {
-                        robot->move2(clickedNode);
-                        if (checkROS()) {
-                            sendNodeROSmsg(clickedNode, edgeWithRobot, i);
-                        }
-                    }
+                else
+                {
+                    cerr << "[TopoUI::onQGI_NodeRightClicked] ROBOT at nowhere!!!!" << endl;
                 }
-            } else {
-                cerr << "[TopoUI::onQGI_NodeRightClicked] ROBOT at nowhere!!!!" << endl;
             }
+        }
+        else
+        {
+            auto & mapCollection = mapFromBuilding.getMapCollection();
+            auto & path = mapCollection.getTopoPath();
+            auto robotPlace = dynamic_cast<QNode*>(robot->getCurrentAt());
+            if (robotPlace == nullptr) {
+                setMsg("plan failure:\nrobot is not at node");
+                return;
+            }
+            path.findPath(currentDrawnMap,
+                          robotPlace->getRelatedNodeTOPO()->getInsCorrespond(),
+                          clickedNode->getRelatedNodeTOPO()->getInsCorrespond());
+            QNode* currentQNode = robotPlace;
+            for (const auto & step : path.getPath()) {
+                currentQNode->setSelected(true);
+                auto gateId = step.beginNode->gateIdOfTheTopoEdge(step.stepEdge);
+                QEdge* nextEdge = currentQNode->getQEdgeAtExit(gateId);
+                nextEdge->setSelected(true);
+                currentQNode = nextEdge->getAnotherNode(currentQNode);
+            }
+            clickedNode->setSelected(true);
         }
     }
     else if (CURRENT_MODE == REALTIME_MODE)
