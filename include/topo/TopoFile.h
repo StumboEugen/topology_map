@@ -71,7 +71,7 @@ private: // functions
 
 private: // members
     /// the spliter used in JSON file, for compress, use ""
-    std::string spliter = "";
+    std::string spliter = "\t";
 
     /// the file's path
     std::string filePath;

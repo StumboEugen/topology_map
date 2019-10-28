@@ -151,6 +151,7 @@ void NodeCollection::clear() {
  */
 void NodeCollection::addInstanceDirectly(NodeInstance *newNode) {
     nodeSets[newNode->sizeOfExits()].insert(newNode);
+    newNode->setSerialNumber(experiences.size());
     experiences.push_back(newNode);
 }
 
