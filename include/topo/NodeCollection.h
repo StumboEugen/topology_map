@@ -50,6 +50,11 @@ public:
         return experiences.size();
     }
 
+    const vector<NodeInstance*>& getExperiences() const
+    {
+        return experiences;
+    }
+
 private:
 
     /// the parent MapArranger

@@ -65,6 +65,7 @@ private:
     ros::Publisher pub_nodeInfo;
     ros::Publisher pub_gateMove;
     ros::ServiceClient srvC_askMaps;
+    ros::ServiceClient srvC_pathPlanning;
 
     bool checkROS();
 

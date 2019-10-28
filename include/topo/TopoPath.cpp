@@ -26,7 +26,8 @@ MapCandidate* TopoPath::setInvalid()
  * @param targetMap the map where the algorithm runs on
  * @param beginIns the NodeInstance of the begin point
  * @param goalIns the NodeInstance of the goal point
- * @return wheather the path if successfully generated
+ * @return wheather the path if successfully generated, the answer would be stored
+ * in the TopoPath::path
  */
 bool
 TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance* goalIns)

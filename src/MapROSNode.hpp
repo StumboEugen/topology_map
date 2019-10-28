@@ -15,6 +15,7 @@
 #include <topology_map/LeaveNode.h>
 #include <topology_map/SaveMap.h>
 #include <topology_map/GetMaps.h>
+#include <topology_map/PathPlanning.h>
 #include <std_msgs/UInt8.h>
 
 using std::cout;
@@ -31,6 +32,7 @@ public:
         sub_GateMovement.shutdown();
         srv_SaveMap.shutdown();
         srv_getMaps.shutdown();
+        srv_PathPlan.shutdown();
     }
 
 
@@ -40,6 +42,7 @@ private:
     ros::Subscriber sub_GateMovement;
     ros::ServiceServer srv_SaveMap;
     ros::ServiceServer srv_getMaps;
+    ros::ServiceServer srv_PathPlan;
     ros::NodeHandle n;
 
     void rosNodeInit();
@@ -48,6 +51,8 @@ private:
     void cbThroughGate(const topology_map::LeaveNode &);
     bool srvSaveMap(topology_map::SaveMap::Request &, topology_map::SaveMap::Response &);
     bool srvGetMap(topology_map::GetMaps::Request &, topology_map::GetMaps::Response &);
+    bool srvPathPlanning(topology_map::PathPlanning::Request &, 
+                         topology_map::PathPlanning::Response &);
 };
 
 MapROSNode::MapROSNode() {
@@ -116,12 +121,13 @@ void MapROSNode::rosNodeInit() {
             &MapROSNode::srvSaveMap, this);
     srv_getMaps = n.advertiseService(TOPO_STD_SERVICE_NAME_GETMAPS,
             &MapROSNode::srvGetMap, this);
+    srv_PathPlan = n.advertiseService(TOPO_STD_SERVICE_NAME_PATHPLANNING, 
+            &MapROSNode::srvPathPlanning, this);
 
 }
 
-bool
-MapROSNode::srvGetMap(topology_map::GetMaps::Request & req,
-                      topology_map::GetMaps::Response & res) {
+bool MapROSNode::srvGetMap(topology_map::GetMaps::Request & req,
+                           topology_map::GetMaps::Response & res) {
     auto askMaps = req.requiredMaps;
     mapGroup.sortByConfidence(askMaps);
     auto str = mapGroup.toString(askMaps);
@@ -132,6 +138,35 @@ MapROSNode::srvGetMap(topology_map::GetMaps::Request & req,
     res.mapJS = std::move(str);
 
     return true;
+}
+
+bool MapROSNode::srvPathPlanning(topology_map::PathPlanning::Request& req,
+                                 topology_map::PathPlanning::Response& res)
+{
+    auto & resVec = res.pathInsSerialN;
+    mapGroup.getMapCollection().sortByConfidence(req.rankOfPlanningMap);
+    MapCandidate* map = mapGroup.getMapCollection().getOrderedMaps()[req.rankOfPlanningMap];
+    TopoPath& topoPath = mapGroup.getMapCollection().getTopoPath();
+    NodeInstance* beginIns =
+            mapGroup.getNodeCollection().getExperiences()[req.beginInsSerialN];
+    if (beginIns != map->getCurrentNode()->getInsCorrespond()) {
+        cerr << __FILE__ << ":" << __LINE__ <<
+                "[WARNING] the path plan request is out of date!" << endl;
+    }
+    NodeInstance* goalIns =
+            mapGroup.getNodeCollection().getExperiences()[req.goalInsSerialN];
+    bool success = topoPath.findPath(map, beginIns, goalIns);
+    if (success) {
+        auto& steps = topoPath.getPath();
+        resVec.reserve(steps.size() + 1);
+        for (auto & step : steps) {
+            resVec.emplace_back(step.beginNode->getInsCorrespond()->getSerialNumber());
+        }
+        resVec.emplace_back(req.goalInsSerialN);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 #endif //TOPOLOGY_MAP_MAPNODE_HPP

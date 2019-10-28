@@ -1,0 +1,5 @@
+uint16 beginInsSerialN
+uint16 goalInsSerialN
+uint16 rankOfPlanningMap
+---
+uint16[] pathInsSerialN

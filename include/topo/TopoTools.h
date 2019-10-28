@@ -46,6 +46,7 @@ static const double RAD2DEG = 180 / pi;
 #define TOPO_STD_TOPIC_NAME_CVINFO "topo/cvInfo"
 #define TOPO_STD_SERVICE_NAME_SAVEMAP "topoSrv/SaveMap"
 #define TOPO_STD_SERVICE_NAME_GETMAPS "topoSrv/GetMaps"
+#define TOPO_STD_SERVICE_NAME_PATHPLANNING "topoSrv/PathPlanning"
 
 namespace topo {
     // a tool to get a string represents time (only in LINUX)

@@ -34,6 +34,7 @@
 #include <ctime>
 #include <topology_map/LeaveNode.h>
 #include <topology_map/NewNodeMsg.h>
+#include <topology_map/PathPlanning.h>
 
 using namespace std;
 
@@ -487,6 +488,47 @@ void TopoUI::onQGI_NodeRightClicked(QNode * clickedNode) {
                 currentQNode = nextEdge->getAnotherNode(currentQNode);
             }
             clickedNode->setSelected(true);
+        }
+
+        if (uiDockRealTime->cbSendPlanningReq->isChecked())
+        {
+            auto robotPlace = dynamic_cast<QNode*>(robot->getCurrentAt());
+            if (robotPlace == nullptr) {
+                setMsg("plan req failure:\nrobot is not at node");
+                return;
+            }
+            topology_map::PathPlanningRequest req;
+            topology_map::PathPlanningResponse res;
+            req.beginInsSerialN = robotPlace->getRelatedNodeTOPO()
+                    ->getInsCorrespond()->getSerialNumber();
+            req.goalInsSerialN = clickedNode->getRelatedNodeTOPO()
+                    ->getInsCorrespond()->getSerialNumber();
+            req.rankOfPlanningMap = uiDockRealTime->cbCandidates->currentIndex();
+            if (srvC_pathPlanning.call(req, res))
+            {
+                QNode* currentQNode = robotPlace;
+                currentQNode->setSelected(true);
+
+                const auto & steps = res.pathInsSerialN;
+                for (size_t nStep = 1; nStep < steps.size(); ++nStep)
+                {
+                    for (int nExit = 0; nExit < currentQNode->getExitNums(); ++nExit) {
+                        QNode* anotherQNode = currentQNode->getQNodeAtExit(nExit);
+                        if (anotherQNode == nullptr) {
+                            continue;
+                        }
+                        auto serial = anotherQNode->getRelatedNodeTOPO()
+                                ->getInsCorrespond()->getSerialNumber();
+                        if (serial == steps[nStep]) {
+                            currentQNode->getQEdgeAtExit(nExit)->setSelected(true);
+                            anotherQNode->setSelected(true);
+                            currentQNode = anotherQNode;
+                        }
+                    }
+                }
+            } else {
+                setMsg("service call fail!");
+            }
         }
     }
 }
@@ -946,6 +988,8 @@ void TopoUI::initROS() {
     pub_gateMove = n.advertise<topology_map::LeaveNode>(
             TOPO_STD_TOPIC_NAME_GATEMOVE, 0);
     srvC_askMaps = n.serviceClient<topology_map::GetMaps>(TOPO_STD_SERVICE_NAME_GETMAPS);
+    srvC_pathPlanning =n.serviceClient<topology_map::PathPlanning>
+            (TOPO_STD_SERVICE_NAME_PATHPLANNING);
 }
 
 void TopoUI::changeNodeMovable(bool movable) {

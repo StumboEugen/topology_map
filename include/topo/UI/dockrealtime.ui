@@ -52,10 +52,14 @@
     <item>
      <widget class="QCheckBox" name="cbEnablePathPlanning">
       <property name="text">
-       <string>enable path planning</string>
+       <string>Enable Path Planning</string>
       </property>
-      <property name="checked">
-       <bool>true</bool>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="cbSendPlanningReq">
+      <property name="text">
+       <string>Send Path Planning Req</string>
       </property>
      </widget>
     </item>
