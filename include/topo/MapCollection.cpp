@@ -42,6 +42,8 @@ void MapCollection::arriveNodeInstance(NodeInstance *instance, uint8_t arriveAt,
             }
         }
     }
+
+    currentPath.stepForward();
 }
 
 /**

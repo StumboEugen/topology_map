@@ -144,7 +144,7 @@ TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance
     }
 
     /// 发现了路径, 复制到path中
-    path.clear();
+    initPath();
     TopoNode* currentNode = topoGoal;
     while (true)
     {
@@ -159,4 +159,49 @@ TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance
             return true;
         }
     }
+}
+
+/**
+ * @brief 通知 TopoPath 向前移动一步
+ * @return 是否成功向前移动, 失败可能: <br>
+ * 1. 对应的 MapCandidate 被删除, 路径无效
+ * 2. 路径已经走完
+ * 3. 之前已经脱轨没有按照路径走
+ * 4. 这次没有按照路径走
+ */
+bool TopoPath::stepForward()
+{
+    if (!isValid() || isFinished() || notFollowingPath) {
+        return false;
+    }
+    auto & lastStep = path[currentProgress];
+    if (relatedMap->getCurrentNode() ==
+        lastStep.stepEdge->getAnotherNode(lastStep.beginNode))
+    {
+        currentProgress++;
+        return true;
+    }
+    notFollowingPath = true;
+    return false;
+}
+
+/**
+ * @brief 是否已经走完全程 (如果路径已经无效, 则为否)
+ */
+bool TopoPath::isFinished()
+{
+    if (!isValid()) {
+        return false;
+    }
+    return currentProgress == path.size();
+}
+
+/**
+ * @brief 重置路径状态, 清空path, 进度清零, 脱轨标志位置true
+ */
+void TopoPath::initPath()
+{
+    path.clear();
+    currentProgress = 0;
+    notFollowingPath = false;
 }

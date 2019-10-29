@@ -133,6 +133,7 @@ private: // member
 
     /**
      * @brief the TopoNode state of robot
+     *
      * on edge -> the node just left
      *
      * on node -> current node

@@ -33,6 +33,16 @@ public:
 
     MapCandidate* setInvalid();
 
+    bool stepForward();
+
+    bool isFinished();
+
+    void initPath();
+
+    bool isValid() const
+    {
+        return relatedMap != nullptr;
+    }
 
     MapCandidate* getRelatedMap() const
     {
@@ -54,6 +64,11 @@ public:
         return path;
     }
 
+    bool isFollowingPath() const
+    {
+        return !notFollowingPath;
+    }
+
 
 private:
     /// 路径规划对应的 MapCandidate, 如果为 nullptr, 说明对应地图是错误的
@@ -69,6 +84,9 @@ private:
 
     /// 对应的路径, 记录 PathStep 类型, 表征每一步对应的 TopoNode 以及下一步要走的 TopoEdge
     std::vector<PathStep> path;
+
+    /// 是否中途离开了路径, 离开后 TopoPath::currentProgress 会保持不变
+    bool notFollowingPath;
 };
 
 
