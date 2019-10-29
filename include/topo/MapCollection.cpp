@@ -179,9 +179,12 @@ void MapCollection::purgeBadMaps(int survivorCount) {
     sortByConfidence(static_cast<size_t>(survivorCount));
 
     for (int i = survivorCount; i < orderedMaps.size(); i++) {
-        auto map2delete = orderedMaps[i];
+        MapCandidate* map2delete = orderedMaps[i];
         map2delete->removeUseages();
         maps.erase(map2delete);
+        if (currentPath.getRelatedMap() == map2delete) {
+            currentPath.setInvalid();
+        }
         delete map2delete;
     }
 
