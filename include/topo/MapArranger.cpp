@@ -213,7 +213,7 @@ bool MapArranger::readFromStr(const std::string & str) {
 /**
  * @brief load the file according to the file name
  * if fail, the whole group will be cleared.
- * @param fileName default is ~/topoMaps/<fileName>.
+ * @param fileName default is ~/topoMaps/${fileName}.
  * @return if the reload is successful
  * @see TopoFile::setFileName(string fileName)
  */

@@ -13,6 +13,7 @@
  * @param arriveAt the gate just arrived at
  * @param dis_x distance x since last move
  * @param dis_y distance y since last move
+ * @param yaw orientation since last move (unused)
  */
 void MapCollection::arriveNodeInstance(NodeInstance *instance, uint8_t arriveAt,
                                        double dis_x, double dis_y, double yaw) {

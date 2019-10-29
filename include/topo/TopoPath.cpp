@@ -11,8 +11,8 @@
 using namespace std;
 
 /**
- * @brief set the topopath to be invalid, mostly caused by the purge of the related map
- * @return the removed map candidate
+ * @brief 设置对应的路径无效化, 可能是因为对应的 MapCandidate 是错误构图, 也可能因为没有按照路线移动
+ * @return 之前用来寻路的 MapCandidate 的指针
  */
 MapCandidate* TopoPath::setInvalid()
 {
@@ -22,24 +22,25 @@ MapCandidate* TopoPath::setInvalid()
 }
 
 /**
- * @brief find a path using A* algorithm, the answer would be stored in the TopoPath::path
- * @param targetMap the map where the algorithm runs on
- * @param beginIns the NodeInstance of the begin point
- * @param goalIns the NodeInstance of the goal point
- * @return wheather the path if successfully generated, the answer would be stored
- * in the TopoPath::path
+ * @brief 使用A*算法寻找路径, 结果会被保存在 TopoPath::path
+ * @param targetMap 进行路径搜索的地图
+ * @param beginIns 表示起点的 NodeInstance
+ * @param goalIns 表示终点的 NodeInstance
+ * @return 是否成功找到路径, 结果会被保存在 TopoPath::path
  */
 bool
 TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance* goalIns)
 {
-    /// this is the data needed to store in the TopoNode
+    /// A* 辅助数据结构, 需要存储在 TopoNode 中
     struct AStarHelper
     {
-        /// the evaluated cost to arrive at goal
+        /// 估计的当前 TopoNode 距离终点的代价, 目前用的就是距离
         double H = 0.0;
-        /// the cost since the begin point
+        /// 目前距离起点已经付出的代价, 目前用的就是距离
         double G = 0.0;
+        /// 从哪个 TopoNode 经过哪个 TopoEdge 来
         TopoEdge* edge2Father = nullptr;
+        /// 是否已经被遍历过
         bool closed = false;
 
         AStarHelper(TopoNode* master, double targetX, double targetY) {
@@ -51,20 +52,20 @@ TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance
         }
     };
 
-    /// a memory block to store the helpers
+    /// 一个整块申请的内存, 用于存储临时的 AStarHelper
     vector<AStarHelper> aStarfreeList;
     aStarfreeList.reserve(targetMap->getNodeNum());
-    /// clean the ptr slots in the TopoNodes (where the helpers are stored)
+    /// 清除所有 TopoNode 的辅助执政位, 用于存储 AStarHelper
     targetMap->cleanAllNodeFlagsAndPtr();
 
-    targetNode = goalIns;
+    goalIns = goalIns;
     relatedMap = targetMap;
     TopoNode* const topoBegin = beginIns->getNodeUsageOfGivenMap(targetMap);
     TopoNode* const topoGoal = goalIns->getNodeUsageOfGivenMap(targetMap);
     double targetX = goalIns->getGlobalX();
     double targetY = goalIns->getGlobalY();
 
-    /// the candidate list of A* algorithm piar of <G+H, TopoNode>
+    /// 按照G+H排序的候选 TopoNode 表, A* 算法的核心
     map<double, vector<TopoNode*>> openList;
 
     aStarfreeList.emplace_back(topoBegin, targetX, targetY);
@@ -74,7 +75,7 @@ TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance
 
     while(topoGoal->getAssistPtr() == nullptr)
     {
-        /// the openList runs out, which means the goal is unreachable
+        /// openList用完了, 这意味着没有找到通路, 目前的情况下这应该是不可能的
         if (openList.empty()) {
             cerr << __FILE__ << ":" << __LINE__
                             << "[ERROR] a path planning is failure!\n"
@@ -82,39 +83,40 @@ TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance
             return false;
         }
 
-        /// pick out the best candidate TopoNode from the list
+        /// 挑选一个估计总代价较小的 TopoNode
         auto & TopoNodeVecWithLowestF = openList.begin()->second;
         TopoNode* currentNode = TopoNodeVecWithLowestF.back();
         TopoNodeVecWithLowestF.pop_back();
-        /// make sure all keys in the openList is not empty
+        /// 确保openList的每一个键值对都有值, 而不会出现空Vector
         if (TopoNodeVecWithLowestF.empty()) {
             openList.erase(openList.begin());
         }
         auto baseHelper = static_cast<AStarHelper*>(currentNode->getAssistPtr());
         if (baseHelper->closed) {
-            /// if the helper.G is changed durning the later progress, the new key would be
-            /// inserted again, and the older one would be reduplicative then comes to here
+            /// 过程中如果helper.G减少了, 不会改变原来对应的键值对, 而是插入一个新的, 那么等到后来如果遇
+            /// 到了这个老的键值对, 需要确保不会重复操作, 检查closed就可以做到
             continue;
         } else {
             baseHelper->closed = true;
         }
 
+        /// 检查目标 TopoNode 的每一个相邻节点
         const auto & edges = currentNode->getEdgeConnected();
         for (const auto & edge : edges) {
-            /// not built yet, ignore
+            /// 对应的 TopoEdge 是空的(还没建图), 跳过
             if (edge == nullptr) {
                 continue;
             }
             TopoNode * anotherNode = edge->getAnotherNode(currentNode);
             auto helper = static_cast<AStarHelper*>(anotherNode->getAssistPtr());
-            /// not touched, add it to openlist
+            /// 还没有碰到过, 建立对应的A*helper
             if (helper == nullptr) {
                 aStarfreeList.emplace_back(anotherNode, targetX, targetY);
                 helper = &aStarfreeList.back();
                 anotherNode->setAssistPtr(helper);
                 helper->edge2Father = edge;
                 if (anotherNode == topoGoal) {
-                    /// wow, we make it!
+                    /// 这个就是终点! 找到了路径, 准备记录这个路径
                     break;
                 }
                 helper->G = edge->getOdomLen() + baseHelper->G;
@@ -122,16 +124,16 @@ TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance
                 continue;
             }
             if (helper->closed) {
-                /// well, this one is used
+                /// 这个TopoNode已经被遍历过了, 忽略
                 continue;
             } else {
-                /// let's see if mine route is better
+                /// 看一看这个备选的路径是不是不如从 current 走
                 double newG = edge->getOdomLen() + baseHelper->G;
                 if (helper->G < newG) {
-                    /// nope, his is faster
+                    /// 并没有, 还是别人的更快
                     continue;
                 } else {
-                    /// mine is better! replace it, I AM YOUR FATHER
+                    /// 从我这里走更快! 更新它的G, 并且设设置我为father
                     helper->G = newG;
                     helper->edge2Father = edge;
                     openList[newG + helper->H].push_back(anotherNode);
@@ -141,18 +143,18 @@ TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance
         }
     }
 
-    /// we found the path, copy it
+    /// 发现了路径, 复制到path中
     path.clear();
     TopoNode* currentNode = topoGoal;
     while (true)
     {
-        /// from the current node to find the back node, and record the connected edge
+        /// 从尾巴向头部开始遍历, 记录每一步的信息
         auto currentHelper = static_cast<AStarHelper*>(currentNode->getAssistPtr());
         TopoEdge* connectedEdge = currentHelper->edge2Father;
         currentNode = connectedEdge->getAnotherNode(currentNode);
         path.push_back({currentNode, connectedEdge});
         if (currentNode == topoBegin) {
-            /// remember to reverse it to begin->goal order
+            /// 最后将路径的内容反转, 使之获得正确的顺序
             reverse(path.begin(), path.end());
             return true;
         }

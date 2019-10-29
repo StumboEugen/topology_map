@@ -204,7 +204,8 @@ int NodeInstance::alike(const NodeInstance & rnode) const {
  * ENU
  * @param arriveAt the arriving at Exit ID of this instance
  * @param odomX the odom movement since last instance in X
- * @param odomY the odom movement since last instance in X
+ * @param odomY the odom movement since last instance in Y
+ * @param yaw the odom turned since last instance in degree (unused)
  * @return the built ROS msg structure
  * @todo split this(ROS related) out of the lib
  */
