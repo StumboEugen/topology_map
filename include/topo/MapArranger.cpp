@@ -46,7 +46,6 @@ void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
         mapCollection.addNewMap(newMap);
 //        newMap.second->setPosInList(newPos);
     }
-    experiences ++;
 }
 
 /**
@@ -263,4 +262,12 @@ string MapArranger::toString(size_t mapCount) {
     std::unique_ptr<Json::StreamWriter> const writer(builder.newStreamWriter());
     writer->write(toJS(mapCount), &ss);
     return std::move(ss.str());
+}
+
+/**
+ * @brief 当前已经走过的 NodeInstance 数量
+ */
+size_t MapArranger::experienceNum()
+{
+    return nodeCollection.experienceSize();
 }
