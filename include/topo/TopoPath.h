@@ -35,7 +35,9 @@ public:
 
     bool stepForward();
 
-    bool isFinished();
+    bool hasSteps2Go() const;
+
+    bool isFinished() const;
 
     void initPath();
 

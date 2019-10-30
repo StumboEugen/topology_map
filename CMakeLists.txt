@@ -75,6 +75,7 @@ add_service_files(
     SaveMap.srv
     GetMaps.srv
     PathPlanning.srv
+    NextStepOfPath.srv
 )
 
 ## Generate actions in the 'action' folder

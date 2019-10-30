@@ -171,7 +171,7 @@ TopoPath::findPath(MapCandidate* targetMap, NodeInstance* beginIns, NodeInstance
  */
 bool TopoPath::stepForward()
 {
-    if (!isValid() || isFinished() || notFollowingPath) {
+    if (!hasSteps2Go()) {
         return false;
     }
     auto & lastStep = path[currentProgress];
@@ -188,7 +188,7 @@ bool TopoPath::stepForward()
 /**
  * @brief 是否已经走完全程 (如果路径已经无效, 则为否)
  */
-bool TopoPath::isFinished()
+bool TopoPath::isFinished() const
 {
     if (!isValid()) {
         return false;
@@ -204,4 +204,9 @@ void TopoPath::initPath()
     path.clear();
     currentProgress = 0;
     notFollowingPath = false;
+}
+
+bool TopoPath::hasSteps2Go() const
+{
+    return isValid() && !isFinished() && !notFollowingPath;
 }

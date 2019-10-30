@@ -16,6 +16,7 @@
 #include <topology_map/SaveMap.h>
 #include <topology_map/GetMaps.h>
 #include <topology_map/PathPlanning.h>
+#include <topology_map/NextStepOfPath.h>
 #include <std_msgs/UInt8.h>
 
 using std::cout;
@@ -33,6 +34,7 @@ public:
         srv_SaveMap.shutdown();
         srv_getMaps.shutdown();
         srv_PathPlan.shutdown();
+        srv_AskedNextPathStep.shutdown();
     }
 
 
@@ -43,6 +45,7 @@ private:
     ros::ServiceServer srv_SaveMap;
     ros::ServiceServer srv_getMaps;
     ros::ServiceServer srv_PathPlan;
+    ros::ServiceServer srv_AskedNextPathStep;
     ros::NodeHandle n;
 
     void rosNodeInit();
@@ -53,6 +56,8 @@ private:
     bool srvGetMap(topology_map::GetMaps::Request &, topology_map::GetMaps::Response &);
     bool srvPathPlanning(topology_map::PathPlanning::Request &, 
                          topology_map::PathPlanning::Response &);
+    bool srvAskedPathStep(topology_map::NextStepOfPath::Request &,
+                          topology_map::NextStepOfPath::Response &);
 };
 
 MapROSNode::MapROSNode() {
@@ -123,6 +128,8 @@ void MapROSNode::rosNodeInit() {
             &MapROSNode::srvGetMap, this);
     srv_PathPlan = n.advertiseService(TOPO_STD_SERVICE_NAME_PATHPLANNING, 
             &MapROSNode::srvPathPlanning, this);
+    srv_AskedNextPathStep = n.advertiseService(TOPO_STD_SERVICE_NAME_ASKINGNEXTSTEP,
+            &MapROSNode::srvAskedPathStep, this);
 
 }
 
@@ -167,6 +174,35 @@ bool MapROSNode::srvPathPlanning(topology_map::PathPlanning::Request& req,
     } else {
         return false;
     }
+}
+
+bool MapROSNode::srvAskedPathStep(topology_map::NextStepOfPath::Request& req,
+                                  topology_map::NextStepOfPath::Response& res)
+{
+    TopoPath & topoPath = mapGroup.getMapCollection().getTopoPath();
+    if (topoPath.hasSteps2Go()) {
+        auto & path = topoPath.getPath();
+        auto progress = topoPath.getCurrentProgress();
+        auto & step = path[progress];
+        TopoNode* currentNode = step.beginNode;
+        res.gateId = currentNode->gateIdOfTheTopoEdge(step.stepEdge);
+        res.nRestEdge = path.size() - progress;
+        auto& exitInstance = currentNode->getInsCorrespond()->getExits()[res.gateId];
+        res.midPosX = exitInstance.getPosX();
+        res.midPosY = exitInstance.getPosY();
+        res.outDir = exitInstance.getOutDir();
+    } else {
+        if (!topoPath.isValid()) {
+            res.nRestEdge = -1;
+        }
+        else if (topoPath.isFinished()) {
+            res.nRestEdge = 0;
+        }
+        else if (!topoPath.isFollowingPath()) {
+            res.nRestEdge = -2;
+        }
+    }
+    return true;
 }
 
 #endif //TOPOLOGY_MAP_MAPNODE_HPP

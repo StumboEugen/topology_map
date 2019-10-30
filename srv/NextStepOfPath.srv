@@ -1,0 +1,6 @@
+---
+uint16 gateId
+float32 midPosX
+float32 midPosY
+float32 outDir
+int16 nRestEdge # the rest edges to move
