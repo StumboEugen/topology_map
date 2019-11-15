@@ -46,7 +46,6 @@ void MapArranger::arriveInstance(NodeInstance *instance, gateId arriveAt,
         mapCollection.addNewMap(newMap);
 //        newMap.second->setPosInList(newPos);
     }
-    experiences ++;
 }
 
 /**
@@ -165,11 +164,21 @@ bool MapArranger::readFromJSON(const JSobj &obj) {
         /**
          * construct the node collection
          */
+
+//        for (const auto & theIns: nodeInsesDict) {
+//            if (theIns != nullptr) {
+//                nodeCollection.addInstanceDirectly(theIns);
+//            }
+//        }
+
         for (const auto & theIns: nodeInsesDict) {
-            if (theIns != nullptr) {
-                nodeCollection.addInstanceDirectly(theIns);
+            if (theIns == nullptr) {
+                cerr << __FILE__ << ":" << __LINE__ << "the dict has empty nodes!" << endl;
             }
         }
+        nodeCollection.addInstancesFromVector(std::move(nodeInsesDict));
+
+
     } catch (exception & e) {
         cerr << "decode JSON file FAIL!\n" << e.what() << endl;
         return false;
@@ -203,7 +212,7 @@ bool MapArranger::readFromStr(const std::string & str) {
 /**
  * @brief load the file according to the file name
  * if fail, the whole group will be cleared.
- * @param fileName default is ~/topoMaps/<fileName>.
+ * @param fileName default is ~/topoMaps/${fileName}.
  * @return if the reload is successful
  * @see TopoFile::setFileName(string fileName)
  */
@@ -253,4 +262,12 @@ string MapArranger::toString(size_t mapCount) {
     std::unique_ptr<Json::StreamWriter> const writer(builder.newStreamWriter());
     writer->write(toJS(mapCount), &ss);
     return std::move(ss.str());
+}
+
+/**
+ * @brief 当前已经走过的 NodeInstance 数量
+ */
+size_t MapArranger::experienceNum()
+{
+    return nodeCollection.experienceSize();
 }

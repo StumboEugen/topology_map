@@ -204,7 +204,8 @@ int NodeInstance::alike(const NodeInstance & rnode) const {
  * ENU
  * @param arriveAt the arriving at Exit ID of this instance
  * @param odomX the odom movement since last instance in X
- * @param odomY the odom movement since last instance in X
+ * @param odomY the odom movement since last instance in Y
+ * @param yaw the odom turned since last instance in degree (unused)
  * @return the built ROS msg structure
  * @todo split this(ROS related) out of the lib
  */
@@ -239,11 +240,11 @@ NodeInstance::encode2ROSmsg(unsigned char arriveAt,
  */
 JSobj NodeInstance::toJS() const {
     JSobj obj;
-    obj["No"] = serialNumber;
+//    obj["No"] = serialNumber;
     obj["Extra"] = extraMsg;
     auto & exitJS = obj["Exits"];
     for (const auto & exit: exits) {
-        exitJS.append(exit.toJS());
+        exitJS.append(std::move(exit.toJS()));
     }
     return std::move(obj);
 }
@@ -304,6 +305,23 @@ gateId NodeInstance::figureOutWhichExitItis(double posx, double posy) {
         }
     }
     return static_cast<gateId>(ans);
+}
+
+/**
+ * @brief find the related TopoNode of given MapCandidate
+ * @param givenMap the key MapCandidate you would like to find
+ * @return the Node usage in the given MapCandidate, if not found, return nullptr
+ */
+TopoNode* NodeInstance::getNodeUsageOfGivenMap(MapCandidate* givenMap) const
+{
+    auto it = nodeUseages.find(givenMap);
+    if (it == nodeUseages.end()) {
+        cerr << __FILE__ << ":" << __LINE__ << "[ERROR] you find inexist useage in "
+                                               "NodeInstance!" << endl;
+        return nullptr;
+    } else {
+        return it->second;
+    }
 }
 
 

@@ -29,7 +29,7 @@ const std::string topo::getCurrentTimeString() {
  * @param js the target JSON object
  * @return if the JSON object has all of these string members
  */
-bool topo::checkJSMember(const vector<std::string> &strs, const JSobj &js) {
+bool topo::checkJSMember(const std::vector<std::string> &strs, const JSobj &js) {
     for (const auto & str: strs) {
         if(js.isMember(str)) {
             continue;

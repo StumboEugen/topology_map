@@ -49,9 +49,8 @@ public:
     // clean everything, data, ptrs
     void selfClean();
 
-    size_t experienceNum() {
-        return experiences;
-    }
+    // 当前已经走过的 NodeInstance 数量
+    size_t experienceNum();
 
     const string &getMapName() const {
         return mapName;
@@ -83,8 +82,6 @@ public:
     }
 
 private:
-    /// the NodeInstance that has moved through
-    size_t experiences = 0;
 
     /// the NodeCollection
     NodeCollection nodeCollection;

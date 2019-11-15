@@ -40,12 +40,19 @@ public:
     // manually add a NodeInstance.
     void addInstanceDirectly(NodeInstance * newNode);
 
+    void addInstancesFromVector(std::vector<NodeInstance* > && nodeDict);
+
     const map<int, set<NodeInstance *>> &getNodeSets() const {
         return nodeSets;
     }
 
     size_t experienceSize() const {
         return experiences.size();
+    }
+
+    const vector<NodeInstance*>& getExperiences() const
+    {
+        return experiences;
     }
 
 private:

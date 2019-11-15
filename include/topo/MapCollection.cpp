@@ -13,6 +13,7 @@
  * @param arriveAt the gate just arrived at
  * @param dis_x distance x since last move
  * @param dis_y distance y since last move
+ * @param yaw orientation since last move (unused)
  */
 void MapCollection::arriveNodeInstance(NodeInstance *instance, uint8_t arriveAt,
                                        double dis_x, double dis_y, double yaw) {
@@ -20,10 +21,19 @@ void MapCollection::arriveNodeInstance(NodeInstance *instance, uint8_t arriveAt,
         auto firstMap = new MapCandidate(instance);
         maps.insert(firstMap);
     } else {
+
+        MapCandidate* currentPathRelatedMap = currentPath.getRelatedMap();
+
         auto iter = maps.begin();
         while (iter != maps.end()) {
             auto & map = *iter;
             if(!map->arriveAtNode(instance, arriveAt, dis_x, dis_y, yaw)) {
+
+                if (currentPathRelatedMap == map)
+                {
+                    currentPath.setInvalid();
+                }
+
                 map->removeUseages();
                 delete map;
                 iter = maps.erase(iter);
@@ -32,6 +42,8 @@ void MapCollection::arriveNodeInstance(NodeInstance *instance, uint8_t arriveAt,
             }
         }
     }
+
+    currentPath.stepForward();
 }
 
 /**
@@ -169,9 +181,12 @@ void MapCollection::purgeBadMaps(int survivorCount) {
     sortByConfidence(static_cast<size_t>(survivorCount));
 
     for (int i = survivorCount; i < orderedMaps.size(); i++) {
-        auto map2delete = orderedMaps[i];
+        MapCandidate* map2delete = orderedMaps[i];
         map2delete->removeUseages();
         maps.erase(map2delete);
+        if (currentPath.getRelatedMap() == map2delete) {
+            currentPath.setInvalid();
+        }
         delete map2delete;
     }
 

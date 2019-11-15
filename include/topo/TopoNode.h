@@ -37,6 +37,9 @@ public:
     // rotate the exits' ID
     void ringRotate(int diff);
 
+    // a simple tool to find which gateId is the topoNode at
+    gateId gateIdOfTheTopoEdge(TopoEdge *targetEdge) const;
+
     // convert the TopoNode to JSON structure
     JSobj toJS() const;
 
@@ -73,7 +76,7 @@ public:
         relatedInses.push_back(ins);
     }
 
-    const vector<NodeInstance *> & getRelatedInses() const {
+    const std::vector<NodeInstance *> & getRelatedInses() const {
         return relatedInses;
     }
 
@@ -82,7 +85,7 @@ public:
         edgeConnected[number] = nullptr;
     }
 
-    const vector<TopoEdge *> & getEdgeConnected() const {
+    const std::vector<TopoEdge *> & getEdgeConnected() const {
         return edgeConnected;
     }
 

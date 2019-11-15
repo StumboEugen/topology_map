@@ -65,12 +65,15 @@ private:
     ros::Publisher pub_nodeInfo;
     ros::Publisher pub_gateMove;
     ros::ServiceClient srvC_askMaps;
+    ros::ServiceClient srvC_pathPlanning;
 
     bool checkROS();
 
     MapArranger mapFromReading;
     MapArranger mapFromBuilding;
     MapArranger mapFromRealTime;
+
+    MapCandidate * currentDrawnMap;
 
     QHBoxLayout * centerLayout;
 
@@ -102,8 +105,11 @@ private:
 
     QDockWidget * initTheDock(const char *objectName);
 
-    void displayMapAtMapGV(MapCandidate &, bool drawRobot = false, bool detailed = true, bool
-            movable = false);
+    void displayMapAtMapGV(MapCandidate &,
+            bool drawRobot = false,
+            bool detailed = true,
+            bool movable = false,
+            bool fillInsOdom = false);
 
     bool loadMapGroupFromFile(const QString & fileName, MapArranger & dist);
 

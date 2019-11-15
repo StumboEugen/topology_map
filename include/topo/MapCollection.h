@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include "TopoTools.h"
+#include "TopoPath.h"
 
 class MapArranger;
 /**
@@ -76,6 +77,10 @@ public:
         return sumOfConfidence;
     }
 
+    TopoPath & getTopoPath() {
+        return currentPath;
+    }
+
 private:
     /// the MapArranger that owns this MapCollection
     MapArranger * const parent;
@@ -91,6 +96,9 @@ private:
     /// the sum of all maps' confidence, for easy normalization
     /// @see calSumOfConfidence()
     double sumOfConfidence = 0.0;
+
+    /// the planned path storage
+    TopoPath currentPath;
 };
 
 

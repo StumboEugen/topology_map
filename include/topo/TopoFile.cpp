@@ -8,14 +8,12 @@
 #include <pwd.h>
 #include <vector>
 #include <iostream>
-#include <fstream>
-
 
 using namespace std;
 
 /**
  * @brief constructor, the file's Name can be assigned
- * @param fileName the path of the file, default("") is ~/topoMaps/<current Time>.
+ * @param fileName the path of the file, default("") is ~/topoMaps/${current Time}.
  * absolute path is not supported
  * @note \b example:
  * filename = abc/map will create the map at ~/abc/map
@@ -36,7 +34,7 @@ void TopoFile::chDir2UserPath() {
 
 /**
  * @brief set the file path
- * @param fileName the path of the file, default("") is ~/topoMaps/<current Time>.
+ * @param fileName the path of the file, default("") is ~/topoMaps/${current Time}.
  * absolute path is not supported
  * @note \b example:
  * filename = abc/map will create the map at ~/abc/map

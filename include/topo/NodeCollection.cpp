@@ -2,10 +2,8 @@
 // Created by stumbo on 18-5-21.
 //
 
-#include <iostream>
 #include <vector>
 #include <list>
-#include <set>
 #include <map>
 #include <tuple>
 
@@ -41,6 +39,8 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
                              dis_y + lastIns->getGlobalY(),
                              dis + lastIns->getTravelDis());
     }
+
+    newIns->setSerialNumber(experiences.size());
     experiences.push_back(newIns);
 
     ///////////////////// find similiar NodeInstance s
@@ -114,11 +114,19 @@ vector<MapCandidate *> NodeCollection::addInstanceAndCompare
  */
 JSobj NodeCollection::toJS() const {
     JSobj obj;
-    for (const auto & nodeSet: nodeSets) {
-        for (const auto & node: nodeSet.second) {
-            obj.append(node->toJS());
-        }
+
+    for (size_t i = 0; i < experiences.size(); ++i)
+    {
+        auto nodeJS = experiences[i]->toJS();
+        nodeJS["No"] = i;
+        obj.append(std::move(nodeJS));
     }
+
+//    for (const auto & nodeSet: nodeSets) {
+//        for (const auto & node: nodeSet.second) {
+//            obj.append(node->toJS());
+//        }
+//    }
     return std::move(obj);
 }
 
@@ -143,6 +151,7 @@ void NodeCollection::clear() {
  */
 void NodeCollection::addInstanceDirectly(NodeInstance *newNode) {
     nodeSets[newNode->sizeOfExits()].insert(newNode);
+    newNode->setSerialNumber(experiences.size());
     experiences.push_back(newNode);
 }
 
@@ -155,4 +164,12 @@ NodeCollection::NodeCollection(MapArranger *parent):
         parent(parent)
 {
 
+}
+
+void NodeCollection::addInstancesFromVector(std::vector<NodeInstance*>&& nodeDict)
+{
+    experiences = std::move(nodeDict);
+    for (const auto node : experiences) {
+        nodeSets[node->sizeOfExits()].insert(node);
+    }
 }

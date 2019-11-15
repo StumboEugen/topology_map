@@ -85,3 +85,25 @@ void TopoNode::ringRotate(int diff) {
     }
 }
 
+/**
+ * @brief get the gate id of the input topo edge, a tool function
+ * @param targetEdge the edge to search through
+ * @return the related gate id
+ * @warning if a wrong edge is inputed, the return will be 255
+ */
+gateId TopoNode::gateIdOfTheTopoEdge(TopoEdge *targetEdge) const
+{
+    for (int i = 0; i < edgeConnected.size(); i++)
+    {
+        if (targetEdge == edgeConnected.at(i))
+        {
+            return i;
+        }
+    }
+
+    cerr << __FILE__ << ":" << __LINE__
+         << " [ERROR] the edge you search doesn't belong to the Node!"<< endl;
+
+    return -1;
+}
+

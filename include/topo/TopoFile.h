@@ -26,7 +26,7 @@
 /**
  * @brief a tool class for TopoMap IO.
  * @note
- * \b step1 set the file name, the default file would be at ~/topoMaps/<current Time> <br>
+ * \b step1 set the file name, the default file would be at ~/topoMaps/${current Time} <br>
  * \b step2 call open <br>
  * \b step3 call outputMap or intputMap
  *
@@ -71,7 +71,7 @@ private: // functions
 
 private: // members
     /// the spliter used in JSON file, for compress, use ""
-    std::string spliter = "";
+    std::string spliter = "\t";
 
     /// the file's path
     std::string filePath;
