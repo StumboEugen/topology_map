@@ -1,6 +1,8 @@
 # topology_map
 navigation based on topo map
 
+Departured, currently working on Tmapping
+
 
 # BASIC STEPS
 
